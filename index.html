@@ -343,6 +343,16 @@
       line-height: 1.6;
     }
 
+    .growth-breakdown {
+      margin-top: 12px;
+      padding: 12px 14px;
+      border-radius: 16px;
+      background: rgba(255, 250, 242, 0.82);
+      color: #4f4a43;
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
     .today-story-card {
       margin-top: 14px;
       padding: 18px;
@@ -1192,6 +1202,28 @@
                 </div>
               </div>
               <div class="field full">
+                <label>今天吃得健康营养丰富吗</label>
+                <div class="toggle-group">
+                  <input id="healthyFoodNo" type="radio" name="healthyFood" value="false" checked />
+                  <label for="healthyFoodNo">否</label>
+                  <input id="healthyFoodYes" type="radio" name="healthyFood" value="true" />
+                  <label for="healthyFoodYes">是</label>
+                </div>
+              </div>
+              <div class="field full">
+                <label>今天吃了外面的食物吗</label>
+                <div class="toggle-group">
+                  <input id="ateOutNo" type="radio" name="ateOut" value="false" checked />
+                  <label for="ateOutNo">否</label>
+                  <input id="ateOutYes" type="radio" name="ateOut" value="true" />
+                  <label for="ateOutYes">是</label>
+                </div>
+              </div>
+              <div class="field">
+                <label for="completedTasks">完成工作事项数</label>
+                <input id="completedTasks" name="completedTasks" type="number" min="0" max="20" step="1" placeholder="例如 2" />
+              </div>
+              <div class="field full">
                 <label for="mood">心情备注</label>
                 <textarea id="mood" name="mood" placeholder="例如：稳定、神清气爽、提不起劲"></textarea>
               </div>
@@ -1225,18 +1257,19 @@
               <div class="summary-subtitle" id="todayMoodValue">还没有记录，先填一条试试看。</div>
             </div>
             <div class="summary-card growth-card">
-              <div class="summary-label">复利成长值</div>
+              <div class="summary-label">能量仪表盘</div>
               <div class="growth-meter" id="growthMeter">
                 <div class="growth-meter-inner">
                   <strong id="todayGrowthScore">--</strong>
-                  <span>今日成长分</span>
+                  <span>今日能量值</span>
                 </div>
               </div>
-              <div class="summary-subtitle" id="growthSummary">先连续记录，仪表盘就会开始显示你和昨天的差值。</div>
+              <div class="summary-subtitle" id="growthSummary">先连续记录，仪表盘就会开始显示你的加分项和消耗项。</div>
               <div class="growth-meta">
                 <strong class="growth-delta neutral" id="growthDelta">昨天暂无记录</strong>
-                <span class="growth-baseline" id="growthBaseline">今天的进步先从把第一条记录写下来开始。</span>
+                <span class="growth-baseline" id="growthBaseline">今天的能量底盘先从昨晚睡眠开始算起。</span>
               </div>
+              <div class="growth-breakdown" id="energyBreakdown">睡眠底盘、饮食、锻炼和工作消耗都会显示在这里。</div>
             </div>
             <div class="vitals">
               <div class="vital">
@@ -1254,6 +1287,10 @@
               <div class="vital">
                 <span>训练 / 做饭</span>
                 <strong id="todayHabitsValue">--</strong>
+              </div>
+              <div class="vital">
+                <span>营养 / 外食 / 工作</span>
+                <strong id="todayFuelValue">--</strong>
               </div>
               <div class="vital">
                 <span>今日体重</span>
@@ -1365,7 +1402,7 @@
           </div>
           <div class="data-pill">
             <span>导出格式</span>
-            <strong id="dataFormatValue">v4 JSON</strong>
+            <strong id="dataFormatValue">v5 JSON</strong>
             <small id="dataUpdatedValue">等待第一条记录</small>
           </div>
         </div>
@@ -1384,7 +1421,7 @@
         storageKey: "michael-energy-tracker-v1",
         seededKey: "michael-energy-tracker-seeded",
         templateSettingsKey: "michael-energy-template-settings-v1",
-        exportVersion: 4,
+        exportVersion: 5,
         obsidianVault: "Michael&Jarvis",
         obsidianFolder: "我的训练日志",
         reminderSleepThreshold: 60,
@@ -1439,10 +1476,12 @@
         growthSummary: document.getElementById("growthSummary"),
         growthDelta: document.getElementById("growthDelta"),
         growthBaseline: document.getElementById("growthBaseline"),
+        energyBreakdown: document.getElementById("energyBreakdown"),
         todaySleepValue: document.getElementById("todaySleepValue"),
         todayTimeValue: document.getElementById("todayTimeValue"),
         todayWakeupsValue: document.getElementById("todayWakeupsValue"),
         todayHabitsValue: document.getElementById("todayHabitsValue"),
+        todayFuelValue: document.getElementById("todayFuelValue"),
         todayWeightValue: document.getElementById("todayWeightValue"),
         todayStoryValue: document.getElementById("todayStoryValue"),
         avgSleepScore: document.getElementById("avgSleepScore"),
@@ -1681,6 +1720,9 @@
             weight: this.normalizeNullableNumber(raw.weight),
             exercised: this.normalizeBoolean(raw.exercised) || workoutItems.length > 0,
             cooked: this.normalizeBoolean(raw.cooked),
+            healthyFood: this.normalizeBoolean(raw.healthyFood),
+            ateOut: this.normalizeBoolean(raw.ateOut),
+            completedTasks: this.normalizeNumber(raw.completedTasks, 0),
             mood: String(raw.mood || "").trim(),
             dailyStory: String(raw.dailyStory || raw.story || "").trim(),
             workoutItems
@@ -1694,6 +1736,7 @@
           if (entry.energy < 1 || entry.energy > 10) return "主观能量值需要在 1 到 10 之间。";
           if (entry.wakeups < 0 || entry.wakeups > 10) return "起夜次数需要在 0 到 10 之间。";
           if (entry.weight !== null && (entry.weight < 20 || entry.weight > 300)) return "今日体重请填写在 20 到 300 kg 之间。";
+          if (entry.completedTasks < 0 || entry.completedTasks > 20) return "完成工作事项数请填写在 0 到 20 之间。";
           const workoutError = WorkoutModel.validateItems(entry.workoutItems || []);
           if (workoutError) return workoutError;
           return "";
@@ -1722,7 +1765,7 @@
         getDefaultSeedEntries() {
           const year = new Date().getFullYear();
           return [
-            { date: `${year}-04-17`, sleepScore: 96, bedtime: "22:00", wakeTime: "05:20", wakeups: 0, energy: 10, weight: 68.1, exercised: false, cooked: false, mood: "太爽了", dailyStory: "一整天都很轻快，处理事情非常顺，晚上整个人像满电一样。", workoutItems: [] },
+            { date: `${year}-04-17`, sleepScore: 96, bedtime: "22:00", wakeTime: "05:20", wakeups: 0, energy: 10, weight: 68.1, exercised: false, cooked: false, healthyFood: true, ateOut: false, completedTasks: 1, mood: "太爽了", dailyStory: "一整天都很轻快，处理事情非常顺，晚上整个人像满电一样。", workoutItems: [] },
             {
               date: `${year}-04-18`,
               sleepScore: 47,
@@ -1733,6 +1776,9 @@
               weight: 68.8,
               exercised: true,
               cooked: true,
+              healthyFood: false,
+              ateOut: true,
+              completedTasks: 2,
               mood: "提不起劲",
               dailyStory: "白天明显有点拖，晚上还是硬撑着练了两项，算是没让节奏彻底掉下去。",
               workoutItems: [
@@ -1740,7 +1786,7 @@
                 { name: "拉伸", volume: "10 分钟", rating: 7, note: "训练后身体稍微舒展开一点。" }
               ]
             },
-            { date: `${year}-04-19`, sleepScore: 75, bedtime: "22:00", wakeTime: "06:00", wakeups: 1, energy: 7, weight: 68.4, exercised: false, cooked: true, mood: "神清气爽", dailyStory: "今天脑子很清楚，事情推进得比预期顺，整体状态在回正。", workoutItems: [] },
+            { date: `${year}-04-19`, sleepScore: 75, bedtime: "22:00", wakeTime: "06:00", wakeups: 1, energy: 7, weight: 68.4, exercised: false, cooked: true, healthyFood: true, ateOut: false, completedTasks: 1, mood: "神清气爽", dailyStory: "今天脑子很清楚，事情推进得比预期顺，整体状态在回正。", workoutItems: [] },
             {
               date: `${year}-04-20`,
               sleepScore: 74,
@@ -1751,6 +1797,9 @@
               weight: 68.0,
               exercised: true,
               cooked: true,
+              healthyFood: true,
+              ateOut: false,
+              completedTasks: 2,
               mood: "充实",
               dailyStory: "白天安排得比较满，但完成度不错，训练做完后感觉身体和精神都比较扎实。",
               workoutItems: [
@@ -1758,7 +1807,7 @@
                 { name: "悬垂举腿", volume: "14 个 x 1 组", rating: 7, note: "下放时继续慢一点会更稳。" }
               ]
             },
-            { date: `${year}-04-21`, sleepScore: 80, bedtime: "22:00", wakeTime: "06:00", wakeups: 0, energy: 8, weight: 67.9, exercised: false, cooked: true, mood: "稳定", dailyStory: "节奏比较稳，虽然没有训练，但吃饭和作息都守住了，整天推进感不错。", workoutItems: [] }
+            { date: `${year}-04-21`, sleepScore: 80, bedtime: "22:00", wakeTime: "06:00", wakeups: 0, energy: 8, weight: 67.9, exercised: false, cooked: true, healthyFood: true, ateOut: false, completedTasks: 1, mood: "稳定", dailyStory: "节奏比较稳，虽然没有训练，但吃饭和作息都守住了，整天推进感不错。", workoutItems: [] }
           ].map((entry) => this.normalize(entry));
         },
 
@@ -1961,63 +2010,33 @@
           return streak;
         },
 
-        calculateTargetTimeScore(actualMinutes, targetMinutes, spanMinutes, maxScore) {
-          if (actualMinutes === null) return 0;
-          const offset = Math.abs(actualMinutes - targetMinutes);
-          const ratio = Math.max(0, 1 - offset / spanMinutes);
-          return ratio * maxScore;
-        },
-
-        calculateWorkoutCharge(entry) {
-          if (!EntryModel.isExerciseDay(entry)) return 0;
-          const workoutItems = WorkoutModel.normalizeItems(entry.workoutItems);
-          const averageRating = WorkoutModel.getAverageRating(workoutItems);
-          const detailBonus = Math.min(2, workoutItems.length * 0.5);
-          const ratingBonus = averageRating === null ? 0.5 : (averageRating / 10) * 2;
-          return Math.min(10, 6 + detailBonus + ratingBonus);
-        },
-
-        calculateStoryReflectionScore(story) {
-          const length = String(story || "").trim().length;
-          if (!length) return 0;
-          if (length >= 40) return 5;
-          return 2 + (length / 40) * 3;
-        },
-
         calculateGrowthScore(entry) {
           if (!entry) {
             return {
               total: 0,
-              sleepCharge: 0,
-              routineCharge: 0,
-              actionCharge: 0,
-              foodCharge: 0,
-              reflectionCharge: 0
+              sleepBase: 0,
+              nutritionBonus: 0,
+              exerciseBonus: 0,
+              outsidePenalty: 0,
+              taskPenalty: 0
             };
           }
 
-          const sleepCharge = (entry.sleepScore / 100) * 38;
-          const bedtimeCharge = this.calculateTargetTimeScore(DateUtils.bedtimeComparableMinutes(entry.bedtime), 22 * 60, 180, 12);
-          const wakeCharge = this.calculateTargetTimeScore(DateUtils.timeToMinutes(entry.wakeTime), 6 * 60, 150, 8);
-          const energyCharge = (entry.energy / 10) * 15;
-          const workoutCharge = this.calculateWorkoutCharge(entry);
-          const foodCharge = entry.cooked ? 6 : 0;
-          const storyCharge = this.calculateStoryReflectionScore(entry.dailyStory);
-          const weightCharge = entry.weight === null ? 0 : 3;
-          const moodCharge = entry.mood ? 3 : 0;
-          const total = this.clamp(
-            sleepCharge + bedtimeCharge + wakeCharge + energyCharge + workoutCharge + foodCharge + storyCharge + weightCharge + moodCharge,
-            0,
-            100
-          );
+          const sleepBase = entry.sleepScore * 0.6;
+          const nutritionBonus = entry.healthyFood ? 10 : 0;
+          const exerciseBonus = EntryModel.isExerciseDay(entry) ? 10 : 0;
+          const outsidePenalty = entry.ateOut ? 10 : 0;
+          const taskPenalty = Math.max(0, entry.completedTasks) * 10;
+          const rawTotal = sleepBase + nutritionBonus + exerciseBonus - outsidePenalty - taskPenalty;
+          const total = this.clamp(rawTotal, 0, 100);
 
           return {
             total,
-            sleepCharge,
-            routineCharge: bedtimeCharge + wakeCharge,
-            actionCharge: energyCharge + workoutCharge,
-            foodCharge,
-            reflectionCharge: storyCharge + weightCharge + moodCharge
+            sleepBase,
+            nutritionBonus,
+            exerciseBonus,
+            outsidePenalty,
+            taskPenalty
           };
         },
 
@@ -2038,38 +2057,37 @@
           const yesterdayEntry = entryMap.get(DateUtils.addDays(targetEntry.date, -1)) || null;
           const yesterdayScore = yesterdayEntry ? this.calculateGrowthScore(yesterdayEntry) : null;
           const delta = yesterdayScore ? todayScore.total - yesterdayScore.total : null;
-
-          const focusAreas = [
-            { label: "睡眠底盘", value: todayScore.sleepCharge + todayScore.routineCharge },
-            { label: "行动充电", value: todayScore.actionCharge },
-            { label: "饮食稳定", value: todayScore.foodCharge },
-            { label: "记录校准", value: todayScore.reflectionCharge }
-          ].sort((left, right) => right.value - left.value);
-
-          const topArea = focusAreas[0];
           let deltaText = "昨天暂无记录";
           let deltaClass = "neutral";
-          let summary = `今天最稳的是${topArea.label}，这个部分正在托住你整天的状态。`;
+          let summary = "睡眠是你的主电池，饮食和锻炼是补给，外食和工作事项会消耗电量。";
 
           if (delta !== null) {
             if (delta >= 0.01) {
               deltaText = `比昨天 +${delta.toFixed(2)} 分`;
               deltaClass = "positive";
               summary = delta >= 1
-                ? "今天比昨天更稳，复利已经在往上累。"
+                ? "今天比昨天电量更稳，说明你的底盘和补给在起作用。"
                 : "今天比昨天小幅更好，哪怕只多 0.01 分也值得看见。";
             } else if (delta <= -0.01) {
               deltaText = `比昨天 ${delta.toFixed(2)} 分`;
               deltaClass = "negative";
               summary = delta <= -1
-                ? "今天比昨天有些回落，明天优先把底盘环节拉回来。"
+                ? "今天比昨天掉了一些电，优先补睡眠或减少额外消耗。"
                 : "今天和昨天很接近，稍微回落一点，调一个小动作就能追上。";
             } else {
               deltaText = "和昨天基本持平";
               deltaClass = "neutral";
-              summary = "今天和昨天非常接近，继续把稳定变成长期优势。";
+              summary = "今天和昨天的电量结构很接近，继续把稳定变成长期优势。";
             }
           }
+
+          const breakdown = [
+            `睡眠 ${todayScore.sleepBase.toFixed(1)}`,
+            `营养 +${todayScore.nutritionBonus}`,
+            `锻炼 +${todayScore.exerciseBonus}`,
+            `外食 -${todayScore.outsidePenalty}`,
+            `工作 -${todayScore.taskPenalty}`
+          ].join(" ｜ ");
 
           return {
             score: todayScore.total,
@@ -2077,7 +2095,8 @@
             deltaText,
             deltaClass,
             summary,
-            baseline: `当前最强项：${topArea.label}。先把强项守住，再慢慢补短板。`
+            baseline: `主观能量 ${targetEntry.energy}/10。先看这个仪表盘，再和你自己的体感做校准。`,
+            breakdown
           };
         },
 
@@ -2554,9 +2573,12 @@
           elements.bedtimeSlider.value = 22 * 60;
           elements.wakeTimeSlider.value = 6 * 60;
           elements.form.weight.value = "";
+          elements.form.completedTasks.value = "";
           elements.form.dailyStory.value = "";
           document.getElementById("exerciseNo").checked = true;
           document.getElementById("cookedNo").checked = true;
+          document.getElementById("healthyFoodNo").checked = true;
+          document.getElementById("ateOutNo").checked = true;
           this.clearWorkoutEditor();
           this.syncAllSliders();
           this.setFormMode("保存或更新当天记录");
@@ -2570,10 +2592,13 @@
           elements.form.wakeups.value = entry.wakeups;
           elements.form.energy.value = entry.energy;
           elements.form.weight.value = entry.weight ?? "";
+          elements.form.completedTasks.value = entry.completedTasks ?? 0;
           elements.form.mood.value = entry.mood || "";
           elements.form.dailyStory.value = entry.dailyStory || "";
           document.getElementById(EntryModel.isExerciseDay(entry) ? "exerciseYes" : "exerciseNo").checked = true;
           document.getElementById(entry.cooked ? "cookedYes" : "cookedNo").checked = true;
+          document.getElementById(entry.healthyFood ? "healthyFoodYes" : "healthyFoodNo").checked = true;
+          document.getElementById(entry.ateOut ? "ateOutYes" : "ateOutNo").checked = true;
           this.renderWorkoutEditor(entry.workoutItems || []);
           this.syncAllSliders();
           this.setFormMode(`正在编辑：${DateUtils.formatShortDate(entry.date)}`);
@@ -2591,11 +2616,14 @@
           elements.growthDelta.classList.remove("positive", "negative", "neutral");
           elements.growthDelta.classList.add(dashboard.deltaClass);
           elements.growthBaseline.textContent = dashboard.baseline;
+          elements.energyBreakdown.textContent = dashboard.breakdown || "睡眠底盘、饮食、锻炼和工作消耗都会显示在这里。";
         },
 
         renderTodaySummary(latestEntry) {
+          const todayISO = DateUtils.getTodayISO();
+          elements.heroDateLabel.textContent = `今天 · ${DateUtils.formatDateLabel(todayISO)}`;
+
           if (!latestEntry) {
-            elements.heroDateLabel.textContent = `今天 · ${DateUtils.formatDateLabel(DateUtils.getTodayISO())}`;
             elements.todayStatusLabel.textContent = "还没有记录";
             elements.todayEnergyValue.textContent = "--";
             elements.todayMoodValue.textContent = "还没有记录，先填一条试试看。";
@@ -2603,19 +2631,22 @@
             elements.todayTimeValue.textContent = "--";
             elements.todayWakeupsValue.textContent = "--";
             elements.todayHabitsValue.textContent = "--";
+            elements.todayFuelValue.textContent = "--";
             elements.todayWeightValue.textContent = "--";
             elements.todayStoryValue.textContent = "还没有记录，后面这里会变成你当天的简短复盘，也会一起发进 Obsidian。";
             return;
           }
 
-          elements.heroDateLabel.textContent = `最新记录 · ${DateUtils.formatDateLabel(latestEntry.date)}`;
-          elements.todayStatusLabel.textContent = `最新记录：${DateUtils.formatShortDate(latestEntry.date)}`;
+          elements.todayStatusLabel.textContent = latestEntry.date === todayISO
+            ? `今天已保存：${DateUtils.formatShortDate(latestEntry.date)}`
+            : `最新记录：${DateUtils.formatShortDate(latestEntry.date)} · 今天 ${DateUtils.formatShortDate(todayISO)} 还没保存`;
           elements.todayEnergyValue.textContent = `${latestEntry.energy}/10`;
           elements.todayMoodValue.textContent = latestEntry.mood || "没有填写心情备注";
           elements.todaySleepValue.textContent = `${latestEntry.sleepScore} 分`;
           elements.todayTimeValue.textContent = `${latestEntry.bedtime} / ${latestEntry.wakeTime}`;
           elements.todayWakeupsValue.textContent = `${latestEntry.wakeups} 次`;
           elements.todayHabitsValue.textContent = `${EntryModel.getWorkoutSummary(latestEntry)} / ${latestEntry.cooked ? "做饭" : "未做饭"}`;
+          elements.todayFuelValue.textContent = `${latestEntry.healthyFood ? "营养好" : "营养弱"} / ${latestEntry.ateOut ? "外食" : "未外食"} / 工作 ${latestEntry.completedTasks}`;
           elements.todayWeightValue.textContent = this.formatWeight(latestEntry.weight);
           elements.todayStoryValue.textContent = latestEntry.dailyStory || "今天还没有补充事件记录。";
         },
@@ -2685,7 +2716,7 @@
                       <div class="record-date">${DateUtils.formatShortDate(entry.date)}</div>
                       <span class="chip">睡眠 ${entry.sleepScore}</span>
                       <span class="chip">能量 ${entry.energy}/10</span>
-                      <span class="chip">成长 ${growthDashboard.score.toFixed(2)}</span>
+                      <span class="chip">仪表盘 ${growthDashboard.score.toFixed(2)}</span>
                       ${entry.weight !== null ? `<span class="chip">体重 ${this.formatWeight(entry.weight)}</span>` : ""}
                       ${workoutItems.length ? `<span class="chip">训练 ${workoutItems.length} 项</span>` : ""}
                       ${workoutAverage !== null ? `<span class="chip">训练状态 ${workoutAverage.toFixed(1)}</span>` : ""}
@@ -2694,6 +2725,9 @@
                       入睡 ${this.escapeHtml(entry.bedtime)}，起床 ${this.escapeHtml(entry.wakeTime)}，起夜 ${entry.wakeups} 次，
                       ${workoutSummary}，
                       ${entry.cooked ? "自己做饭" : "没做饭"}，
+                      ${entry.healthyFood ? "营养补给到位" : "营养补给一般"}，
+                      ${entry.ateOut ? "有外食" : "没有外食"}，
+                      完成工作 ${entry.completedTasks} 项，
                       体重 ${this.formatWeight(entry.weight)}。<br />
                       心情：${mood}
                     </div>
@@ -2761,6 +2795,9 @@
             weight: formData.get("weight"),
             exercised: formData.get("exercised") === "true" || workoutItems.length > 0,
             cooked: formData.get("cooked"),
+            healthyFood: formData.get("healthyFood"),
+            ateOut: formData.get("ateOut"),
+            completedTasks: formData.get("completedTasks"),
             mood: formData.get("mood"),
             dailyStory: formData.get("dailyStory"),
             workoutItems
@@ -2786,10 +2823,14 @@
             `- 今日体重：${UI.formatWeight(entry.weight)}`,
             `- 训练概览：${workoutSummary}${workoutAverage !== null ? `，平均状态 ${workoutAverage.toFixed(1)}/10` : ""}`,
             `- 自己做饭：${entry.cooked ? "是" : "否"}`,
+            `- 健康营养补给：${entry.healthyFood ? "是" : "否"}`,
+            `- 外食：${entry.ateOut ? "是" : "否"}`,
+            `- 完成工作事项：${entry.completedTasks} 项`,
             `- 心情备注：${entry.mood || "无"}`,
-            `- 复利成长值：${growthDashboard.score === null ? "--" : growthDashboard.score.toFixed(2)}`,
+            `- 能量仪表盘：${growthDashboard.score === null ? "--" : growthDashboard.score.toFixed(2)}`,
             `- 与昨天对比：${growthDashboard.deltaText}`,
             `- 仪表盘解读：${growthDashboard.summary}`,
+            `- 加减分明细：${growthDashboard.breakdown || "无"}`,
             ""
           ];
 
