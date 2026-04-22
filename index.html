@@ -1,0 +1,1826 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="description" content="Michael 能量追踪器，一个为个人每日健康、睡眠、锻炼与能量节奏设计的单页网页应用。" />
+  <meta name="theme-color" content="#1e7b64" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>Michael 能量追踪器</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --bg: #f5efe4;
+      --bg-deep: #e8dcc6;
+      --panel: rgba(255, 250, 243, 0.88);
+      --panel-strong: rgba(255, 246, 234, 0.96);
+      --text: #1f2421;
+      --muted: #6e6a62;
+      --line: rgba(89, 73, 45, 0.12);
+      --accent: #1f7a5c;
+      --accent-soft: rgba(31, 122, 92, 0.14);
+      --accent-warm: #d17b1f;
+      --accent-hot: #c44536;
+      --warning: #c48a07;
+      --success: #2d8f4e;
+      --shadow: 0 18px 40px rgba(81, 57, 20, 0.12);
+      --radius-xl: 28px;
+      --radius-lg: 22px;
+      --radius-md: 18px;
+      --radius-sm: 14px;
+      --font-main: "Avenir Next", "SF Pro Display", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      --font-number: "DIN Alternate", "Avenir Next Condensed", "SF Pro Display", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: var(--font-main);
+      color: var(--text);
+      background:
+        radial-gradient(circle at top right, rgba(255, 180, 62, 0.22), transparent 26%),
+        radial-gradient(circle at top left, rgba(31, 122, 92, 0.18), transparent 28%),
+        linear-gradient(180deg, #fbf7ef 0%, #f1e5d2 100%);
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255, 255, 255, 0.18) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.14) 1px, transparent 1px);
+      background-size: 32px 32px;
+      mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.45), transparent 65%);
+      opacity: 0.25;
+    }
+
+    .app {
+      width: min(100%, 1080px);
+      margin: 0 auto;
+      padding: 22px 16px 48px;
+    }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      padding: 28px 22px;
+      border-radius: 34px;
+      color: #fff8ed;
+      background:
+        radial-gradient(circle at 85% 20%, rgba(255, 245, 218, 0.2), transparent 22%),
+        linear-gradient(135deg, #175b46 0%, #1e7b64 35%, #bb6a1b 100%);
+      box-shadow: var(--shadow);
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      right: -36px;
+      top: -40px;
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.08);
+      filter: blur(2px);
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.14);
+      font-size: 13px;
+      letter-spacing: 0.06em;
+    }
+
+    .hero h1 {
+      margin: 16px 0 10px;
+      font-size: clamp(30px, 8vw, 46px);
+      line-height: 1.06;
+    }
+
+    .hero p {
+      margin: 0;
+      max-width: 640px;
+      color: rgba(255, 248, 237, 0.86);
+      font-size: 15px;
+      line-height: 1.7;
+    }
+
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .hero-meta span {
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.12);
+      font-size: 13px;
+      color: rgba(255, 248, 237, 0.95);
+    }
+
+    .status-banner {
+      margin-top: 14px;
+      padding: 12px 14px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.12);
+      font-size: 14px;
+      color: rgba(255, 248, 237, 0.96);
+      opacity: 0;
+      transform: translateY(8px);
+      transition: 240ms ease;
+      pointer-events: none;
+    }
+
+    .status-banner.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .panel-grid {
+      display: grid;
+      gap: 16px;
+      margin-top: 18px;
+    }
+
+    .panel-grid.top {
+      grid-template-columns: 1.2fr 1fr;
+    }
+
+    .panel {
+      position: relative;
+      overflow: hidden;
+      background: var(--panel);
+      backdrop-filter: blur(18px);
+      border: 1px solid rgba(255, 255, 255, 0.48);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow);
+    }
+
+    .panel::after {
+      content: "";
+      position: absolute;
+      inset: auto -10% -70% auto;
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.15);
+      filter: blur(18px);
+      pointer-events: none;
+    }
+
+    .panel-content {
+      position: relative;
+      z-index: 1;
+      padding: 22px 18px;
+    }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .section-title h2,
+    .section-title h3 {
+      margin: 0;
+      font-size: 20px;
+      letter-spacing: 0.01em;
+    }
+
+    .section-title span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 1fr;
+      gap: 14px;
+    }
+
+    .summary-card {
+      padding: 18px;
+      border-radius: 22px;
+      background: linear-gradient(180deg, rgba(255, 252, 248, 0.9), rgba(255, 245, 231, 0.88));
+      border: 1px solid rgba(113, 95, 65, 0.08);
+    }
+
+    .summary-label {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .summary-value {
+      margin-top: 8px;
+      font-family: var(--font-number);
+      font-size: clamp(36px, 8vw, 56px);
+      line-height: 0.95;
+      letter-spacing: 0.02em;
+    }
+
+    .summary-subtitle {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .vitals {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .vital {
+      padding: 16px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.72);
+      border: 1px solid rgba(125, 99, 55, 0.08);
+    }
+
+    .vital span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .vital strong {
+      display: block;
+      margin-top: 8px;
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .field.full {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    input,
+    textarea,
+    select {
+      width: 100%;
+      padding: 14px 14px;
+      border: 1px solid rgba(109, 90, 60, 0.12);
+      border-radius: 16px;
+      font: inherit;
+      color: var(--text);
+      background: rgba(255, 252, 247, 0.96);
+      transition: border-color 180ms ease, transform 180ms ease, box-shadow 180ms ease;
+      appearance: none;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+      outline: none;
+      border-color: rgba(31, 122, 92, 0.52);
+      box-shadow: 0 0 0 4px rgba(31, 122, 92, 0.12);
+      transform: translateY(-1px);
+    }
+
+    textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    .toggle-row {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .toggle-group {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      padding: 4px;
+      border-radius: 18px;
+      background: rgba(229, 218, 199, 0.6);
+    }
+
+    .toggle-group input {
+      display: none;
+    }
+
+    .toggle-group label {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 46px;
+      border-radius: 14px;
+      cursor: pointer;
+      color: #5c574e;
+      font-size: 14px;
+      transition: 180ms ease;
+    }
+
+    .toggle-group input:checked + label {
+      background: linear-gradient(135deg, #1f7a5c, #24936d);
+      color: #fff;
+      box-shadow: 0 8px 18px rgba(31, 122, 92, 0.2);
+    }
+
+    .button-row,
+    .manage-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .data-overview {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .data-pill {
+      padding: 16px;
+      border-radius: 18px;
+      background: rgba(255, 250, 242, 0.9);
+      border: 1px solid rgba(109, 90, 60, 0.12);
+    }
+
+    .data-pill span,
+    .data-pill small {
+      display: block;
+      color: var(--muted);
+    }
+
+    .data-pill span {
+      font-size: 12px;
+    }
+
+    .data-pill strong {
+      display: block;
+      margin-top: 8px;
+      font-size: 20px;
+      line-height: 1.3;
+    }
+
+    .data-pill small {
+      margin-top: 6px;
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    button {
+      border: none;
+      border-radius: 16px;
+      padding: 13px 18px;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 180ms ease, box-shadow 180ms ease, opacity 180ms ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 22px rgba(42, 34, 19, 0.12);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #1f7a5c, #2a926f);
+      color: #fff;
+    }
+
+    .btn-secondary {
+      background: rgba(255, 250, 242, 0.96);
+      color: var(--text);
+      border: 1px solid rgba(109, 90, 60, 0.12);
+    }
+
+    .btn-danger {
+      background: linear-gradient(135deg, #c44536, #dc5c4d);
+      color: #fff;
+    }
+
+    .btn-warning {
+      background: linear-gradient(135deg, #c48a07, #deac2b);
+      color: #fff;
+    }
+
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .metric {
+      padding: 18px 16px;
+      border-radius: 24px;
+      background: var(--panel-strong);
+      border: 1px solid rgba(120, 101, 71, 0.08);
+      min-height: 148px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .metric .kicker {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .metric .number {
+      margin-top: 14px;
+      font-family: var(--font-number);
+      font-size: clamp(30px, 7vw, 44px);
+      line-height: 1;
+    }
+
+    .metric .hint {
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .metric.trend {
+      background:
+        radial-gradient(circle at top right, rgba(209, 123, 31, 0.12), transparent 34%),
+        rgba(255, 247, 236, 0.98);
+    }
+
+    .trend-arrow {
+      font-size: clamp(38px, 8vw, 56px);
+      line-height: 1;
+      color: var(--accent-warm);
+    }
+
+    .chart-wrap {
+      position: relative;
+      height: 280px;
+      margin-top: 10px;
+    }
+
+    .reminder-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .reminder-item {
+      padding: 16px 18px;
+      border-radius: 18px;
+      border: 1px solid transparent;
+      line-height: 1.6;
+      font-size: 14px;
+      animation: riseIn 380ms ease both;
+    }
+
+    .reminder-item.red {
+      background: rgba(196, 69, 54, 0.1);
+      color: #8f2f24;
+      border-color: rgba(196, 69, 54, 0.16);
+    }
+
+    .reminder-item.yellow {
+      background: rgba(196, 138, 7, 0.12);
+      color: #8b6207;
+      border-color: rgba(196, 138, 7, 0.18);
+    }
+
+    .reminder-item.green {
+      background: rgba(45, 143, 78, 0.1);
+      color: #296d3d;
+      border-color: rgba(45, 143, 78, 0.16);
+    }
+
+    .reminder-item.neutral {
+      background: rgba(31, 122, 92, 0.1);
+      color: #205944;
+      border-color: rgba(31, 122, 92, 0.16);
+    }
+
+    .record-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .record-item {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      padding: 16px 16px;
+      border-radius: 20px;
+      background: rgba(255, 251, 245, 0.92);
+      border: 1px solid rgba(120, 101, 71, 0.08);
+    }
+
+    .record-head {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px 10px;
+      margin-bottom: 8px;
+    }
+
+    .record-date {
+      font-weight: 700;
+      font-size: 16px;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(31, 122, 92, 0.1);
+      color: #225946;
+      font-size: 12px;
+    }
+
+    .record-body {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .record-actions {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    .record-actions button {
+      padding: 10px 12px;
+      border-radius: 14px;
+      font-size: 13px;
+    }
+
+    .empty-state {
+      padding: 28px 18px;
+      text-align: center;
+      color: var(--muted);
+      border-radius: 20px;
+      border: 1px dashed rgba(109, 90, 60, 0.2);
+      background: rgba(255, 250, 243, 0.6);
+    }
+
+    .footer-note {
+      margin-top: 18px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .hidden-input {
+      display: none;
+    }
+
+    @keyframes riseIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 920px) {
+      .panel-grid.top,
+      .summary-grid,
+      .metrics-grid,
+      .data-overview {
+        grid-template-columns: 1fr;
+      }
+
+      .metric {
+        min-height: auto;
+      }
+    }
+
+    @media (max-width: 680px) {
+      .app {
+        padding: 14px 12px 40px;
+      }
+
+      .hero {
+        padding: 22px 18px;
+        border-radius: 28px;
+      }
+
+      .panel-content {
+        padding: 18px 16px;
+      }
+
+      .form-grid,
+      .toggle-row,
+      .vitals {
+        grid-template-columns: 1fr;
+      }
+
+      .record-item {
+        grid-template-columns: 1fr;
+      }
+
+      .record-actions {
+        justify-content: flex-end;
+      }
+
+      button {
+        width: 100%;
+      }
+
+      .button-row button,
+      .manage-row button {
+        width: calc(50% - 5px);
+      }
+    }
+
+    @media (max-width: 440px) {
+      .button-row button,
+      .manage-row button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="hero">
+      <div class="hero-badge">每日健康与能量管理仪表盘</div>
+      <h1>Michael 能量追踪器</h1>
+      <p>把睡眠、作息、锻炼、做饭和主观能量放在一个页面里，每天花几十秒记录，就能更快看见自己的节奏是否在变好。</p>
+      <div class="hero-meta">
+        <span id="heroDateLabel">今天</span>
+        <span>纯前端 · HTML + CSS + JS</span>
+        <span>数据保存在 localStorage</span>
+      </div>
+      <div class="status-banner" id="statusBanner"></div>
+    </header>
+
+    <section class="panel-grid top">
+      <article class="panel">
+        <div class="panel-content">
+          <div class="section-title">
+            <h2>今日录入</h2>
+            <span id="formModeLabel">保存或更新当天记录</span>
+          </div>
+          <form id="entryForm">
+            <div class="form-grid">
+              <div class="field">
+                <label for="entryDate">日期</label>
+                <input id="entryDate" name="entryDate" type="date" required />
+              </div>
+              <div class="field">
+                <label for="sleepScore">睡眠分</label>
+                <input id="sleepScore" name="sleepScore" type="number" min="0" max="100" placeholder="0-100" required />
+              </div>
+              <div class="field">
+                <label for="bedtime">入睡时间</label>
+                <input id="bedtime" name="bedtime" type="time" required />
+              </div>
+              <div class="field">
+                <label for="wakeTime">起床时间</label>
+                <input id="wakeTime" name="wakeTime" type="time" required />
+              </div>
+              <div class="field">
+                <label for="wakeups">起夜次数</label>
+                <input id="wakeups" name="wakeups" type="number" min="0" max="10" required />
+              </div>
+              <div class="field">
+                <label for="energy">主观能量值</label>
+                <input id="energy" name="energy" type="number" min="1" max="10" placeholder="1-10" required />
+              </div>
+              <div class="field full">
+                <label>今天有锻炼吗</label>
+                <div class="toggle-group">
+                  <input id="exerciseNo" type="radio" name="exercised" value="false" checked />
+                  <label for="exerciseNo">否</label>
+                  <input id="exerciseYes" type="radio" name="exercised" value="true" />
+                  <label for="exerciseYes">是</label>
+                </div>
+              </div>
+              <div class="field full">
+                <label>今天自己做饭了吗</label>
+                <div class="toggle-group">
+                  <input id="cookedNo" type="radio" name="cooked" value="false" checked />
+                  <label for="cookedNo">否</label>
+                  <input id="cookedYes" type="radio" name="cooked" value="true" />
+                  <label for="cookedYes">是</label>
+                </div>
+              </div>
+              <div class="field full">
+                <label for="mood">心情备注</label>
+                <textarea id="mood" name="mood" placeholder="例如：稳定、神清气爽、提不起劲"></textarea>
+              </div>
+            </div>
+            <div class="button-row">
+              <button class="btn-primary" type="submit">保存记录</button>
+              <button class="btn-secondary" id="resetFormBtn" type="button">重置表单</button>
+            </div>
+          </form>
+        </div>
+      </article>
+
+      <article class="panel">
+        <div class="panel-content">
+          <div class="section-title">
+            <h2>今日概览</h2>
+            <span id="todayStatusLabel">以最新一条记录为准</span>
+          </div>
+          <div class="summary-grid">
+            <div class="summary-card">
+              <div class="summary-label">主观能量值</div>
+              <div class="summary-value" id="todayEnergyValue">--</div>
+              <div class="summary-subtitle" id="todayMoodValue">还没有记录，先填一条试试看。</div>
+            </div>
+            <div class="vitals">
+              <div class="vital">
+                <span>睡眠分</span>
+                <strong id="todaySleepValue">--</strong>
+              </div>
+              <div class="vital">
+                <span>入睡 / 起床</span>
+                <strong id="todayTimeValue">--</strong>
+              </div>
+              <div class="vital">
+                <span>起夜次数</span>
+                <strong id="todayWakeupsValue">--</strong>
+              </div>
+              <div class="vital">
+                <span>锻炼 / 做饭</span>
+                <strong id="todayHabitsValue">--</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <section class="panel">
+      <div class="panel-content">
+        <div class="section-title">
+          <h2>核心卡片</h2>
+          <span>最近 7 天 + 最近 30 天</span>
+        </div>
+        <div class="metrics-grid">
+          <div class="metric">
+            <div class="kicker">本周平均睡眠分</div>
+            <div class="number" id="avgSleepScore">0</div>
+            <div class="hint">最近 7 天已记录数据的平均值</div>
+          </div>
+          <div class="metric">
+            <div class="kicker">连续 22:00 前入睡天数</div>
+            <div class="number" id="sleepStreak">0</div>
+            <div class="hint">从最近记录日开始往回连续计算</div>
+          </div>
+          <div class="metric">
+            <div class="kicker">本周锻炼次数</div>
+            <div class="number" id="exerciseCount">0</div>
+            <div class="hint">最近 7 天累计有锻炼的天数</div>
+          </div>
+          <div class="metric">
+            <div class="kicker">本周自己做饭次数</div>
+            <div class="number" id="cookingCount">0</div>
+            <div class="hint">最近 7 天累计自己做饭的天数</div>
+          </div>
+          <div class="metric trend">
+            <div class="kicker">30 天睡眠趋势</div>
+            <div class="trend-arrow" id="sleepTrendArrow">→</div>
+            <div class="hint" id="sleepTrendText">数据不足时默认显示平稳</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel-grid">
+      <article class="panel">
+        <div class="panel-content">
+        <div class="section-title">
+          <h2>30 天睡眠走势</h2>
+          <span id="chartStatusLabel">Chart.js 折线图</span>
+        </div>
+        <div class="chart-wrap">
+          <canvas id="sleepChart"></canvas>
+        </div>
+          <div class="footer-note">
+            睡眠分会按日期连续展示，缺失日期会留空，方便看清作息波动和恢复节奏。
+          </div>
+        </div>
+      </article>
+
+      <article class="panel">
+        <div class="panel-content">
+          <div class="section-title">
+            <h2>最近记录</h2>
+            <span>点击编辑可载入表单</span>
+          </div>
+          <div class="record-list" id="recordList"></div>
+        </div>
+      </article>
+    </section>
+
+    <section class="panel">
+      <div class="panel-content">
+        <div class="section-title">
+          <h2>能量守恒提醒</h2>
+          <span>根据最新一天数据自动生成</span>
+        </div>
+        <div class="reminder-list" id="reminderList"></div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-content">
+        <div class="section-title">
+          <h2>数据管理</h2>
+          <span>备份、恢复、本地清理</span>
+        </div>
+        <div class="manage-row">
+          <button class="btn-secondary" id="exportBtn" type="button">导出 JSON</button>
+          <button class="btn-secondary" id="importBtn" type="button">导入 JSON</button>
+          <button class="btn-danger" id="clearBtn" type="button">清除所有数据</button>
+        </div>
+        <div class="data-overview">
+          <div class="data-pill">
+            <span>总记录</span>
+            <strong id="dataCountValue">0 天</strong>
+            <small>按日期去重后统计</small>
+          </div>
+          <div class="data-pill">
+            <span>覆盖区间</span>
+            <strong id="dataRangeValue">暂无</strong>
+            <small>方便判断连续追踪是否中断</small>
+          </div>
+          <div class="data-pill">
+            <span>导出格式</span>
+            <strong id="dataFormatValue">v2 JSON</strong>
+            <small id="dataUpdatedValue">等待第一条记录</small>
+          </div>
+        </div>
+        <input class="hidden-input" id="importFileInput" type="file" accept="application/json" />
+        <div class="footer-note">
+          首次打开会自动写入最近 5 天示例数据，之后不会覆盖你自己的记录。清除按钮采用二次确认，避免误删。网页部署后也可以添加到手机主屏幕，体验会更像一个轻量应用。
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    (() => {
+      // 统一配置项，后续迁移到小程序时可以直接抽成独立配置文件。
+      const CONFIG = {
+        storageKey: "michael-energy-tracker-v1",
+        seededKey: "michael-energy-tracker-seeded",
+        exportVersion: 2,
+        clearArmedMs: 4000,
+        reminderSleepThreshold: 60,
+        reminderLateSleepMinutes: 22 * 60 + 30,
+        recoverySleepThreshold: 75,
+        chartDays: 30,
+        weeklyDays: 7
+      };
+
+      const state = {
+        entries: [],
+        sleepChart: null,
+        clearArmedUntil: 0
+      };
+
+      const elements = {
+        form: document.getElementById("entryForm"),
+        recordList: document.getElementById("recordList"),
+        statusBanner: document.getElementById("statusBanner"),
+        importFileInput: document.getElementById("importFileInput"),
+        clearBtn: document.getElementById("clearBtn"),
+        formModeLabel: document.getElementById("formModeLabel"),
+        chartCanvas: document.getElementById("sleepChart"),
+        chartStatusLabel: document.getElementById("chartStatusLabel"),
+        heroDateLabel: document.getElementById("heroDateLabel"),
+        todayStatusLabel: document.getElementById("todayStatusLabel"),
+        todayEnergyValue: document.getElementById("todayEnergyValue"),
+        todayMoodValue: document.getElementById("todayMoodValue"),
+        todaySleepValue: document.getElementById("todaySleepValue"),
+        todayTimeValue: document.getElementById("todayTimeValue"),
+        todayWakeupsValue: document.getElementById("todayWakeupsValue"),
+        todayHabitsValue: document.getElementById("todayHabitsValue"),
+        avgSleepScore: document.getElementById("avgSleepScore"),
+        sleepStreak: document.getElementById("sleepStreak"),
+        exerciseCount: document.getElementById("exerciseCount"),
+        cookingCount: document.getElementById("cookingCount"),
+        sleepTrendArrow: document.getElementById("sleepTrendArrow"),
+        sleepTrendText: document.getElementById("sleepTrendText"),
+        reminderList: document.getElementById("reminderList"),
+        dataCountValue: document.getElementById("dataCountValue"),
+        dataRangeValue: document.getElementById("dataRangeValue"),
+        dataFormatValue: document.getElementById("dataFormatValue"),
+        dataUpdatedValue: document.getElementById("dataUpdatedValue")
+      };
+
+      const DateUtils = {
+        getTodayISO() {
+          const now = new Date();
+          const month = String(now.getMonth() + 1).padStart(2, "0");
+          const day = String(now.getDate()).padStart(2, "0");
+          return `${now.getFullYear()}-${month}-${day}`;
+        },
+
+        parseDate(dateString) {
+          return new Date(`${dateString}T12:00:00`);
+        },
+
+        formatShortDate(dateString) {
+          const date = this.parseDate(dateString);
+          const weekdays = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"];
+          return `${date.getMonth() + 1}/${date.getDate()} ${weekdays[date.getDay()]}`;
+        },
+
+        formatDateLabel(dateString) {
+          const date = this.parseDate(dateString);
+          return `${date.getFullYear()} 年 ${date.getMonth() + 1} 月 ${date.getDate()} 日`;
+        },
+
+        addDays(dateString, delta) {
+          const date = this.parseDate(dateString);
+          date.setDate(date.getDate() + delta);
+          const month = String(date.getMonth() + 1).padStart(2, "0");
+          const day = String(date.getDate()).padStart(2, "0");
+          return `${date.getFullYear()}-${month}-${day}`;
+        },
+
+        daysBetween(laterDateString, earlierDateString) {
+          const later = this.parseDate(laterDateString);
+          const earlier = this.parseDate(earlierDateString);
+          const diff = later.getTime() - earlier.getTime();
+          return Math.round(diff / (24 * 60 * 60 * 1000));
+        },
+
+        timeToMinutes(timeString) {
+          if (!timeString) return null;
+          const [hourText, minuteText] = timeString.split(":");
+          return Number(hourText) * 60 + Number(minuteText);
+        },
+
+        bedtimeComparableMinutes(timeString) {
+          const minutes = this.timeToMinutes(timeString);
+          if (minutes === null) return null;
+          // 凌晨入睡视为超过当天 22 点后的延迟入睡，便于统一比较。
+          return minutes < 12 * 60 ? minutes + 24 * 60 : minutes;
+        }
+      };
+
+      const EntryModel = {
+        normalizeBoolean(value) {
+          return value === true || value === "true" || value === 1 || value === "1";
+        },
+
+        normalizeNumber(value, fallback = 0) {
+          const number = Number(value);
+          return Number.isFinite(number) ? number : fallback;
+        },
+
+        normalize(raw) {
+          return {
+            date: String(raw.date || ""),
+            sleepScore: this.normalizeNumber(raw.sleepScore, 0),
+            bedtime: String(raw.bedtime || ""),
+            wakeTime: String(raw.wakeTime || ""),
+            wakeups: this.normalizeNumber(raw.wakeups, 0),
+            energy: this.normalizeNumber(raw.energy, 0),
+            exercised: this.normalizeBoolean(raw.exercised),
+            cooked: this.normalizeBoolean(raw.cooked),
+            mood: String(raw.mood || "").trim()
+          };
+        },
+
+        validate(entry) {
+          if (!/^\d{4}-\d{2}-\d{2}$/.test(entry.date)) return "日期格式不正确。";
+          if (!entry.bedtime || !entry.wakeTime) return "请把入睡时间和起床时间填完整。";
+          if (entry.sleepScore < 0 || entry.sleepScore > 100) return "睡眠分需要在 0 到 100 之间。";
+          if (entry.energy < 1 || entry.energy > 10) return "主观能量值需要在 1 到 10 之间。";
+          if (entry.wakeups < 0 || entry.wakeups > 10) return "起夜次数需要在 0 到 10 之间。";
+          return "";
+        },
+
+        getDefaultSeedEntries() {
+          const year = new Date().getFullYear();
+          return [
+            { date: `${year}-04-17`, sleepScore: 96, bedtime: "22:00", wakeTime: "05:20", wakeups: 0, energy: 10, exercised: false, cooked: false, mood: "太爽了" },
+            { date: `${year}-04-18`, sleepScore: 47, bedtime: "00:30", wakeTime: "06:00", wakeups: 1, energy: 3, exercised: true, cooked: true, mood: "提不起劲" },
+            { date: `${year}-04-19`, sleepScore: 75, bedtime: "22:00", wakeTime: "06:00", wakeups: 1, energy: 7, exercised: false, cooked: true, mood: "神清气爽" },
+            { date: `${year}-04-20`, sleepScore: 74, bedtime: "21:30", wakeTime: "05:00", wakeups: 3, energy: 7, exercised: true, cooked: true, mood: "充实" },
+            { date: `${year}-04-21`, sleepScore: 80, bedtime: "22:00", wakeTime: "06:00", wakeups: 0, energy: 8, exercised: false, cooked: true, mood: "稳定" }
+          ].map((entry) => this.normalize(entry));
+        },
+
+        dedupe(entries) {
+          const map = new Map();
+          entries.forEach((entry) => {
+            const normalized = this.normalize(entry);
+            if (normalized.date) {
+              map.set(normalized.date, normalized);
+            }
+          });
+          return [...map.values()].sort((a, b) => a.date.localeCompare(b.date));
+        }
+      };
+
+      const StorageService = {
+        loadEntries() {
+          const raw = localStorage.getItem(CONFIG.storageKey);
+          if (!raw) return [];
+          try {
+            const parsed = JSON.parse(raw);
+            if (!Array.isArray(parsed)) return [];
+            return EntryModel.dedupe(parsed);
+          } catch (error) {
+            console.error("读取本地数据失败:", error);
+            return [];
+          }
+        },
+
+        saveEntries(entries) {
+          const normalized = EntryModel.dedupe(entries);
+          localStorage.setItem(CONFIG.storageKey, JSON.stringify(normalized));
+          localStorage.setItem(CONFIG.seededKey, "true");
+          return normalized;
+        },
+
+        ensureSeedData() {
+          const existingEntries = this.loadEntries();
+          const hasSeeded = localStorage.getItem(CONFIG.seededKey) === "true";
+          if (existingEntries.length > 0 || hasSeeded) return existingEntries;
+          return this.saveEntries(EntryModel.getDefaultSeedEntries());
+        },
+
+        clearAll() {
+          localStorage.setItem(CONFIG.storageKey, JSON.stringify([]));
+          localStorage.setItem(CONFIG.seededKey, "true");
+          return [];
+        },
+
+        buildExportPayload(entries) {
+          return {
+            app: "Michael 能量追踪器",
+            version: CONFIG.exportVersion,
+            exportedAt: new Date().toISOString(),
+            entries: EntryModel.dedupe(entries)
+          };
+        },
+
+        parseImportPayload(payload) {
+          const validateImportedEntries = (entries) => {
+            const normalizedEntries = EntryModel.dedupe(entries);
+            const validEntries = normalizedEntries.filter((entry) => !EntryModel.validate(entry));
+            if (!validEntries.length && normalizedEntries.length) {
+              throw new Error("导入内容没有有效记录");
+            }
+            return validEntries;
+          };
+
+          if (Array.isArray(payload)) {
+            return validateImportedEntries(payload);
+          }
+
+          if (payload && typeof payload === "object" && Array.isArray(payload.entries)) {
+            return validateImportedEntries(payload.entries);
+          }
+
+          throw new Error("JSON 格式不符合预期");
+        }
+      };
+
+      const Analytics = {
+        getLatestEntry(entries) {
+          return entries.length ? entries[entries.length - 1] : null;
+        },
+
+        buildEntryMap(entries) {
+          return new Map(entries.map((entry) => [entry.date, entry]));
+        },
+
+        getWindowEntries(entries, endDateString, days) {
+          return entries.filter((entry) => {
+            const diff = DateUtils.daysBetween(endDateString, entry.date);
+            return diff >= 0 && diff < days;
+          });
+        },
+
+        calculateAverageSleep(entries, latestDate) {
+          const windowEntries = this.getWindowEntries(entries, latestDate, CONFIG.weeklyDays);
+          if (!windowEntries.length) return 0;
+          const total = windowEntries.reduce((sum, entry) => sum + entry.sleepScore, 0);
+          return total / windowEntries.length;
+        },
+
+        calculateBefore10Streak(entryMap, latestDate) {
+          let streak = 0;
+          let cursor = latestDate;
+          while (entryMap.has(cursor)) {
+            const bedtime = DateUtils.bedtimeComparableMinutes(entryMap.get(cursor).bedtime);
+            if (bedtime === null || bedtime > 22 * 60) break;
+            streak += 1;
+            cursor = DateUtils.addDays(cursor, -1);
+          }
+          return streak;
+        },
+
+        calculateCount(entries, latestDate, fieldName) {
+          return this.getWindowEntries(entries, latestDate, CONFIG.weeklyDays).filter((entry) => entry[fieldName]).length;
+        },
+
+        calculateTrend(entries, latestDate) {
+          const startDate = DateUtils.addDays(latestDate, -(CONFIG.chartDays - 1));
+          const rangeEntries = entries.filter((entry) => entry.date >= startDate && entry.date <= latestDate);
+
+          if (rangeEntries.length < 2) {
+            return { arrow: "→", text: "记录不足 2 天，先持续记录" };
+          }
+
+          let sumX = 0;
+          let sumY = 0;
+          let sumXY = 0;
+          let sumXX = 0;
+
+          rangeEntries.forEach((entry) => {
+            const x = DateUtils.daysBetween(entry.date, startDate);
+            const y = entry.sleepScore;
+            sumX += x;
+            sumY += y;
+            sumXY += x * y;
+            sumXX += x * x;
+          });
+
+          const count = rangeEntries.length;
+          const denominator = count * sumXX - sumX * sumX;
+          const slope = denominator === 0 ? 0 : (count * sumXY - sumX * sumY) / denominator;
+
+          if (slope >= 1.2) return { arrow: "↑", text: "睡眠分明显上扬，恢复趋势很强" };
+          if (slope >= 0.35) return { arrow: "↗", text: "睡眠分正在回升，继续稳住作息" };
+          if (slope <= -1.2) return { arrow: "↓", text: "睡眠分明显走低，需要尽快修复节奏" };
+          if (slope <= -0.35) return { arrow: "↘", text: "睡眠分有下滑迹象，别再透支" };
+          return { arrow: "→", text: "最近 30 天大致平稳，继续观察" };
+        },
+
+        calculateBooleanStreak(entryMap, latestDate, fieldName, expectedValue) {
+          let streak = 0;
+          let cursor = latestDate;
+          while (entryMap.has(cursor)) {
+            if (entryMap.get(cursor)[fieldName] !== expectedValue) break;
+            streak += 1;
+            cursor = DateUtils.addDays(cursor, -1);
+          }
+          return streak;
+        },
+
+        calculateSleepScoreStreak(entryMap, latestDate, threshold) {
+          let streak = 0;
+          let cursor = latestDate;
+          while (entryMap.has(cursor)) {
+            if (entryMap.get(cursor).sleepScore <= threshold) break;
+            streak += 1;
+            cursor = DateUtils.addDays(cursor, -1);
+          }
+          return streak;
+        },
+
+        getReminderItems(entries, latestEntry) {
+          if (!latestEntry) {
+            return [{ level: "neutral", text: "先保存一条记录，提醒卡片就会根据你的状态自动生成。" }];
+          }
+
+          const entryMap = this.buildEntryMap(entries);
+          const reminders = [];
+          const noExerciseStreak = this.calculateBooleanStreak(entryMap, latestEntry.date, "exercised", false);
+          const cookingStreak = this.calculateBooleanStreak(entryMap, latestEntry.date, "cooked", true);
+          const sleepRecoveryStreak = this.calculateSleepScoreStreak(entryMap, latestEntry.date, CONFIG.recoverySleepThreshold);
+          const bedtime = DateUtils.bedtimeComparableMinutes(latestEntry.bedtime);
+
+          if (latestEntry.sleepScore < CONFIG.reminderSleepThreshold) {
+            reminders.push({ level: "red", text: "⚠️ 黑马电量不足，今天优先级：补觉 > 一切" });
+          }
+
+          if (noExerciseStreak >= 2) {
+            reminders.push({ level: "yellow", text: "🔋 充电口缺失：锻炼占10%充电，别连续跳过" });
+          }
+
+          if (bedtime !== null && bedtime > CONFIG.reminderLateSleepMinutes) {
+            reminders.push({ level: "red", text: "🚨 22:00是你的底线，昨天突破了" });
+          }
+
+          if (cookingStreak >= 3) {
+            reminders.push({ level: "green", text: "🟢 饮食充电口稳定运转中" });
+          }
+
+          if (sleepRecoveryStreak >= 3) {
+            reminders.push({ level: "green", text: "🟢 黑马恢复良好，保持节奏" });
+          }
+
+          if (!reminders.length) {
+            reminders.push({ level: "neutral", text: "今天的能量结构比较平衡，按现在的节奏继续推进就行。" });
+          }
+
+          return reminders;
+        },
+
+        buildChartData(entries, latestEntry) {
+          if (!latestEntry) return { labels: [], values: [] };
+
+          const latestDate = latestEntry.date;
+          const startDate = DateUtils.addDays(latestDate, -(CONFIG.chartDays - 1));
+          const entryMap = this.buildEntryMap(entries);
+          const labels = [];
+          const values = [];
+
+          for (let index = 0; index < CONFIG.chartDays; index += 1) {
+            const dateString = DateUtils.addDays(startDate, index);
+            labels.push(DateUtils.formatShortDate(dateString));
+            values.push(entryMap.has(dateString) ? entryMap.get(dateString).sleepScore : null);
+          }
+
+          return { labels, values };
+        }
+      };
+
+      const ChartRenderer = {
+        destroy() {
+          if (state.sleepChart) {
+            state.sleepChart.destroy();
+            state.sleepChart = null;
+          }
+        },
+
+        render(entries, latestEntry) {
+          const chartData = Analytics.buildChartData(entries, latestEntry);
+          if (window.Chart) {
+            this.renderWithChartJs(chartData);
+            elements.chartStatusLabel.textContent = "Chart.js 折线图";
+            return;
+          }
+
+          this.destroy();
+          this.renderFallbackCanvas(chartData);
+          elements.chartStatusLabel.textContent = "离线降级折线图";
+        },
+
+        renderWithChartJs(chartData) {
+          this.destroy();
+          const context = elements.chartCanvas.getContext("2d");
+          state.sleepChart = new Chart(context, {
+            type: "line",
+            data: {
+              labels: chartData.labels,
+              datasets: [
+                {
+                  label: "睡眠分",
+                  data: chartData.values,
+                  spanGaps: true,
+                  borderColor: "#1f7a5c",
+                  backgroundColor: "rgba(31, 122, 92, 0.12)",
+                  pointBackgroundColor: "#d17b1f",
+                  pointBorderColor: "#fff8ef",
+                  pointBorderWidth: 2,
+                  pointRadius: 4,
+                  pointHoverRadius: 6,
+                  tension: 0.35,
+                  fill: true
+                }
+              ]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              animation: {
+                duration: 650,
+                easing: "easeOutQuart"
+              },
+              plugins: {
+                legend: {
+                  display: false
+                },
+                tooltip: {
+                  backgroundColor: "rgba(31, 36, 33, 0.92)",
+                  titleFont: { family: "Avenir Next" },
+                  bodyFont: { family: "Avenir Next" },
+                  displayColors: false,
+                  padding: 12,
+                  callbacks: {
+                    label(context) {
+                      if (context.raw === null) return "暂无记录";
+                      return `睡眠分：${context.raw}`;
+                    }
+                  }
+                }
+              },
+              scales: {
+                x: {
+                  grid: {
+                    display: false
+                  },
+                  ticks: {
+                    color: "#7a7368",
+                    maxRotation: 0,
+                    autoSkip: true,
+                    maxTicksLimit: 6
+                  }
+                },
+                y: {
+                  min: 0,
+                  max: 100,
+                  ticks: {
+                    stepSize: 20,
+                    color: "#7a7368"
+                  },
+                  grid: {
+                    color: "rgba(99, 78, 44, 0.08)"
+                  }
+                }
+              }
+            }
+          });
+        },
+
+        renderFallbackCanvas(chartData) {
+          const canvas = elements.chartCanvas;
+          const ctx = canvas.getContext("2d");
+          const rect = canvas.getBoundingClientRect();
+          const width = rect.width || 320;
+          const height = rect.height || 280;
+          const dpr = window.devicePixelRatio || 1;
+
+          canvas.width = width * dpr;
+          canvas.height = height * dpr;
+          ctx.setTransform(1, 0, 0, 1, 0, 0);
+          ctx.scale(dpr, dpr);
+          ctx.clearRect(0, 0, width, height);
+
+          const padding = { top: 18, right: 12, bottom: 28, left: 28 };
+          const chartWidth = width - padding.left - padding.right;
+          const chartHeight = height - padding.top - padding.bottom;
+          const hasData = chartData.values.some((value) => value !== null);
+
+          ctx.strokeStyle = "rgba(99, 78, 44, 0.08)";
+          ctx.lineWidth = 1;
+          ctx.font = '12px "Avenir Next", "PingFang SC", sans-serif';
+          ctx.fillStyle = "#7a7368";
+
+          for (let tick = 0; tick <= 5; tick += 1) {
+            const y = padding.top + chartHeight - (chartHeight / 5) * tick;
+            ctx.beginPath();
+            ctx.moveTo(padding.left, y);
+            ctx.lineTo(width - padding.right, y);
+            ctx.stroke();
+            ctx.fillText(String(tick * 20), 2, y + 4);
+          }
+
+          if (!hasData) {
+            ctx.fillStyle = "#6e6a62";
+            ctx.fillText("暂无睡眠记录，保存后这里会显示折线走势。", padding.left, height / 2);
+            return;
+          }
+
+          const getX = (index) => padding.left + (chartWidth / Math.max(chartData.values.length - 1, 1)) * index;
+          const getY = (value) => padding.top + chartHeight - (value / 100) * chartHeight;
+
+          const gradient = ctx.createLinearGradient(0, padding.top, 0, padding.top + chartHeight);
+          gradient.addColorStop(0, "rgba(31, 122, 92, 0.2)");
+          gradient.addColorStop(1, "rgba(31, 122, 92, 0.02)");
+
+          ctx.beginPath();
+          let started = false;
+          chartData.values.forEach((value, index) => {
+            if (value === null) return;
+            const x = getX(index);
+            const y = getY(value);
+            if (!started) {
+              ctx.moveTo(x, y);
+              started = true;
+            } else {
+              ctx.lineTo(x, y);
+            }
+          });
+          ctx.strokeStyle = "#1f7a5c";
+          ctx.lineWidth = 2.5;
+          ctx.stroke();
+
+          ctx.beginPath();
+          started = false;
+          chartData.values.forEach((value, index) => {
+            if (value === null) return;
+            const x = getX(index);
+            const y = getY(value);
+            if (!started) {
+              ctx.moveTo(x, y);
+              started = true;
+            } else {
+              ctx.lineTo(x, y);
+            }
+          });
+          ctx.lineTo(getX(chartData.values.length - 1), padding.top + chartHeight);
+          ctx.lineTo(getX(0), padding.top + chartHeight);
+          ctx.closePath();
+          ctx.fillStyle = gradient;
+          ctx.fill();
+
+          chartData.values.forEach((value, index) => {
+            if (value === null) return;
+            const x = getX(index);
+            const y = getY(value);
+            ctx.beginPath();
+            ctx.fillStyle = "#d17b1f";
+            ctx.arc(x, y, 3.5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.strokeStyle = "#fff8ef";
+            ctx.lineWidth = 1.5;
+            ctx.arc(x, y, 3.5, 0, Math.PI * 2);
+            ctx.stroke();
+          });
+
+          ctx.fillStyle = "#7a7368";
+          ctx.fillText(chartData.labels[0], padding.left, height - 6);
+          ctx.fillText(chartData.labels[chartData.labels.length - 1], Math.max(padding.left, width - padding.right - 52), height - 6);
+        }
+      };
+
+      const UI = {
+        showStatus(message) {
+          elements.statusBanner.textContent = message;
+          elements.statusBanner.classList.add("show");
+          clearTimeout(this.statusTimer);
+          this.statusTimer = setTimeout(() => {
+            elements.statusBanner.classList.remove("show");
+          }, 2400);
+        },
+
+        escapeHtml(value) {
+          return String(value)
+            .replaceAll("&", "&amp;")
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;")
+            .replaceAll('"', "&quot;")
+            .replaceAll("'", "&#39;");
+        },
+
+        setFormMode(text) {
+          elements.formModeLabel.textContent = text;
+        },
+
+        resetForm() {
+          elements.form.reset();
+          elements.form.entryDate.value = DateUtils.getTodayISO();
+          document.getElementById("exerciseNo").checked = true;
+          document.getElementById("cookedNo").checked = true;
+          this.setFormMode("保存或更新当天记录");
+        },
+
+        fillForm(entry) {
+          elements.form.entryDate.value = entry.date;
+          elements.form.sleepScore.value = entry.sleepScore;
+          elements.form.bedtime.value = entry.bedtime;
+          elements.form.wakeTime.value = entry.wakeTime;
+          elements.form.wakeups.value = entry.wakeups;
+          elements.form.energy.value = entry.energy;
+          elements.form.mood.value = entry.mood || "";
+          document.getElementById(entry.exercised ? "exerciseYes" : "exerciseNo").checked = true;
+          document.getElementById(entry.cooked ? "cookedYes" : "cookedNo").checked = true;
+          this.setFormMode(`正在编辑：${DateUtils.formatShortDate(entry.date)}`);
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        },
+
+        renderTodaySummary(latestEntry) {
+          if (!latestEntry) {
+            elements.heroDateLabel.textContent = `今天 · ${DateUtils.formatDateLabel(DateUtils.getTodayISO())}`;
+            elements.todayStatusLabel.textContent = "还没有记录";
+            elements.todayEnergyValue.textContent = "--";
+            elements.todayMoodValue.textContent = "还没有记录，先填一条试试看。";
+            elements.todaySleepValue.textContent = "--";
+            elements.todayTimeValue.textContent = "--";
+            elements.todayWakeupsValue.textContent = "--";
+            elements.todayHabitsValue.textContent = "--";
+            return;
+          }
+
+          elements.heroDateLabel.textContent = `最新记录 · ${DateUtils.formatDateLabel(latestEntry.date)}`;
+          elements.todayStatusLabel.textContent = `最新记录：${DateUtils.formatShortDate(latestEntry.date)}`;
+          elements.todayEnergyValue.textContent = `${latestEntry.energy}/10`;
+          elements.todayMoodValue.textContent = latestEntry.mood || "没有填写心情备注";
+          elements.todaySleepValue.textContent = `${latestEntry.sleepScore} 分`;
+          elements.todayTimeValue.textContent = `${latestEntry.bedtime} / ${latestEntry.wakeTime}`;
+          elements.todayWakeupsValue.textContent = `${latestEntry.wakeups} 次`;
+          elements.todayHabitsValue.textContent = `${latestEntry.exercised ? "锻炼" : "未锻炼"} / ${latestEntry.cooked ? "做饭" : "未做饭"}`;
+        },
+
+        renderMetrics(entries, latestEntry) {
+          if (!latestEntry) {
+            elements.avgSleepScore.textContent = "0";
+            elements.sleepStreak.textContent = "0";
+            elements.exerciseCount.textContent = "0";
+            elements.cookingCount.textContent = "0";
+            elements.sleepTrendArrow.textContent = "→";
+            elements.sleepTrendText.textContent = "数据不足时默认显示平稳";
+            return;
+          }
+
+          const latestDate = latestEntry.date;
+          const entryMap = Analytics.buildEntryMap(entries);
+          const trend = Analytics.calculateTrend(entries, latestDate);
+
+          elements.avgSleepScore.textContent = Analytics.calculateAverageSleep(entries, latestDate).toFixed(1);
+          elements.sleepStreak.textContent = String(Analytics.calculateBefore10Streak(entryMap, latestDate));
+          elements.exerciseCount.textContent = String(Analytics.calculateCount(entries, latestDate, "exercised"));
+          elements.cookingCount.textContent = String(Analytics.calculateCount(entries, latestDate, "cooked"));
+          elements.sleepTrendArrow.textContent = trend.arrow;
+          elements.sleepTrendText.textContent = trend.text;
+        },
+
+        renderReminders(entries, latestEntry) {
+          const reminders = Analytics.getReminderItems(entries, latestEntry);
+          elements.reminderList.innerHTML = reminders
+            .map((reminder) => `<div class="reminder-item ${reminder.level}">${this.escapeHtml(reminder.text)}</div>`)
+            .join("");
+        },
+
+        renderRecordList(entries) {
+          if (!entries.length) {
+            elements.recordList.innerHTML = '<div class="empty-state">还没有任何记录，先保存一条数据吧。</div>';
+            return;
+          }
+
+          const latestFirst = [...entries].sort((a, b) => b.date.localeCompare(a.date));
+          elements.recordList.innerHTML = latestFirst
+            .map((entry) => {
+              const mood = this.escapeHtml(entry.mood || "没有填写心情");
+              return `
+                <article class="record-item">
+                  <div>
+                    <div class="record-head">
+                      <div class="record-date">${DateUtils.formatShortDate(entry.date)}</div>
+                      <span class="chip">睡眠 ${entry.sleepScore}</span>
+                      <span class="chip">能量 ${entry.energy}/10</span>
+                    </div>
+                    <div class="record-body">
+                      入睡 ${this.escapeHtml(entry.bedtime)}，起床 ${this.escapeHtml(entry.wakeTime)}，起夜 ${entry.wakeups} 次，
+                      ${entry.exercised ? "有锻炼" : "没锻炼"}，
+                      ${entry.cooked ? "自己做饭" : "没做饭"}。<br />
+                      心情：${mood}
+                    </div>
+                  </div>
+                  <div class="record-actions">
+                    <button class="btn-secondary" type="button" data-action="edit" data-date="${entry.date}">编辑</button>
+                    <button class="btn-warning" type="button" data-action="delete" data-date="${entry.date}">删除</button>
+                  </div>
+                </article>
+              `;
+            })
+            .join("");
+        },
+
+        renderDataOverview(entries, latestEntry) {
+          elements.dataCountValue.textContent = `${entries.length} 天`;
+          elements.dataFormatValue.textContent = `v${CONFIG.exportVersion} JSON`;
+
+          if (!entries.length) {
+            elements.dataRangeValue.textContent = "暂无";
+            elements.dataUpdatedValue.textContent = "等待第一条记录";
+            return;
+          }
+
+          const firstDate = entries[0].date;
+          const lastDate = entries[entries.length - 1].date;
+          elements.dataRangeValue.textContent = `${DateUtils.formatShortDate(firstDate)} - ${DateUtils.formatShortDate(lastDate)}`;
+          elements.dataUpdatedValue.textContent = `最近更新：${DateUtils.formatShortDate(latestEntry.date)}`;
+        },
+
+        render(entries) {
+          const latestEntry = Analytics.getLatestEntry(entries);
+          this.renderTodaySummary(latestEntry);
+          this.renderMetrics(entries, latestEntry);
+          this.renderReminders(entries, latestEntry);
+          this.renderRecordList(entries);
+          this.renderDataOverview(entries, latestEntry);
+          ChartRenderer.render(entries, latestEntry);
+        }
+      };
+
+      const App = {
+        syncEntries() {
+          state.entries = StorageService.loadEntries();
+          return state.entries;
+        },
+
+        render() {
+          UI.render(this.syncEntries());
+        },
+
+        buildEntryFromForm() {
+          const formData = new FormData(elements.form);
+          return EntryModel.normalize({
+            date: formData.get("entryDate"),
+            sleepScore: formData.get("sleepScore"),
+            bedtime: formData.get("bedtime"),
+            wakeTime: formData.get("wakeTime"),
+            wakeups: formData.get("wakeups"),
+            energy: formData.get("energy"),
+            exercised: formData.get("exercised"),
+            cooked: formData.get("cooked"),
+            mood: formData.get("mood")
+          });
+        },
+
+        upsertEntry(entry) {
+          const nextEntries = state.entries.filter((item) => item.date !== entry.date);
+          nextEntries.push(entry);
+          state.entries = StorageService.saveEntries(nextEntries);
+          UI.render(state.entries);
+        },
+
+        deleteEntry(date) {
+          state.entries = StorageService.saveEntries(state.entries.filter((entry) => entry.date !== date));
+          UI.render(state.entries);
+        },
+
+        exportEntries() {
+          const payload = StorageService.buildExportPayload(state.entries);
+          const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement("a");
+          link.href = url;
+          link.download = `michael-energy-tracker-${DateUtils.getTodayISO()}.json`;
+          document.body.appendChild(link);
+          link.click();
+          link.remove();
+          URL.revokeObjectURL(url);
+        },
+
+        importEntries(payload) {
+          state.entries = StorageService.saveEntries(StorageService.parseImportPayload(payload));
+          UI.render(state.entries);
+        },
+
+        clearEntries() {
+          state.entries = StorageService.clearAll();
+          UI.resetForm();
+          UI.render(state.entries);
+        }
+      };
+
+      const Handlers = {
+        submit(event) {
+          event.preventDefault();
+          const entry = App.buildEntryFromForm();
+          const validationMessage = EntryModel.validate(entry);
+          if (validationMessage) {
+            UI.showStatus(validationMessage);
+            return;
+          }
+
+          App.upsertEntry(entry);
+          UI.setFormMode(`已保存：${DateUtils.formatShortDate(entry.date)}`);
+          UI.showStatus(`已保存 ${DateUtils.formatShortDate(entry.date)} 的记录`);
+        },
+
+        recordActions(event) {
+          const target = event.target.closest("button[data-action]");
+          if (!target) return;
+
+          const { action, date } = target.dataset;
+          const targetEntry = state.entries.find((entry) => entry.date === date);
+          if (!targetEntry) return;
+
+          if (action === "edit") {
+            UI.fillForm(targetEntry);
+            UI.showStatus(`已载入 ${DateUtils.formatShortDate(date)} 的数据`);
+            return;
+          }
+
+          if (action === "delete") {
+            const shouldDelete = window.confirm(`确定删除 ${DateUtils.formatShortDate(date)} 的记录吗？`);
+            if (!shouldDelete) return;
+            App.deleteEntry(date);
+            if (elements.form.entryDate.value === date) {
+              UI.resetForm();
+            }
+            UI.showStatus(`已删除 ${DateUtils.formatShortDate(date)} 的记录`);
+          }
+        },
+
+        exportJson() {
+          App.exportEntries();
+          UI.showStatus("JSON 备份已导出");
+        },
+
+        importTrigger() {
+          elements.importFileInput.click();
+        },
+
+        importFile(event) {
+          const file = event.target.files && event.target.files[0];
+          if (!file) return;
+
+          const reader = new FileReader();
+          reader.onload = () => {
+            try {
+              const parsed = JSON.parse(String(reader.result));
+              App.importEntries(parsed);
+              UI.resetForm();
+              UI.showStatus("JSON 数据已导入");
+            } catch (error) {
+              console.error("导入失败:", error);
+              UI.showStatus("导入失败：请确认 JSON 格式正确");
+            } finally {
+              elements.importFileInput.value = "";
+            }
+          };
+          reader.readAsText(file);
+        },
+
+        clearData() {
+          const now = Date.now();
+          if (now > state.clearArmedUntil) {
+            state.clearArmedUntil = now + CONFIG.clearArmedMs;
+            elements.clearBtn.textContent = "再次点击确认清除";
+            UI.showStatus("再次点击“清除所有数据”即可确认删除");
+            setTimeout(() => {
+              if (Date.now() > state.clearArmedUntil) {
+                elements.clearBtn.textContent = "清除所有数据";
+              }
+            }, CONFIG.clearArmedMs + 120);
+            return;
+          }
+
+          state.clearArmedUntil = 0;
+          elements.clearBtn.textContent = "清除所有数据";
+          App.clearEntries();
+          UI.showStatus("已清空所有本地数据");
+        },
+
+        resetForm() {
+          UI.resetForm();
+        },
+
+        resize() {
+          if (!window.Chart) {
+            UI.render(state.entries);
+          }
+        }
+      };
+
+      function bindEvents() {
+        elements.form.addEventListener("submit", Handlers.submit);
+        elements.recordList.addEventListener("click", Handlers.recordActions);
+        document.getElementById("resetFormBtn").addEventListener("click", Handlers.resetForm);
+        document.getElementById("exportBtn").addEventListener("click", Handlers.exportJson);
+        document.getElementById("importBtn").addEventListener("click", Handlers.importTrigger);
+        elements.importFileInput.addEventListener("change", Handlers.importFile);
+        elements.clearBtn.addEventListener("click", Handlers.clearData);
+        window.addEventListener("resize", Handlers.resize);
+      }
+
+      function initialize() {
+        state.entries = StorageService.ensureSeedData();
+        bindEvents();
+        UI.resetForm();
+        UI.render(state.entries);
+      }
+
+      initialize();
+    })();
+  </script>
+</body>
+</html>
