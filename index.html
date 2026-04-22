@@ -391,6 +391,52 @@
       margin-bottom: 12px;
     }
 
+    .template-block {
+      margin-bottom: 14px;
+    }
+
+    .template-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .template-head span {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .template-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .template-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(31, 122, 92, 0.1);
+      border: 1px solid rgba(31, 122, 92, 0.14);
+      color: #1f5c46;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .template-chip:hover {
+      box-shadow: 0 10px 20px rgba(31, 122, 92, 0.12);
+    }
+
+    .template-chip small {
+      color: rgba(31, 92, 70, 0.78);
+      font-weight: 600;
+      font-size: 12px;
+    }
+
     .btn-slim {
       padding: 10px 14px;
       border-radius: 14px;
@@ -845,7 +891,15 @@
                   <span class="inline-meta" id="workoutMetaLabel">不训练也可以直接保存</span>
                 </div>
                 <div class="workout-editor">
+                  <div class="template-block">
+                    <div class="template-head">
+                      <label for="workoutTemplateGrid">常用动作模板</label>
+                      <span>点一下就能加到今天的训练明细里</span>
+                    </div>
+                    <div class="template-grid" id="workoutTemplateGrid"></div>
+                  </div>
                   <div class="workout-toolbar">
+                    <button class="btn-secondary btn-slim" id="addWorkoutRoutineBtn" type="button">导入今日常用七项</button>
                     <button class="btn-secondary btn-slim" id="addWorkoutItemBtn" type="button">添加训练项目</button>
                     <button class="btn-secondary btn-slim" id="clearWorkoutItemsBtn" type="button">清空训练明细</button>
                   </div>
@@ -1031,7 +1085,16 @@
         reminderLateSleepMinutes: 22 * 60 + 30,
         recoverySleepThreshold: 75,
         chartDays: 30,
-        weeklyDays: 7
+        weeklyDays: 7,
+        workoutTemplates: [
+          { name: "单腿深蹲", volume: "20 个 x 1 组", rating: 8, note: "" },
+          { name: "合桥", volume: "35 个 x 1 组", rating: 9, note: "" },
+          { name: "宽距引体向上", volume: "15 个 x 1 组", rating: 9, note: "" },
+          { name: "靠墙倒立", volume: "12 个 x 1 组", rating: 7, note: "" },
+          { name: "窄距俯卧撑", volume: "20 个 x 1 组", rating: 8, note: "" },
+          { name: "悬垂举腿", volume: "14 个 x 1 组", rating: 8, note: "" },
+          { name: "拉伸", volume: "10 分钟", rating: 8, note: "" }
+        ]
       };
 
       const state = {
@@ -1048,6 +1111,8 @@
         clearBtn: document.getElementById("clearBtn"),
         formModeLabel: document.getElementById("formModeLabel"),
         workoutItemsEditor: document.getElementById("workoutItemsEditor"),
+        workoutTemplateGrid: document.getElementById("workoutTemplateGrid"),
+        addWorkoutRoutineBtn: document.getElementById("addWorkoutRoutineBtn"),
         addWorkoutItemBtn: document.getElementById("addWorkoutItemBtn"),
         clearWorkoutItemsBtn: document.getElementById("clearWorkoutItemsBtn"),
         workoutEmptyState: document.getElementById("workoutEmptyState"),
@@ -1128,6 +1193,10 @@
       };
 
       const WorkoutModel = {
+        getTemplates() {
+          return CONFIG.workoutTemplates.map((item) => this.normalize(item));
+        },
+
         normalize(raw) {
           const ratingValue = raw.rating === "" || raw.rating === null || raw.rating === undefined
             ? null
@@ -1150,6 +1219,10 @@
           return items
             .map((item) => this.normalize(item))
             .filter((item) => this.isMeaningful(item));
+        },
+
+        hasSameTemplate(items, templateName) {
+          return this.normalizeItems(items).some((item) => item.name === templateName);
         },
 
         validateItems(items) {
@@ -1755,6 +1828,17 @@
           return wrapper;
         },
 
+        renderWorkoutTemplates() {
+          elements.workoutTemplateGrid.innerHTML = WorkoutModel.getTemplates()
+            .map((item) => `
+              <button class="template-chip" type="button" data-action="add-workout-template" data-template-name="${this.escapeHtml(item.name)}">
+                <span>${this.escapeHtml(item.name)}</span>
+                <small>${this.escapeHtml(item.volume)}</small>
+              </button>
+            `)
+            .join("");
+        },
+
         getWorkoutItemsFromEditor() {
           return [...elements.workoutItemsEditor.querySelectorAll(".workout-item")]
             .map((item) => WorkoutModel.normalize({
@@ -1778,6 +1862,25 @@
           elements.workoutItemsEditor.appendChild(this.createWorkoutItemElement(item));
           document.getElementById("exerciseYes").checked = true;
           this.refreshWorkoutMeta();
+        },
+
+        addWorkoutTemplateByName(templateName) {
+          const template = WorkoutModel.getTemplates().find((item) => item.name === templateName);
+          if (!template) return;
+          this.addWorkoutItem(template);
+        },
+
+        addWorkoutRoutine() {
+          const currentItems = this.getWorkoutItemsFromEditor();
+          const nextItems = WorkoutModel.getTemplates().filter((template) => !WorkoutModel.hasSameTemplate(currentItems, template.name));
+          nextItems.forEach((item) => {
+            elements.workoutItemsEditor.appendChild(this.createWorkoutItemElement(item));
+          });
+          if (nextItems.length) {
+            document.getElementById("exerciseYes").checked = true;
+          }
+          this.refreshWorkoutMeta();
+          return nextItems.length;
         },
 
         clearWorkoutEditor() {
@@ -2123,6 +2226,18 @@
           UI.addWorkoutItem();
         },
 
+        addWorkoutRoutine() {
+          const addedCount = UI.addWorkoutRoutine();
+          UI.showStatus(addedCount ? `已加入 ${addedCount} 个常用动作模板` : "常用七项已经都在今天的训练明细里了");
+        },
+
+        workoutTemplateClick(event) {
+          const templateButton = event.target.closest('[data-action="add-workout-template"]');
+          if (!templateButton) return;
+          UI.addWorkoutTemplateByName(templateButton.dataset.templateName);
+          UI.showStatus(`已加入动作模板：${templateButton.dataset.templateName}`);
+        },
+
         clearWorkoutItems() {
           UI.clearWorkoutEditor();
           UI.refreshWorkoutMeta();
@@ -2161,6 +2276,8 @@
         elements.form.addEventListener("submit", Handlers.submit);
         elements.recordList.addEventListener("click", Handlers.recordActions);
         document.getElementById("resetFormBtn").addEventListener("click", Handlers.resetForm);
+        elements.workoutTemplateGrid.addEventListener("click", Handlers.workoutTemplateClick);
+        elements.addWorkoutRoutineBtn.addEventListener("click", Handlers.addWorkoutRoutine);
         elements.addWorkoutItemBtn.addEventListener("click", Handlers.addWorkoutItem);
         elements.clearWorkoutItemsBtn.addEventListener("click", Handlers.clearWorkoutItems);
         elements.workoutItemsEditor.addEventListener("click", Handlers.workoutEditorClick);
@@ -2176,6 +2293,7 @@
 
       function initialize() {
         state.entries = StorageService.ensureSeedData();
+        UI.renderWorkoutTemplates();
         bindEvents();
         UI.resetForm();
         UI.render(state.entries);
