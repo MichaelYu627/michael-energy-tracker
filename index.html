@@ -362,6 +362,78 @@
       margin-top: 16px;
     }
 
+    .field-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .inline-meta {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+      text-align: right;
+    }
+
+    .workout-editor {
+      padding: 14px;
+      border-radius: 20px;
+      background: rgba(255, 251, 245, 0.78);
+      border: 1px solid rgba(109, 90, 60, 0.12);
+    }
+
+    .workout-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .btn-slim {
+      padding: 10px 14px;
+      border-radius: 14px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .workout-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .workout-item {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr) 120px auto;
+      gap: 10px;
+      align-items: end;
+      padding: 14px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.78);
+      border: 1px solid rgba(120, 101, 71, 0.08);
+    }
+
+    .workout-item .field {
+      gap: 6px;
+    }
+
+    .workout-note-field {
+      grid-column: 1 / -1;
+    }
+
+    .workout-item-actions {
+      display: flex;
+      align-items: stretch;
+    }
+
+    .workout-empty {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.7;
+      padding: 14px 2px 4px;
+    }
+
     .data-overview {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -576,6 +648,25 @@
       line-height: 1.7;
     }
 
+    .record-workouts {
+      display: grid;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .record-workout-item {
+      padding: 10px 12px;
+      border-radius: 14px;
+      background: rgba(31, 122, 92, 0.07);
+      color: #2a3f35;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .record-workout-item strong {
+      color: var(--text);
+    }
+
     .record-actions {
       display: flex;
       align-items: flex-start;
@@ -631,6 +722,15 @@
       .metric {
         min-height: auto;
       }
+
+      .workout-item {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .workout-item-actions,
+      .workout-note-field {
+        grid-column: 1 / -1;
+      }
     }
 
     @media (max-width: 680px) {
@@ -650,6 +750,10 @@
       .form-grid,
       .toggle-row,
       .vitals {
+        grid-template-columns: 1fr;
+      }
+
+      .workout-item {
         grid-template-columns: 1fr;
       }
 
@@ -727,12 +831,26 @@
                 <input id="energy" name="energy" type="number" min="1" max="10" placeholder="1-10" required />
               </div>
               <div class="field full">
-                <label>今天有锻炼吗</label>
+                <label>今天有正式训练吗</label>
                 <div class="toggle-group">
                   <input id="exerciseNo" type="radio" name="exercised" value="false" checked />
                   <label for="exerciseNo">否</label>
                   <input id="exerciseYes" type="radio" name="exercised" value="true" />
                   <label for="exerciseYes">是</label>
+                </div>
+              </div>
+              <div class="field full">
+                <div class="field-head">
+                  <label for="workoutItemsEditor">今日训练明细</label>
+                  <span class="inline-meta" id="workoutMetaLabel">不训练也可以直接保存</span>
+                </div>
+                <div class="workout-editor">
+                  <div class="workout-toolbar">
+                    <button class="btn-secondary btn-slim" id="addWorkoutItemBtn" type="button">添加训练项目</button>
+                    <button class="btn-secondary btn-slim" id="clearWorkoutItemsBtn" type="button">清空训练明细</button>
+                  </div>
+                  <div class="workout-list" id="workoutItemsEditor"></div>
+                  <div class="workout-empty" id="workoutEmptyState">今天如果没有训练，保持空白直接保存就行；如果训练了，可以把项目、组数和状态一起记下来。</div>
                 </div>
               </div>
               <div class="field full">
@@ -783,7 +901,7 @@
                 <strong id="todayWakeupsValue">--</strong>
               </div>
               <div class="vital">
-                <span>锻炼 / 做饭</span>
+                <span>训练 / 做饭</span>
                 <strong id="todayHabitsValue">--</strong>
               </div>
             </div>
@@ -889,7 +1007,7 @@
           </div>
           <div class="data-pill">
             <span>导出格式</span>
-            <strong id="dataFormatValue">v2 JSON</strong>
+            <strong id="dataFormatValue">v3 JSON</strong>
             <small id="dataUpdatedValue">等待第一条记录</small>
           </div>
         </div>
@@ -907,7 +1025,7 @@
       const CONFIG = {
         storageKey: "michael-energy-tracker-v1",
         seededKey: "michael-energy-tracker-seeded",
-        exportVersion: 2,
+        exportVersion: 3,
         clearArmedMs: 4000,
         reminderSleepThreshold: 60,
         reminderLateSleepMinutes: 22 * 60 + 30,
@@ -929,6 +1047,11 @@
         importFileInput: document.getElementById("importFileInput"),
         clearBtn: document.getElementById("clearBtn"),
         formModeLabel: document.getElementById("formModeLabel"),
+        workoutItemsEditor: document.getElementById("workoutItemsEditor"),
+        addWorkoutItemBtn: document.getElementById("addWorkoutItemBtn"),
+        clearWorkoutItemsBtn: document.getElementById("clearWorkoutItemsBtn"),
+        workoutEmptyState: document.getElementById("workoutEmptyState"),
+        workoutMetaLabel: document.getElementById("workoutMetaLabel"),
         chartCanvas: document.getElementById("sleepChart"),
         chartStatusLabel: document.getElementById("chartStatusLabel"),
         heroDateLabel: document.getElementById("heroDateLabel"),
@@ -1004,6 +1127,50 @@
         }
       };
 
+      const WorkoutModel = {
+        normalize(raw) {
+          const ratingValue = raw.rating === "" || raw.rating === null || raw.rating === undefined
+            ? null
+            : Number(raw.rating);
+
+          return {
+            name: String(raw.name || raw.project || "").trim(),
+            volume: String(raw.volume || raw.sets || raw.quantity || "").trim(),
+            rating: Number.isFinite(ratingValue) ? ratingValue : null,
+            note: String(raw.note || raw.remark || "").trim()
+          };
+        },
+
+        isMeaningful(item) {
+          return Boolean(item.name || item.volume || item.rating !== null || item.note);
+        },
+
+        normalizeItems(items) {
+          if (!Array.isArray(items)) return [];
+          return items
+            .map((item) => this.normalize(item))
+            .filter((item) => this.isMeaningful(item));
+        },
+
+        validateItems(items) {
+          for (const item of items) {
+            if (!item.name) return "训练项目不能为空。";
+            if (!item.volume) return `请为“${item.name}”填写组数/数量。`;
+            if (item.rating !== null && (item.rating < 1 || item.rating > 10)) {
+              return `训练项目“${item.name}”的状态自评需要在 1 到 10 之间。`;
+            }
+          }
+          return "";
+        },
+
+        getAverageRating(items) {
+          const scoredItems = this.normalizeItems(items).filter((item) => item.rating !== null);
+          if (!scoredItems.length) return null;
+          const total = scoredItems.reduce((sum, item) => sum + item.rating, 0);
+          return total / scoredItems.length;
+        }
+      };
+
       const EntryModel = {
         normalizeBoolean(value) {
           return value === true || value === "true" || value === 1 || value === "1";
@@ -1015,6 +1182,7 @@
         },
 
         normalize(raw) {
+          const workoutItems = WorkoutModel.normalizeItems(raw.workoutItems || raw.trainingItems || []);
           return {
             date: String(raw.date || ""),
             sleepScore: this.normalizeNumber(raw.sleepScore, 0),
@@ -1022,9 +1190,10 @@
             wakeTime: String(raw.wakeTime || ""),
             wakeups: this.normalizeNumber(raw.wakeups, 0),
             energy: this.normalizeNumber(raw.energy, 0),
-            exercised: this.normalizeBoolean(raw.exercised),
+            exercised: this.normalizeBoolean(raw.exercised) || workoutItems.length > 0,
             cooked: this.normalizeBoolean(raw.cooked),
-            mood: String(raw.mood || "").trim()
+            mood: String(raw.mood || "").trim(),
+            workoutItems
           };
         },
 
@@ -1034,17 +1203,67 @@
           if (entry.sleepScore < 0 || entry.sleepScore > 100) return "睡眠分需要在 0 到 100 之间。";
           if (entry.energy < 1 || entry.energy > 10) return "主观能量值需要在 1 到 10 之间。";
           if (entry.wakeups < 0 || entry.wakeups > 10) return "起夜次数需要在 0 到 10 之间。";
+          const workoutError = WorkoutModel.validateItems(entry.workoutItems || []);
+          if (workoutError) return workoutError;
           return "";
+        },
+
+        hasWorkoutDetails(entry) {
+          return WorkoutModel.normalizeItems(entry.workoutItems).length > 0;
+        },
+
+        isExerciseDay(entry) {
+          return this.normalizeBoolean(entry.exercised) || this.hasWorkoutDetails(entry);
+        },
+
+        getWorkoutSummary(entry) {
+          const workoutItems = WorkoutModel.normalizeItems(entry.workoutItems);
+          if (workoutItems.length) {
+            return `${workoutItems.length} 项训练`;
+          }
+          return this.isExerciseDay(entry) ? "已训练" : "未训练";
+        },
+
+        getWorkoutAverageRating(entry) {
+          return WorkoutModel.getAverageRating(entry.workoutItems);
         },
 
         getDefaultSeedEntries() {
           const year = new Date().getFullYear();
           return [
-            { date: `${year}-04-17`, sleepScore: 96, bedtime: "22:00", wakeTime: "05:20", wakeups: 0, energy: 10, exercised: false, cooked: false, mood: "太爽了" },
-            { date: `${year}-04-18`, sleepScore: 47, bedtime: "00:30", wakeTime: "06:00", wakeups: 1, energy: 3, exercised: true, cooked: true, mood: "提不起劲" },
-            { date: `${year}-04-19`, sleepScore: 75, bedtime: "22:00", wakeTime: "06:00", wakeups: 1, energy: 7, exercised: false, cooked: true, mood: "神清气爽" },
-            { date: `${year}-04-20`, sleepScore: 74, bedtime: "21:30", wakeTime: "05:00", wakeups: 3, energy: 7, exercised: true, cooked: true, mood: "充实" },
-            { date: `${year}-04-21`, sleepScore: 80, bedtime: "22:00", wakeTime: "06:00", wakeups: 0, energy: 8, exercised: false, cooked: true, mood: "稳定" }
+            { date: `${year}-04-17`, sleepScore: 96, bedtime: "22:00", wakeTime: "05:20", wakeups: 0, energy: 10, exercised: false, cooked: false, mood: "太爽了", workoutItems: [] },
+            {
+              date: `${year}-04-18`,
+              sleepScore: 47,
+              bedtime: "00:30",
+              wakeTime: "06:00",
+              wakeups: 1,
+              energy: 3,
+              exercised: true,
+              cooked: true,
+              mood: "提不起劲",
+              workoutItems: [
+                { name: "宽距引体向上", volume: "10 个 x 1 组", rating: 6, note: "今天发力感偏散，先把动作做完整。" },
+                { name: "拉伸", volume: "10 分钟", rating: 7, note: "训练后身体稍微舒展开一点。" }
+              ]
+            },
+            { date: `${year}-04-19`, sleepScore: 75, bedtime: "22:00", wakeTime: "06:00", wakeups: 1, energy: 7, exercised: false, cooked: true, mood: "神清气爽", workoutItems: [] },
+            {
+              date: `${year}-04-20`,
+              sleepScore: 74,
+              bedtime: "21:30",
+              wakeTime: "05:00",
+              wakeups: 3,
+              energy: 7,
+              exercised: true,
+              cooked: true,
+              mood: "充实",
+              workoutItems: [
+                { name: "窄距俯卧撑", volume: "20 个 x 1 组", rating: 8, note: "胸和手臂发力很顺。" },
+                { name: "悬垂举腿", volume: "14 个 x 1 组", rating: 7, note: "下放时继续慢一点会更稳。" }
+              ]
+            },
+            { date: `${year}-04-21`, sleepScore: 80, bedtime: "22:00", wakeTime: "06:00", wakeups: 0, energy: 8, exercised: false, cooked: true, mood: "稳定", workoutItems: [] }
           ].map((entry) => this.normalize(entry));
         },
 
@@ -1130,6 +1349,13 @@
           return entries.length ? entries[entries.length - 1] : null;
         },
 
+        getFieldValue(entry, fieldName) {
+          if (fieldName === "exercised") {
+            return EntryModel.isExerciseDay(entry);
+          }
+          return entry[fieldName];
+        },
+
         buildEntryMap(entries) {
           return new Map(entries.map((entry) => [entry.date, entry]));
         },
@@ -1161,7 +1387,7 @@
         },
 
         calculateCount(entries, latestDate, fieldName) {
-          return this.getWindowEntries(entries, latestDate, CONFIG.weeklyDays).filter((entry) => entry[fieldName]).length;
+          return this.getWindowEntries(entries, latestDate, CONFIG.weeklyDays).filter((entry) => this.getFieldValue(entry, fieldName)).length;
         },
 
         calculateTrend(entries, latestDate) {
@@ -1201,7 +1427,7 @@
           let streak = 0;
           let cursor = latestDate;
           while (entryMap.has(cursor)) {
-            if (entryMap.get(cursor)[fieldName] !== expectedValue) break;
+            if (this.getFieldValue(entryMap.get(cursor), fieldName) !== expectedValue) break;
             streak += 1;
             cursor = DateUtils.addDays(cursor, -1);
           }
@@ -1501,11 +1727,88 @@
           elements.formModeLabel.textContent = text;
         },
 
+        createWorkoutItemElement(item = {}) {
+          const workoutItem = WorkoutModel.normalize(item);
+          const wrapper = document.createElement("div");
+          wrapper.className = "workout-item";
+          wrapper.innerHTML = `
+            <div class="field">
+              <label>训练项目</label>
+              <input type="text" data-field="name" placeholder="例如：宽距引体向上" value="${this.escapeHtml(workoutItem.name)}" />
+            </div>
+            <div class="field">
+              <label>组数 / 数量</label>
+              <input type="text" data-field="volume" placeholder="例如：15 个 x 1 组" value="${this.escapeHtml(workoutItem.volume)}" />
+            </div>
+            <div class="field">
+              <label>状态自评</label>
+              <input type="number" data-field="rating" min="1" max="10" placeholder="1-10" value="${workoutItem.rating ?? ""}" />
+            </div>
+            <div class="workout-item-actions">
+              <button class="btn-warning btn-slim" type="button" data-action="remove-workout-item">移除</button>
+            </div>
+            <div class="field full workout-note-field">
+              <label>训练备注</label>
+              <input type="text" data-field="note" placeholder="身体感受、痛点、突破都可以记这里" value="${this.escapeHtml(workoutItem.note)}" />
+            </div>
+          `;
+          return wrapper;
+        },
+
+        getWorkoutItemsFromEditor() {
+          return [...elements.workoutItemsEditor.querySelectorAll(".workout-item")]
+            .map((item) => WorkoutModel.normalize({
+              name: item.querySelector('[data-field="name"]').value,
+              volume: item.querySelector('[data-field="volume"]').value,
+              rating: item.querySelector('[data-field="rating"]').value,
+              note: item.querySelector('[data-field="note"]').value
+            }))
+            .filter((item) => WorkoutModel.isMeaningful(item));
+        },
+
+        renderWorkoutEditor(items = []) {
+          elements.workoutItemsEditor.innerHTML = "";
+          WorkoutModel.normalizeItems(items).forEach((item) => {
+            elements.workoutItemsEditor.appendChild(this.createWorkoutItemElement(item));
+          });
+          this.refreshWorkoutMeta();
+        },
+
+        addWorkoutItem(item = {}) {
+          elements.workoutItemsEditor.appendChild(this.createWorkoutItemElement(item));
+          document.getElementById("exerciseYes").checked = true;
+          this.refreshWorkoutMeta();
+        },
+
+        clearWorkoutEditor() {
+          elements.workoutItemsEditor.innerHTML = "";
+          this.refreshWorkoutMeta();
+        },
+
+        refreshWorkoutMeta() {
+          const workoutItems = this.getWorkoutItemsFromEditor();
+          const isExerciseChecked = document.getElementById("exerciseYes").checked;
+          elements.workoutEmptyState.style.display = workoutItems.length ? "none" : "block";
+
+          if (workoutItems.length) {
+            const averageRating = WorkoutModel.getAverageRating(workoutItems);
+            elements.workoutMetaLabel.textContent = averageRating === null
+              ? `已记录 ${workoutItems.length} 个训练项目`
+              : `已记录 ${workoutItems.length} 个训练项目，平均状态 ${averageRating.toFixed(1)}`;
+            return;
+          }
+
+          elements.workoutMetaLabel.textContent = isExerciseChecked
+            ? "今天已标记训练，可继续补充项目明细"
+            : "不训练也可以直接保存";
+        },
+
         resetForm() {
           elements.form.reset();
           elements.form.entryDate.value = DateUtils.getTodayISO();
           document.getElementById("exerciseNo").checked = true;
           document.getElementById("cookedNo").checked = true;
+          this.clearWorkoutEditor();
           this.setFormMode("保存或更新当天记录");
         },
 
@@ -1517,8 +1820,9 @@
           elements.form.wakeups.value = entry.wakeups;
           elements.form.energy.value = entry.energy;
           elements.form.mood.value = entry.mood || "";
-          document.getElementById(entry.exercised ? "exerciseYes" : "exerciseNo").checked = true;
+          document.getElementById(EntryModel.isExerciseDay(entry) ? "exerciseYes" : "exerciseNo").checked = true;
           document.getElementById(entry.cooked ? "cookedYes" : "cookedNo").checked = true;
+          this.renderWorkoutEditor(entry.workoutItems || []);
           this.setFormMode(`正在编辑：${DateUtils.formatShortDate(entry.date)}`);
           window.scrollTo({ top: 0, behavior: "smooth" });
         },
@@ -1543,7 +1847,7 @@
           elements.todaySleepValue.textContent = `${latestEntry.sleepScore} 分`;
           elements.todayTimeValue.textContent = `${latestEntry.bedtime} / ${latestEntry.wakeTime}`;
           elements.todayWakeupsValue.textContent = `${latestEntry.wakeups} 次`;
-          elements.todayHabitsValue.textContent = `${latestEntry.exercised ? "锻炼" : "未锻炼"} / ${latestEntry.cooked ? "做饭" : "未做饭"}`;
+          elements.todayHabitsValue.textContent = `${EntryModel.getWorkoutSummary(latestEntry)} / ${latestEntry.cooked ? "做饭" : "未做饭"}`;
         },
 
         renderMetrics(entries, latestEntry) {
@@ -1586,6 +1890,22 @@
           elements.recordList.innerHTML = latestFirst
             .map((entry) => {
               const mood = this.escapeHtml(entry.mood || "没有填写心情");
+              const workoutItems = WorkoutModel.normalizeItems(entry.workoutItems);
+              const workoutAverage = EntryModel.getWorkoutAverageRating(entry);
+              const workoutSummary = EntryModel.getWorkoutSummary(entry);
+              const workoutDetails = workoutItems.length
+                ? `
+                  <div class="record-workouts">
+                    ${workoutItems.map((item) => `
+                      <div class="record-workout-item">
+                        <strong>${this.escapeHtml(item.name)}</strong> · ${this.escapeHtml(item.volume)}
+                        ${item.rating !== null ? ` · 状态 ${item.rating}/10` : ""}
+                        ${item.note ? `<br />${this.escapeHtml(item.note)}` : ""}
+                      </div>
+                    `).join("")}
+                  </div>
+                `
+                : "";
               return `
                 <article class="record-item">
                   <div>
@@ -1593,13 +1913,16 @@
                       <div class="record-date">${DateUtils.formatShortDate(entry.date)}</div>
                       <span class="chip">睡眠 ${entry.sleepScore}</span>
                       <span class="chip">能量 ${entry.energy}/10</span>
+                      ${workoutItems.length ? `<span class="chip">训练 ${workoutItems.length} 项</span>` : ""}
+                      ${workoutAverage !== null ? `<span class="chip">训练状态 ${workoutAverage.toFixed(1)}</span>` : ""}
                     </div>
                     <div class="record-body">
                       入睡 ${this.escapeHtml(entry.bedtime)}，起床 ${this.escapeHtml(entry.wakeTime)}，起夜 ${entry.wakeups} 次，
-                      ${entry.exercised ? "有锻炼" : "没锻炼"}，
+                      ${workoutSummary}，
                       ${entry.cooked ? "自己做饭" : "没做饭"}。<br />
                       心情：${mood}
                     </div>
+                    ${workoutDetails}
                   </div>
                   <div class="record-actions">
                     <button class="btn-secondary" type="button" data-action="edit" data-date="${entry.date}">编辑</button>
@@ -1650,6 +1973,7 @@
 
         buildEntryFromForm() {
           const formData = new FormData(elements.form);
+          const workoutItems = UI.getWorkoutItemsFromEditor();
           return EntryModel.normalize({
             date: formData.get("entryDate"),
             sleepScore: formData.get("sleepScore"),
@@ -1657,9 +1981,10 @@
             wakeTime: formData.get("wakeTime"),
             wakeups: formData.get("wakeups"),
             energy: formData.get("energy"),
-            exercised: formData.get("exercised"),
+            exercised: formData.get("exercised") === "true" || workoutItems.length > 0,
             cooked: formData.get("cooked"),
-            mood: formData.get("mood")
+            mood: formData.get("mood"),
+            workoutItems
           });
         },
 
@@ -1794,6 +2119,37 @@
           UI.resetForm();
         },
 
+        addWorkoutItem() {
+          UI.addWorkoutItem();
+        },
+
+        clearWorkoutItems() {
+          UI.clearWorkoutEditor();
+          UI.refreshWorkoutMeta();
+        },
+
+        workoutEditorClick(event) {
+          const removeButton = event.target.closest('[data-action="remove-workout-item"]');
+          if (!removeButton) return;
+          const workoutItem = removeButton.closest(".workout-item");
+          if (workoutItem) {
+            workoutItem.remove();
+            UI.refreshWorkoutMeta();
+          }
+        },
+
+        workoutEditorInput(event) {
+          const workoutItem = event.target.closest(".workout-item");
+          if (workoutItem && UI.getWorkoutItemsFromEditor().length) {
+            document.getElementById("exerciseYes").checked = true;
+          }
+          UI.refreshWorkoutMeta();
+        },
+
+        workoutToggleChange() {
+          UI.refreshWorkoutMeta();
+        },
+
         resize() {
           if (!window.Chart) {
             UI.render(state.entries);
@@ -1805,6 +2161,12 @@
         elements.form.addEventListener("submit", Handlers.submit);
         elements.recordList.addEventListener("click", Handlers.recordActions);
         document.getElementById("resetFormBtn").addEventListener("click", Handlers.resetForm);
+        elements.addWorkoutItemBtn.addEventListener("click", Handlers.addWorkoutItem);
+        elements.clearWorkoutItemsBtn.addEventListener("click", Handlers.clearWorkoutItems);
+        elements.workoutItemsEditor.addEventListener("click", Handlers.workoutEditorClick);
+        elements.workoutItemsEditor.addEventListener("input", Handlers.workoutEditorInput);
+        document.getElementById("exerciseNo").addEventListener("change", Handlers.workoutToggleChange);
+        document.getElementById("exerciseYes").addEventListener("change", Handlers.workoutToggleChange);
         document.getElementById("exportBtn").addEventListener("click", Handlers.exportJson);
         document.getElementById("importBtn").addEventListener("click", Handlers.importTrigger);
         elements.importFileInput.addEventListener("change", Handlers.importFile);
