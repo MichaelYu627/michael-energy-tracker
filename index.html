@@ -592,32 +592,66 @@
     }
 
     .template-grid {
-      display: flex;
-      flex-wrap: wrap;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 10px;
     }
 
-    .template-chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 10px 14px;
-      border-radius: 999px;
-      background: rgba(31, 122, 92, 0.1);
-      border: 1px solid rgba(31, 122, 92, 0.14);
+    .template-card {
+      display: grid;
+      gap: 10px;
+      padding: 14px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.78);
+      border: 1px solid rgba(31, 122, 92, 0.12);
+    }
+
+    .template-card-title {
       color: #1f5c46;
-      font-size: 13px;
+      font-size: 14px;
       font-weight: 700;
     }
 
-    .template-chip:hover {
-      box-shadow: 0 10px 20px rgba(31, 122, 92, 0.12);
-    }
-
-    .template-chip small {
+    .template-card-subtitle {
       color: rgba(31, 92, 70, 0.78);
       font-weight: 600;
       font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .template-adjuster {
+      display: grid;
+      grid-template-columns: 42px minmax(0, 1fr) auto 42px;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .template-stepper {
+      padding: 0;
+      min-height: 42px;
+      border-radius: 14px;
+      background: rgba(31, 122, 92, 0.1);
+      color: #1f5c46;
+      border: 1px solid rgba(31, 122, 92, 0.12);
+      font-size: 20px;
+      line-height: 1;
+    }
+
+    .template-count-input {
+      padding: 10px 12px;
+      min-height: 42px;
+      text-align: center;
+      font-weight: 700;
+    }
+
+    .template-unit {
+      color: var(--muted);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .template-add-btn {
+      width: 100%;
     }
 
     .btn-slim {
@@ -966,6 +1000,10 @@
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
 
+      .template-grid {
+        grid-template-columns: 1fr;
+      }
+
       .workout-item-actions,
       .workout-note-field {
         grid-column: 1 / -1;
@@ -994,6 +1032,10 @@
 
       .workout-item {
         grid-template-columns: 1fr;
+      }
+
+      .template-adjuster {
+        grid-template-columns: 40px minmax(0, 1fr) auto 40px;
       }
 
       .record-item {
@@ -1129,7 +1171,7 @@
                   <div class="template-block">
                     <div class="template-head">
                       <label for="workoutTemplateGrid">常用动作模板</label>
-                      <span>点一下就能加到今天的训练明细里</span>
+                      <span>先调数量，再加入今天的训练明细</span>
                     </div>
                     <div class="template-grid" id="workoutTemplateGrid"></div>
                   </div>
@@ -1343,6 +1385,7 @@
       const CONFIG = {
         storageKey: "michael-energy-tracker-v1",
         seededKey: "michael-energy-tracker-seeded",
+        templateSettingsKey: "michael-energy-template-settings-v1",
         exportVersion: 4,
         obsidianVault: "Michael&Jarvis",
         obsidianFolder: "我的训练日志",
@@ -1364,7 +1407,8 @@
 
       const state = {
         entries: [],
-        sleepChart: null
+        sleepChart: null,
+        templateSettings: {}
       };
 
       const elements = {
@@ -1494,7 +1538,23 @@
 
       const WorkoutModel = {
         getTemplates() {
-          return CONFIG.workoutTemplates.map((item) => this.normalize(item));
+          return CONFIG.workoutTemplates.map((item) => {
+            const normalized = this.normalize(item);
+            const volumeMeta = this.parseTemplateVolume(normalized.volume);
+            const storedQuantity = Number(state.templateSettings[normalized.name]);
+            const templateQuantity = volumeMeta.editable && Number.isFinite(storedQuantity) && storedQuantity > 0
+              ? storedQuantity
+              : volumeMeta.quantity;
+
+            return {
+              ...normalized,
+              templateEditable: volumeMeta.editable,
+              templateQuantity,
+              templateSuffix: volumeMeta.suffix,
+              templateStep: volumeMeta.step,
+              templateMin: volumeMeta.min
+            };
+          });
         },
 
         normalize(raw) {
@@ -1508,6 +1568,57 @@
             rating: Number.isFinite(ratingValue) ? ratingValue : null,
             note: String(raw.note || raw.remark || "").trim()
           };
+        },
+
+        parseTemplateVolume(volumeText) {
+          const cleaned = String(volumeText || "").trim();
+          const matched = cleaned.match(/^(\d+(?:\.\d+)?)(.*)$/);
+
+          if (!matched) {
+            return {
+              editable: false,
+              quantity: null,
+              suffix: cleaned,
+              step: 1,
+              min: 1
+            };
+          }
+
+          const quantity = Number(matched[1]);
+          const suffix = String(matched[2] || "").trim();
+          const step = Number.isInteger(quantity) ? 1 : 0.5;
+          return {
+            editable: true,
+            quantity,
+            suffix,
+            step,
+            min: step
+          };
+        },
+
+        formatTemplateVolume(quantity, suffix) {
+          const numericQuantity = Number(quantity);
+          if (!Number.isFinite(numericQuantity)) return String(suffix || "").trim();
+          const quantityText = Number.isInteger(numericQuantity)
+            ? numericQuantity.toFixed(0)
+            : numericQuantity.toFixed(1).replace(/\.0$/, "");
+          return `${quantityText}${suffix ? ` ${suffix}` : ""}`.trim();
+        },
+
+        getTemplateByName(templateName) {
+          return this.getTemplates().find((item) => item.name === templateName) || null;
+        },
+
+        getTemplateWorkoutItem(templateName) {
+          const template = this.getTemplateByName(templateName);
+          if (!template) return null;
+
+          return this.normalize({
+            ...template,
+            volume: template.templateEditable
+              ? this.formatTemplateVolume(template.templateQuantity, template.templateSuffix)
+              : template.volume
+          });
         },
 
         isMeaningful(item) {
@@ -1684,6 +1795,23 @@
           localStorage.setItem(CONFIG.storageKey, JSON.stringify(normalized));
           localStorage.setItem(CONFIG.seededKey, "true");
           return normalized;
+        },
+
+        loadTemplateSettings() {
+          const raw = localStorage.getItem(CONFIG.templateSettingsKey);
+          if (!raw) return {};
+          try {
+            const parsed = JSON.parse(raw);
+            return parsed && typeof parsed === "object" ? parsed : {};
+          } catch (error) {
+            console.error("读取模板设置失败:", error);
+            return {};
+          }
+        },
+
+        saveTemplateSettings(settings) {
+          localStorage.setItem(CONFIG.templateSettingsKey, JSON.stringify(settings));
+          return settings;
         },
 
         ensureSeedData() {
@@ -2297,12 +2425,58 @@
         renderWorkoutTemplates() {
           elements.workoutTemplateGrid.innerHTML = WorkoutModel.getTemplates()
             .map((item) => `
-              <button class="template-chip" type="button" data-action="add-workout-template" data-template-name="${this.escapeHtml(item.name)}">
-                <span>${this.escapeHtml(item.name)}</span>
-                <small>${this.escapeHtml(item.volume)}</small>
-              </button>
+              <div class="template-card">
+                <div class="template-card-title">${this.escapeHtml(item.name)}</div>
+                ${item.templateEditable ? `
+                  <div class="template-adjuster">
+                    <button class="template-stepper" type="button" data-action="step-template-quantity" data-template-name="${this.escapeHtml(item.name)}" data-step="-1" aria-label="减少 ${this.escapeHtml(item.name)} 数量">-</button>
+                    <input
+                      class="template-count-input"
+                      type="number"
+                      min="${item.templateMin}"
+                      step="${item.templateStep}"
+                      value="${item.templateQuantity}"
+                      data-action="template-count-input"
+                      data-template-name="${this.escapeHtml(item.name)}"
+                      aria-label="${this.escapeHtml(item.name)} 数量"
+                    />
+                    <span class="template-unit">${this.escapeHtml(item.templateSuffix || "次")}</span>
+                    <button class="template-stepper" type="button" data-action="step-template-quantity" data-template-name="${this.escapeHtml(item.name)}" data-step="1" aria-label="增加 ${this.escapeHtml(item.name)} 数量">+</button>
+                  </div>
+                ` : `
+                  <div class="template-card-subtitle">${this.escapeHtml(item.volume)}</div>
+                `}
+                <button class="btn-secondary btn-slim template-add-btn" type="button" data-action="add-workout-template" data-template-name="${this.escapeHtml(item.name)}">加入今天</button>
+              </div>
             `)
             .join("");
+        },
+
+        updateTemplateQuantity(templateName, nextValue) {
+          const template = WorkoutModel.getTemplateByName(templateName);
+          if (!template || !template.templateEditable) return null;
+
+          const parsedValue = Number(nextValue);
+          const fallbackValue = template.templateQuantity || template.templateMin || 1;
+          const safeValue = Number.isFinite(parsedValue) && parsedValue > 0 ? parsedValue : fallbackValue;
+          const roundedValue = template.templateStep >= 1
+            ? Math.round(safeValue)
+            : Math.round(safeValue / template.templateStep) * template.templateStep;
+          const nextQuantity = Math.max(template.templateMin || template.templateStep || 1, roundedValue);
+
+          state.templateSettings = StorageService.saveTemplateSettings({
+            ...state.templateSettings,
+            [templateName]: nextQuantity
+          });
+          this.renderWorkoutTemplates();
+          return nextQuantity;
+        },
+
+        nudgeTemplateQuantity(templateName, delta) {
+          const template = WorkoutModel.getTemplateByName(templateName);
+          if (!template || !template.templateEditable) return null;
+          const nextValue = (template.templateQuantity || template.templateMin || 1) + Number(delta || 0) * template.templateStep;
+          return this.updateTemplateQuantity(templateName, nextValue);
         },
 
         getWorkoutItemsFromEditor() {
@@ -2331,14 +2505,17 @@
         },
 
         addWorkoutTemplateByName(templateName) {
-          const template = WorkoutModel.getTemplates().find((item) => item.name === templateName);
+          const template = WorkoutModel.getTemplateWorkoutItem(templateName);
           if (!template) return;
           this.addWorkoutItem(template);
         },
 
         addWorkoutRoutine() {
           const currentItems = this.getWorkoutItemsFromEditor();
-          const nextItems = WorkoutModel.getTemplates().filter((template) => !WorkoutModel.hasSameTemplate(currentItems, template.name));
+          const nextItems = WorkoutModel.getTemplates()
+            .filter((template) => !WorkoutModel.hasSameTemplate(currentItems, template.name))
+            .map((template) => WorkoutModel.getTemplateWorkoutItem(template.name))
+            .filter(Boolean);
           nextItems.forEach((item) => {
             elements.workoutItemsEditor.appendChild(this.createWorkoutItemElement(item));
           });
@@ -2795,10 +2972,30 @@
         },
 
         workoutTemplateClick(event) {
-          const templateButton = event.target.closest('[data-action="add-workout-template"]');
-          if (!templateButton) return;
-          UI.addWorkoutTemplateByName(templateButton.dataset.templateName);
-          UI.showStatus(`已加入动作模板：${templateButton.dataset.templateName}`);
+          const actionButton = event.target.closest('button[data-action]');
+          if (!actionButton) return;
+
+          if (actionButton.dataset.action === "add-workout-template") {
+            UI.addWorkoutTemplateByName(actionButton.dataset.templateName);
+            UI.showStatus(`已加入动作模板：${actionButton.dataset.templateName}`);
+            return;
+          }
+
+          if (actionButton.dataset.action === "step-template-quantity") {
+            const nextQuantity = UI.nudgeTemplateQuantity(actionButton.dataset.templateName, Number(actionButton.dataset.step));
+            if (nextQuantity !== null) {
+              UI.showStatus(`${actionButton.dataset.templateName} 已调整为 ${nextQuantity}`);
+            }
+          }
+        },
+
+        workoutTemplateChange(event) {
+          const quantityInput = event.target.closest('input[data-action="template-count-input"]');
+          if (!quantityInput) return;
+          const nextQuantity = UI.updateTemplateQuantity(quantityInput.dataset.templateName, quantityInput.value);
+          if (nextQuantity !== null) {
+            UI.showStatus(`${quantityInput.dataset.templateName} 已调整为 ${nextQuantity}`);
+          }
         },
 
         clearWorkoutItems() {
@@ -2844,6 +3041,7 @@
         elements.wakeTimeSlider.addEventListener("input", Handlers.wakeTimeSliderInput);
         document.getElementById("resetFormBtn").addEventListener("click", Handlers.resetForm);
         elements.workoutTemplateGrid.addEventListener("click", Handlers.workoutTemplateClick);
+        elements.workoutTemplateGrid.addEventListener("change", Handlers.workoutTemplateChange);
         elements.addWorkoutRoutineBtn.addEventListener("click", Handlers.addWorkoutRoutine);
         elements.addWorkoutItemBtn.addEventListener("click", Handlers.addWorkoutItem);
         elements.clearWorkoutItemsBtn.addEventListener("click", Handlers.clearWorkoutItems);
@@ -2859,6 +3057,7 @@
 
       function initialize() {
         state.entries = StorageService.ensureSeedData();
+        state.templateSettings = StorageService.loadTemplateSettings();
         UI.renderWorkoutTemplates();
         bindEvents();
         UI.resetForm();
