@@ -923,7 +923,11 @@
             </div>
             <div class="button-row">
               <button class="btn-primary" type="submit">保存记录</button>
+              <button class="btn-secondary" id="saveToObsidianBtn" type="button">保存并发到 Obsidian</button>
               <button class="btn-secondary" id="resetFormBtn" type="button">重置表单</button>
+            </div>
+            <div class="footer-note">
+              Obsidian 目标默认使用 `Michael / 我的训练日志`，会按日期生成训练日志笔记。
             </div>
           </form>
         </div>
@@ -1079,6 +1083,8 @@
         storageKey: "michael-energy-tracker-v1",
         seededKey: "michael-energy-tracker-seeded",
         exportVersion: 3,
+        obsidianVault: "Michael",
+        obsidianFolder: "我的训练日志",
         reminderSleepThreshold: 60,
         reminderLateSleepMinutes: 22 * 60 + 30,
         recoverySleepThreshold: 75,
@@ -1105,6 +1111,7 @@
         recordList: document.getElementById("recordList"),
         statusBanner: document.getElementById("statusBanner"),
         importFileInput: document.getElementById("importFileInput"),
+        saveToObsidianBtn: document.getElementById("saveToObsidianBtn"),
         formModeLabel: document.getElementById("formModeLabel"),
         workoutItemsEditor: document.getElementById("workoutItemsEditor"),
         workoutTemplateGrid: document.getElementById("workoutTemplateGrid"),
@@ -1157,6 +1164,14 @@
         formatDateLabel(dateString) {
           const date = this.parseDate(dateString);
           return `${date.getFullYear()} 年 ${date.getMonth() + 1} 月 ${date.getDate()} 日`;
+        },
+
+        formatShortYearDate(dateString) {
+          const date = this.parseDate(dateString);
+          const year = String(date.getFullYear()).slice(-2);
+          const month = String(date.getMonth() + 1).padStart(2, "0");
+          const day = String(date.getDate()).padStart(2, "0");
+          return `${year}-${month}-${day}`;
         },
 
         addDays(dateString, delta) {
@@ -2087,6 +2102,65 @@
           });
         },
 
+        buildObsidianNotePath(entry) {
+          return `${CONFIG.obsidianFolder}/训练日志 ${DateUtils.formatShortYearDate(entry.date)}`;
+        },
+
+        buildObsidianMarkdown(entry) {
+          const workoutItems = WorkoutModel.normalizeItems(entry.workoutItems);
+          const workoutAverage = EntryModel.getWorkoutAverageRating(entry);
+          const workoutSummary = EntryModel.getWorkoutSummary(entry);
+          const sections = [
+            `## ${DateUtils.formatDateLabel(entry.date)} 训练与能量记录`,
+            "",
+            `- 睡眠分：${entry.sleepScore}`,
+            `- 入睡 / 起床：${entry.bedtime} / ${entry.wakeTime}`,
+            `- 起夜次数：${entry.wakeups} 次`,
+            `- 主观能量：${entry.energy}/10`,
+            `- 训练概览：${workoutSummary}${workoutAverage !== null ? `，平均状态 ${workoutAverage.toFixed(1)}/10` : ""}`,
+            `- 自己做饭：${entry.cooked ? "是" : "否"}`,
+            `- 心情备注：${entry.mood || "无"}`,
+            ""
+          ];
+
+          if (workoutItems.length) {
+            sections.push("### 训练明细", "");
+            workoutItems.forEach((item) => {
+              const line = [
+                `- ${item.name}`,
+                `组数/数量：${item.volume}`,
+                item.rating !== null ? `状态：${item.rating}/10` : "",
+                item.note ? `备注：${item.note}` : ""
+              ].filter(Boolean).join("｜");
+              sections.push(line);
+            });
+            sections.push("");
+          }
+
+          sections.push("---", "");
+          return sections.join("\n");
+        },
+
+        sendToObsidian(entry) {
+          const file = this.buildObsidianNotePath(entry);
+          const content = this.buildObsidianMarkdown(entry);
+          const url = `obsidian://new?vault=${encodeURIComponent(CONFIG.obsidianVault)}&file=${encodeURIComponent(file)}&append=true&content=${encodeURIComponent(content)}`;
+          window.setTimeout(() => {
+            window.location.href = url;
+          }, 80);
+        },
+
+        validateAndBuildEntry() {
+          const entry = this.buildEntryFromForm();
+          const validationMessage = EntryModel.validate(entry);
+          return { entry, validationMessage };
+        },
+
+        saveEntry(entry) {
+          this.upsertEntry(entry);
+          UI.setFormMode(`已保存：${DateUtils.formatShortDate(entry.date)}`);
+        },
+
         upsertEntry(entry) {
           const nextEntries = state.entries.filter((item) => item.date !== entry.date);
           nextEntries.push(entry);
@@ -2122,16 +2196,26 @@
       const Handlers = {
         submit(event) {
           event.preventDefault();
-          const entry = App.buildEntryFromForm();
-          const validationMessage = EntryModel.validate(entry);
+          const { entry, validationMessage } = App.validateAndBuildEntry();
           if (validationMessage) {
             UI.showStatus(validationMessage);
             return;
           }
 
-          App.upsertEntry(entry);
-          UI.setFormMode(`已保存：${DateUtils.formatShortDate(entry.date)}`);
+          App.saveEntry(entry);
           UI.showStatus(`已保存 ${DateUtils.formatShortDate(entry.date)} 的记录`);
+        },
+
+        saveToObsidian() {
+          const { entry, validationMessage } = App.validateAndBuildEntry();
+          if (validationMessage) {
+            UI.showStatus(validationMessage);
+            return;
+          }
+
+          App.saveEntry(entry);
+          App.sendToObsidian(entry);
+          UI.showStatus(`已保存并发送到 Obsidian：${DateUtils.formatShortDate(entry.date)}`);
         },
 
         recordActions(event) {
@@ -2246,6 +2330,7 @@
       function bindEvents() {
         elements.form.addEventListener("submit", Handlers.submit);
         elements.recordList.addEventListener("click", Handlers.recordActions);
+        elements.saveToObsidianBtn.addEventListener("click", Handlers.saveToObsidian);
         document.getElementById("resetFormBtn").addEventListener("click", Handlers.resetForm);
         elements.workoutTemplateGrid.addEventListener("click", Handlers.workoutTemplateClick);
         elements.addWorkoutRoutineBtn.addEventListener("click", Handlers.addWorkoutRoutine);
