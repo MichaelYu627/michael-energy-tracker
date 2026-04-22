@@ -1,0 +1,90 @@
+{
+  "date": "2026-04-22",
+  "tagline": "89分的黑马也需要一个安静的角落喘口气",
+  "briefing": {
+    "headlines": [
+      {
+        "level": "red",
+        "title": "Claude Opus 4.7 正式发布",
+        "summary": "最强编码模型，软件工程和复杂长任务显著提升，视觉能力支持更高分辨率"
+      },
+      {
+        "level": "red",
+        "title": "Claude Mythos 因安全风险限制发布",
+        "summary": "能自动发现零日漏洞，Anthropic 选择不公开，启动 Project Glasswing"
+      },
+      {
+        "level": "yellow",
+        "title": "Amazon 再投 250 亿美元给 Anthropic",
+        "summary": "Anthropic 锁定 5GW 算力，未来十年 AWS 花费超 1000 亿"
+      }
+    ],
+    "github_stars": [
+      {
+        "name": "caveman",
+        "stars": 42563,
+        "url": "https://github.com/JuliusBrussee/caveman",
+        "desc": "省 65% token 的 Claude Code 技能"
+      },
+      {
+        "name": "planning-with-files",
+        "stars": 19295,
+        "url": "https://github.com/OthmanAdi/planning-with-files",
+        "desc": "Manus 风格持久化 Markdown 规划"
+      },
+      {
+        "name": "humanizer",
+        "stars": 14790,
+        "url": "https://github.com/blader/humanizer",
+        "desc": "消除 AI 写作痕迹"
+      }
+    ],
+    "youtube_top": [
+      {
+        "title": "CNN: Anthropic 延迟 Mythos 发布",
+        "channel": "CNN",
+        "views": "1.2M",
+        "url": "https://youtu.be/htBaVVh_k90"
+      },
+      {
+        "title": "Fireship: 7 个开源 AI 工具",
+        "channel": "Fireship",
+        "views": "804K",
+        "url": "https://youtu.be/Xn-gtHDsaPY"
+      },
+      {
+        "title": "OpenAI 关闭 Sora 视频平台",
+        "channel": "NBC News",
+        "views": "742K",
+        "url": "https://youtu.be/MIISc5gNRto"
+      }
+    ]
+  },
+  "reminders": [
+    {
+      "type": "success",
+      "icon": "🟢",
+      "text": "睡眠 V 型反弹完成：47→89，只用了 4 天。22:00 纪律是你的操作手册。"
+    },
+    {
+      "type": "success",
+      "icon": "🔥",
+      "text": "复利成长值 92.56（+21.16），训练 7 项全满，能量 10/10——近两周巅峰。"
+    },
+    {
+      "type": "warning",
+      "icon": "👁️",
+      "text": "眼结石根因是屏幕时间过长。每工作 50 分钟，望远 5 分钟。保护你最贵的硬件。"
+    },
+    {
+      "type": "info",
+      "icon": "💧",
+      "text": "允许自己脆弱。89 分的黑马也需要喘气的角落——你今天给了自己这个角落。"
+    }
+  ],
+  "action_items": [
+    "安装 Caveman 技能，测试 token 节省效果",
+    "今晚主动问晨曦要不要一起睡",
+    "小程序审核跟进，觅应收款先跑通再开新战线"
+  ]
+}

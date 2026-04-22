@@ -1062,6 +1062,253 @@
         width: 100%;
       }
     }
+    /* ── Jarvis 每日面板 ── */
+    .jarvis-panel {
+      margin-top: 16px;
+      border-radius: var(--radius-xl);
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 60%, #0f3460 100%);
+      color: #e8e8e8;
+      padding: 24px 20px 20px;
+      box-shadow: 0 20px 50px rgba(15, 20, 40, 0.35);
+      position: relative;
+      overflow: hidden;
+    }
+    .jarvis-panel::before {
+      content: "";
+      position: absolute;
+      top: -60px; right: -60px;
+      width: 200px; height: 200px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(0, 210, 255, 0.12), transparent 70%);
+    }
+    .jarvis-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+    .jarvis-header .jarvis-logo {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #00d2ff, #3a7bd5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+    .jarvis-header h2 {
+      margin: 0;
+      font-size: 17px;
+      color: #fff;
+      font-weight: 700;
+    }
+    .jarvis-header .jarvis-date {
+      margin-left: auto;
+      font-size: 12px;
+      color: rgba(255,255,255,0.5);
+      font-family: var(--font-number);
+    }
+
+    .jarvis-tagline {
+      margin: 14px 0 18px;
+      padding: 14px 18px;
+      border-radius: var(--radius-md);
+      background: rgba(0, 210, 255, 0.08);
+      border-left: 3px solid #00d2ff;
+      font-size: 18px;
+      font-weight: 600;
+      color: #fff;
+      line-height: 1.5;
+    }
+    .jarvis-tagline .tagline-label {
+      display: block;
+      font-size: 11px;
+      font-weight: 500;
+      color: rgba(0, 210, 255, 0.7);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 4px;
+    }
+
+    .jarvis-tabs {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 14px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .jarvis-tab {
+      padding: 7px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.15);
+      background: transparent;
+      color: rgba(255,255,255,0.6);
+      font-size: 13px;
+      cursor: pointer;
+      white-space: nowrap;
+      font-family: var(--font-main);
+      transition: all 0.2s;
+    }
+    .jarvis-tab:hover { border-color: rgba(0, 210, 255, 0.4); color: #fff; }
+    .jarvis-tab.active {
+      background: rgba(0, 210, 255, 0.15);
+      border-color: rgba(0, 210, 255, 0.5);
+      color: #00d2ff;
+      font-weight: 600;
+    }
+
+    .jarvis-tab-content { display: none; }
+    .jarvis-tab-content.active { display: block; }
+
+    /* 简报列表 */
+    .jarvis-news-item {
+      display: flex;
+      gap: 10px;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      align-items: flex-start;
+    }
+    .jarvis-news-item:last-child { border-bottom: none; }
+    .jarvis-news-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      margin-top: 6px;
+      flex-shrink: 0;
+    }
+    .jarvis-news-dot.red { background: #ff6b6b; }
+    .jarvis-news-dot.yellow { background: #ffc107; }
+    .jarvis-news-dot.green { background: #00d2ff; }
+    .jarvis-news-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 2px;
+    }
+    .jarvis-news-summary {
+      font-size: 12px;
+      color: rgba(255,255,255,0.55);
+      line-height: 1.5;
+    }
+
+    /* GitHub 卡片 */
+    .jarvis-gh-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .jarvis-gh-item:last-child { border-bottom: none; }
+    .jarvis-gh-stars {
+      font-family: var(--font-number);
+      font-size: 13px;
+      color: #ffc107;
+      white-space: nowrap;
+      min-width: 55px;
+    }
+    .jarvis-gh-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: #00d2ff;
+    }
+    .jarvis-gh-name a { color: inherit; text-decoration: none; }
+    .jarvis-gh-name a:hover { text-decoration: underline; }
+    .jarvis-gh-desc {
+      font-size: 12px;
+      color: rgba(255,255,255,0.5);
+    }
+
+    /* YouTube 卡片 */
+    .jarvis-yt-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .jarvis-yt-item:last-child { border-bottom: none; }
+    .jarvis-yt-views {
+      font-family: var(--font-number);
+      font-size: 12px;
+      color: rgba(255,255,255,0.4);
+      min-width: 45px;
+    }
+    .jarvis-yt-title a {
+      font-size: 14px;
+      font-weight: 600;
+      color: #ff6b6b;
+      text-decoration: none;
+    }
+    .jarvis-yt-title a:hover { text-decoration: underline; }
+    .jarvis-yt-channel {
+      font-size: 12px;
+      color: rgba(255,255,255,0.45);
+    }
+
+    /* 提醒卡片 */
+    .jarvis-reminder {
+      display: flex;
+      gap: 10px;
+      padding: 10px 14px;
+      border-radius: var(--radius-sm);
+      margin-bottom: 8px;
+      font-size: 13px;
+      line-height: 1.6;
+      color: rgba(255,255,255,0.85);
+    }
+    .jarvis-reminder:last-child { margin-bottom: 0; }
+    .jarvis-reminder.success { background: rgba(45, 143, 78, 0.15); }
+    .jarvis-reminder.warning { background: rgba(196, 138, 7, 0.15); }
+    .jarvis-reminder.info { background: rgba(0, 210, 255, 0.1); }
+    .jarvis-reminder .reminder-icon {
+      font-size: 16px;
+      flex-shrink: 0;
+      line-height: 1.5;
+    }
+
+    /* 行动项 */
+    .jarvis-actions {
+      margin-top: 14px;
+      padding: 14px 16px;
+      border-radius: var(--radius-sm);
+      background: rgba(255,255,255,0.04);
+    }
+    .jarvis-actions-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: rgba(0, 210, 255, 0.7);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 8px;
+    }
+    .jarvis-action-item {
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+      font-size: 13px;
+      color: rgba(255,255,255,0.75);
+      line-height: 1.6;
+      margin-bottom: 4px;
+    }
+    .jarvis-action-item::before {
+      content: "→";
+      color: #00d2ff;
+      flex-shrink: 0;
+      font-weight: 600;
+    }
+
+    .jarvis-empty {
+      text-align: center;
+      padding: 30px 20px;
+      color: rgba(255,255,255,0.35);
+      font-size: 14px;
+    }
+
+    @media (max-width: 680px) {
+      .jarvis-panel { padding: 18px 14px 16px; }
+      .jarvis-tagline { font-size: 16px; padding: 12px 14px; }
+    }
   </style>
 </head>
 <body>
@@ -1075,6 +1322,30 @@
       </div>
       <div class="status-banner" id="statusBanner"></div>
     </header>
+
+    <!-- Jarvis 每日面板 -->
+    <section class="jarvis-panel" id="jarvisPanel">
+      <div class="jarvis-header">
+        <div class="jarvis-logo">J</div>
+        <h2>Jarvis 每日简报</h2>
+        <span class="jarvis-date" id="jarvisDate"></span>
+      </div>
+      <div class="jarvis-tagline" id="jarvisTagline">
+        <span class="tagline-label">今日定语</span>
+        <span id="jarvisTaglineText">加载中...</span>
+      </div>
+      <div class="jarvis-tabs" id="jarvisTabs">
+        <button class="jarvis-tab active" data-tab="briefing">📰 AI简报</button>
+        <button class="jarvis-tab" data-tab="github">⭐ GitHub热门</button>
+        <button class="jarvis-tab" data-tab="youtube">🎬 YouTube</button>
+        <button class="jarvis-tab" data-tab="reminders">💡 Jarvis提醒</button>
+      </div>
+      <div class="jarvis-tab-content active" id="jarvisTabBriefing"></div>
+      <div class="jarvis-tab-content" id="jarvisTabGithub"></div>
+      <div class="jarvis-tab-content" id="jarvisTabYoutube"></div>
+      <div class="jarvis-tab-content" id="jarvisTabReminders"></div>
+      <div class="jarvis-actions" id="jarvisActions"></div>
+    </section>
 
     <section class="panel-grid top">
       <article class="panel">
@@ -3063,6 +3334,155 @@
       }
 
       initialize();
+    })();
+
+    // ── Jarvis 每日面板逻辑 ──
+    (() => {
+      const JARVIS_JSON_URL = "jarvis-daily.json";
+      const JARVIS_STORAGE_KEY = "jarvis-daily-cache";
+
+      function formatStars(n) {
+        if (n >= 1000) return (n / 1000).toFixed(1).replace(/\.0$/, "") + "K";
+        return String(n);
+      }
+
+      function renderBriefing(headlines) {
+        return headlines.map(h => `
+          <div class="jarvis-news-item">
+            <div class="jarvis-news-dot ${h.level}"></div>
+            <div>
+              <div class="jarvis-news-title">${h.title}</div>
+              <div class="jarvis-news-summary">${h.summary}</div>
+            </div>
+          </div>
+        `).join("");
+      }
+
+      function renderGithub(repos) {
+        return repos.map(r => `
+          <div class="jarvis-gh-item">
+            <div class="jarvis-gh-stars">⭐ ${formatStars(r.stars)}</div>
+            <div>
+              <div class="jarvis-gh-name"><a href="${r.url}" target="_blank" rel="noopener">${r.name}</a></div>
+              <div class="jarvis-gh-desc">${r.desc}</div>
+            </div>
+          </div>
+        `).join("");
+      }
+
+      function renderYoutube(videos) {
+        return videos.map(v => `
+          <div class="jarvis-yt-item">
+            <div class="jarvis-yt-views">${v.views}</div>
+            <div>
+              <div class="jarvis-yt-title"><a href="${v.url}" target="_blank" rel="noopener">${v.title}</a></div>
+              <div class="jarvis-yt-channel">${v.channel}</div>
+            </div>
+          </div>
+        `).join("");
+      }
+
+      function renderReminders(reminders) {
+        return reminders.map(r => `
+          <div class="jarvis-reminder ${r.type}">
+            <span class="reminder-icon">${r.icon}</span>
+            <span>${r.text}</span>
+          </div>
+        `).join("");
+      }
+
+      function renderActions(items) {
+        if (!items || items.length === 0) return "";
+        const inner = items.map(a =>
+          `<div class="jarvis-action-item">${a}</div>`
+        ).join("");
+        return `<div class="jarvis-actions-title">今日行动</div>${inner}`;
+      }
+
+      function renderPanel(data) {
+        const panel = document.getElementById("jarvisPanel");
+        if (!panel) return;
+
+        document.getElementById("jarvisDate").textContent = data.date;
+        document.getElementById("jarvisTaglineText").textContent = data.tagline;
+
+        const briefing = data.briefing || {};
+        document.getElementById("jarvisTabBriefing").innerHTML =
+          renderBriefing(briefing.headlines || []);
+        document.getElementById("jarvisTabGithub").innerHTML =
+          renderGithub(briefing.github_stars || []);
+        document.getElementById("jarvisTabYoutube").innerHTML =
+          renderYoutube(briefing.youtube_top || []);
+        document.getElementById("jarvisTabReminders").innerHTML =
+          renderReminders(data.reminders || []);
+        document.getElementById("jarvisActions").innerHTML =
+          renderActions(data.action_items || []);
+      }
+
+      function bindTabs() {
+        const tabContainer = document.getElementById("jarvisTabs");
+        if (!tabContainer) return;
+
+        const tabMap = {
+          briefing: "jarvisTabBriefing",
+          github: "jarvisTabGithub",
+          youtube: "jarvisTabYoutube",
+          reminders: "jarvisTabReminders"
+        };
+
+        tabContainer.addEventListener("click", (e) => {
+          const btn = e.target.closest(".jarvis-tab");
+          if (!btn) return;
+          const tabName = btn.dataset.tab;
+
+          tabContainer.querySelectorAll(".jarvis-tab").forEach(t =>
+            t.classList.toggle("active", t === btn)
+          );
+          Object.entries(tabMap).forEach(([key, id]) => {
+            const el = document.getElementById(id);
+            if (el) el.classList.toggle("active", key === tabName);
+          });
+        });
+      }
+
+      async function loadJarvisData() {
+        try {
+          // 尝试从远程 JSON 加载（GitHub Pages 同域）
+          const cacheBuster = `?t=${Date.now()}`;
+          const resp = await fetch(JARVIS_JSON_URL + cacheBuster);
+          if (resp.ok) {
+            const data = await resp.json();
+            // 缓存到 localStorage
+            localStorage.setItem(JARVIS_STORAGE_KEY, JSON.stringify(data));
+            return data;
+          }
+        } catch (e) {
+          // 网络失败，尝试从缓存读取
+        }
+
+        // 回退到 localStorage 缓存
+        const cached = localStorage.getItem(JARVIS_STORAGE_KEY);
+        if (cached) {
+          try { return JSON.parse(cached); } catch (_) {}
+        }
+
+        return null;
+      }
+
+      async function initJarvis() {
+        bindTabs();
+        const data = await loadJarvisData();
+        if (data) {
+          renderPanel(data);
+        } else {
+          document.getElementById("jarvisTaglineText").textContent =
+            "暂无简报数据。请通过 Jarvis 生成今日简报。";
+          document.getElementById("jarvisTabBriefing").innerHTML =
+            '<div class="jarvis-empty">📡 等待 Jarvis 推送今日数据...</div>';
+        }
+      }
+
+      initJarvis();
     })();
   </script>
 </body>
