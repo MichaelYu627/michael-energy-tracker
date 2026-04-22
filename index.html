@@ -318,6 +318,93 @@
       resize: vertical;
     }
 
+    input[type="range"] {
+      padding: 0;
+      border: none;
+      background: transparent;
+      box-shadow: none;
+      transform: none;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+
+    input[type="range"]::-webkit-slider-runnable-track {
+      height: 10px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(31, 122, 92, 0.16), rgba(209, 123, 31, 0.26));
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 24px;
+      height: 24px;
+      margin-top: -7px;
+      border: 2px solid rgba(255, 248, 237, 0.92);
+      border-radius: 50%;
+      background: linear-gradient(135deg, #1f7a5c, #d17b1f);
+      box-shadow: 0 8px 20px rgba(51, 43, 24, 0.18);
+    }
+
+    input[type="range"]::-moz-range-track {
+      height: 10px;
+      border: none;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(31, 122, 92, 0.16), rgba(209, 123, 31, 0.26));
+    }
+
+    input[type="range"]::-moz-range-thumb {
+      width: 24px;
+      height: 24px;
+      border: 2px solid rgba(255, 248, 237, 0.92);
+      border-radius: 50%;
+      background: linear-gradient(135deg, #1f7a5c, #d17b1f);
+      box-shadow: 0 8px 20px rgba(51, 43, 24, 0.18);
+    }
+
+    .slider-field {
+      gap: 10px;
+    }
+
+    .slider-shell {
+      padding: 14px;
+      border-radius: 18px;
+      background: rgba(255, 251, 245, 0.9);
+      border: 1px solid rgba(109, 90, 60, 0.12);
+    }
+
+    .slider-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .slider-value {
+      font-family: var(--font-number);
+      font-size: 24px;
+      line-height: 1;
+      color: var(--text);
+    }
+
+    .slider-ticks {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .slider-note {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+      margin-top: 10px;
+    }
+
     .toggle-row {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -856,17 +943,55 @@
                 <label for="entryDate">日期</label>
                 <input id="entryDate" name="entryDate" type="date" required />
               </div>
-              <div class="field">
+              <div class="field slider-field">
                 <label for="sleepScore">睡眠分</label>
-                <input id="sleepScore" name="sleepScore" type="number" min="0" max="100" placeholder="0-100" required />
+                <div class="slider-shell">
+                  <div class="slider-top">
+                    <span>今晚整体睡得怎么样</span>
+                    <strong class="slider-value" id="sleepScoreValue">80 分</strong>
+                  </div>
+                  <input id="sleepScore" name="sleepScore" type="range" min="0" max="100" step="1" value="80" required />
+                  <div class="slider-ticks">
+                    <span>0</span>
+                    <span>50</span>
+                    <span>100</span>
+                  </div>
+                </div>
               </div>
-              <div class="field">
-                <label for="bedtime">入睡时间</label>
-                <input id="bedtime" name="bedtime" type="time" required />
+              <div class="field slider-field">
+                <label for="bedtimeSlider">入睡时间</label>
+                <div class="slider-shell">
+                  <div class="slider-top">
+                    <span>默认围绕 22:00 附近</span>
+                    <strong class="slider-value" id="bedtimeValue">22:00</strong>
+                  </div>
+                  <input id="bedtimeSlider" type="range" min="1200" max="1560" step="5" value="1320" />
+                  <input id="bedtime" name="bedtime" type="hidden" value="22:00" />
+                  <div class="slider-ticks">
+                    <span>20:00</span>
+                    <span>22:00</span>
+                    <span>00:00</span>
+                    <span>02:00</span>
+                  </div>
+                  <div class="slider-note">向右滑过 24:00 会自动显示成次日凌晨时间。</div>
+                </div>
               </div>
-              <div class="field">
-                <label for="wakeTime">起床时间</label>
-                <input id="wakeTime" name="wakeTime" type="time" required />
+              <div class="field slider-field">
+                <label for="wakeTimeSlider">起床时间</label>
+                <div class="slider-shell">
+                  <div class="slider-top">
+                    <span>默认围绕 06:00 附近</span>
+                    <strong class="slider-value" id="wakeTimeValue">06:00</strong>
+                  </div>
+                  <input id="wakeTimeSlider" type="range" min="240" max="540" step="5" value="360" />
+                  <input id="wakeTime" name="wakeTime" type="hidden" value="06:00" />
+                  <div class="slider-ticks">
+                    <span>04:00</span>
+                    <span>06:00</span>
+                    <span>08:00</span>
+                    <span>09:00</span>
+                  </div>
+                </div>
               </div>
               <div class="field">
                 <label for="wakeups">起夜次数</label>
@@ -1113,6 +1238,11 @@
         importFileInput: document.getElementById("importFileInput"),
         saveToObsidianBtn: document.getElementById("saveToObsidianBtn"),
         formModeLabel: document.getElementById("formModeLabel"),
+        sleepScoreValue: document.getElementById("sleepScoreValue"),
+        bedtimeSlider: document.getElementById("bedtimeSlider"),
+        bedtimeValue: document.getElementById("bedtimeValue"),
+        wakeTimeSlider: document.getElementById("wakeTimeSlider"),
+        wakeTimeValue: document.getElementById("wakeTimeValue"),
         workoutItemsEditor: document.getElementById("workoutItemsEditor"),
         workoutTemplateGrid: document.getElementById("workoutTemplateGrid"),
         addWorkoutRoutineBtn: document.getElementById("addWorkoutRoutineBtn"),
@@ -1195,11 +1325,27 @@
           return Number(hourText) * 60 + Number(minuteText);
         },
 
+        minutesToTimeString(totalMinutes) {
+          const safeMinutes = ((Number(totalMinutes) % (24 * 60)) + 24 * 60) % (24 * 60);
+          const hour = String(Math.floor(safeMinutes / 60)).padStart(2, "0");
+          const minute = String(safeMinutes % 60).padStart(2, "0");
+          return `${hour}:${minute}`;
+        },
+
         bedtimeComparableMinutes(timeString) {
           const minutes = this.timeToMinutes(timeString);
           if (minutes === null) return null;
           // 凌晨入睡视为超过当天 22 点后的延迟入睡，便于统一比较。
           return minutes < 12 * 60 ? minutes + 24 * 60 : minutes;
+        },
+
+        bedtimeSliderToTimeString(sliderValue) {
+          return this.minutesToTimeString(Number(sliderValue));
+        },
+
+        bedtimeTimeStringToSliderValue(timeString) {
+          const comparableMinutes = this.bedtimeComparableMinutes(timeString);
+          return comparableMinutes ?? 22 * 60;
         }
       };
 
@@ -1811,6 +1957,28 @@
           elements.formModeLabel.textContent = text;
         },
 
+        syncSleepScoreSlider() {
+          elements.sleepScoreValue.textContent = `${elements.form.sleepScore.value} 分`;
+        },
+
+        syncBedtimeSlider() {
+          const timeString = DateUtils.bedtimeSliderToTimeString(elements.bedtimeSlider.value);
+          elements.form.bedtime.value = timeString;
+          elements.bedtimeValue.textContent = timeString;
+        },
+
+        syncWakeTimeSlider() {
+          const timeString = DateUtils.minutesToTimeString(elements.wakeTimeSlider.value);
+          elements.form.wakeTime.value = timeString;
+          elements.wakeTimeValue.textContent = timeString;
+        },
+
+        syncAllSliders() {
+          this.syncSleepScoreSlider();
+          this.syncBedtimeSlider();
+          this.syncWakeTimeSlider();
+        },
+
         createWorkoutItemElement(item = {}) {
           const workoutItem = WorkoutModel.normalize(item);
           const wrapper = document.createElement("div");
@@ -1920,23 +2088,28 @@
         resetForm() {
           elements.form.reset();
           elements.form.entryDate.value = DateUtils.getTodayISO();
+          elements.form.sleepScore.value = 80;
+          elements.bedtimeSlider.value = 22 * 60;
+          elements.wakeTimeSlider.value = 6 * 60;
           document.getElementById("exerciseNo").checked = true;
           document.getElementById("cookedNo").checked = true;
           this.clearWorkoutEditor();
+          this.syncAllSliders();
           this.setFormMode("保存或更新当天记录");
         },
 
         fillForm(entry) {
           elements.form.entryDate.value = entry.date;
           elements.form.sleepScore.value = entry.sleepScore;
-          elements.form.bedtime.value = entry.bedtime;
-          elements.form.wakeTime.value = entry.wakeTime;
+          elements.bedtimeSlider.value = DateUtils.bedtimeTimeStringToSliderValue(entry.bedtime);
+          elements.wakeTimeSlider.value = DateUtils.timeToMinutes(entry.wakeTime) ?? 6 * 60;
           elements.form.wakeups.value = entry.wakeups;
           elements.form.energy.value = entry.energy;
           elements.form.mood.value = entry.mood || "";
           document.getElementById(EntryModel.isExerciseDay(entry) ? "exerciseYes" : "exerciseNo").checked = true;
           document.getElementById(entry.cooked ? "cookedYes" : "cookedNo").checked = true;
           this.renderWorkoutEditor(entry.workoutItems || []);
+          this.syncAllSliders();
           this.setFormMode(`正在编辑：${DateUtils.formatShortDate(entry.date)}`);
           window.scrollTo({ top: 0, behavior: "smooth" });
         },
@@ -2277,6 +2450,18 @@
           UI.resetForm();
         },
 
+        sleepSliderInput() {
+          UI.syncSleepScoreSlider();
+        },
+
+        bedtimeSliderInput() {
+          UI.syncBedtimeSlider();
+        },
+
+        wakeTimeSliderInput() {
+          UI.syncWakeTimeSlider();
+        },
+
         addWorkoutItem() {
           UI.addWorkoutItem();
         },
@@ -2331,6 +2516,9 @@
         elements.form.addEventListener("submit", Handlers.submit);
         elements.recordList.addEventListener("click", Handlers.recordActions);
         elements.saveToObsidianBtn.addEventListener("click", Handlers.saveToObsidian);
+        elements.form.sleepScore.addEventListener("input", Handlers.sleepSliderInput);
+        elements.bedtimeSlider.addEventListener("input", Handlers.bedtimeSliderInput);
+        elements.wakeTimeSlider.addEventListener("input", Handlers.wakeTimeSliderInput);
         document.getElementById("resetFormBtn").addEventListener("click", Handlers.resetForm);
         elements.workoutTemplateGrid.addEventListener("click", Handlers.workoutTemplateClick);
         elements.addWorkoutRoutineBtn.addEventListener("click", Handlers.addWorkoutRoutine);
