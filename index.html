@@ -305,6 +305,9 @@
       height: 100%;
       overflow: hidden;
       border-radius: 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
       background:
         linear-gradient(180deg, rgba(7, 25, 35, 0.88), rgba(12, 42, 53, 0.94)),
         radial-gradient(circle at 50% 20%, rgba(0, 210, 255, 0.1), transparent 46%);
@@ -360,13 +363,11 @@
     }
 
     .battery-copy {
-      position: absolute;
-      left: 20px;
-      right: 20px;
-      top: 20px;
+      position: relative;
       z-index: 2;
       display: grid;
-      gap: 10px;
+      gap: 8px;
+      padding: 20px 20px 0;
     }
 
     .battery-kicker {
@@ -378,6 +379,7 @@
 
     .battery-score {
       display: flex;
+      flex-wrap: wrap;
       align-items: flex-end;
       gap: 8px;
     }
@@ -397,15 +399,16 @@
     }
 
     .battery-caption {
-      max-width: 190px;
+      max-width: 100%;
       color: rgba(226, 248, 252, 0.72);
-      font-size: 13px;
-      line-height: 1.6;
+      font-size: 12px;
+      line-height: 1.55;
     }
 
     .battery-drain {
       display: inline-flex;
       width: fit-content;
+      max-width: 100%;
       align-items: center;
       gap: 8px;
       padding: 7px 10px;
@@ -413,7 +416,7 @@
       background: rgba(255, 255, 255, 0.08);
       color: rgba(226, 248, 252, 0.76);
       font-size: 12px;
-      line-height: 1;
+      line-height: 1.35;
     }
 
     .battery-drain::before {
@@ -426,13 +429,11 @@
     }
 
     .battery-footer {
-      position: absolute;
-      left: 18px;
-      right: 18px;
-      bottom: 18px;
+      position: relative;
       z-index: 2;
       display: grid;
-      gap: 10px;
+      gap: 8px;
+      padding: 0 18px 18px;
     }
 
     .battery-footer-row {
@@ -446,6 +447,8 @@
 
     .battery-footer-row span:first-child {
       flex: 1 1 100%;
+      line-height: 1.45;
+      overflow-wrap: anywhere;
     }
 
     .battery-quote {
@@ -454,8 +457,8 @@
       background: rgba(255, 255, 255, 0.08);
       border: 1px solid rgba(255, 255, 255, 0.08);
       color: rgba(243, 253, 255, 0.84);
-      font-size: 13px;
-      line-height: 1.7;
+      font-size: 12px;
+      line-height: 1.55;
     }
 
     .status-banner {
@@ -1458,7 +1461,7 @@
 
       .battery-shell {
         width: min(100%, 280px);
-        height: 320px;
+        height: 380px;
       }
 
       .workout-item {
@@ -2031,7 +2034,7 @@
             </div>
             <div class="button-row">
               <button class="btn-primary" type="submit">保存记录</button>
-              <button class="btn-secondary" id="saveToObsidianBtn" type="button">保存并发到 Obsidian</button>
+              <button class="btn-secondary" id="saveToObsidianBtn" type="button">保存记录并发到 Obsidian</button>
               <button class="btn-secondary" id="resetFormBtn" type="button">重置表单</button>
             </div>
             <div class="footer-note">
@@ -3667,7 +3670,7 @@
           elements.heroBatteryStatus.textContent = battery.status;
           elements.heroBatteryCaption.textContent = battery.caption;
           elements.heroBatteryDrain.textContent = `基于 ${battery.sourceLabel}，6:00 后已过 ${battery.elapsedHours.toFixed(1)}h`;
-          elements.heroBatteryRule.textContent = `睡眠 ${battery.sleepBase} + 补能 ${battery.recoveryBonus}% + 营养 ${battery.nutritionBonus}% - 熵增 ${battery.entropyDrain.toFixed(1)}%`;
+          elements.heroBatteryRule.textContent = `睡眠${battery.sleepBase} + 补能${battery.recoveryBonus} + 营养${battery.nutritionBonus} - 熵增${battery.entropyDrain.toFixed(1)}`;
           elements.heroBatteryZone.textContent = battery.zoneText;
         },
 
@@ -3931,7 +3934,7 @@
           const url = `obsidian://new?vault=${encodeURIComponent(CONFIG.obsidianVault)}&file=${encodeURIComponent(file)}&append=true&content=${encodeURIComponent(content)}`;
           window.setTimeout(() => {
             window.location.href = url;
-          }, 80);
+          }, 650);
         },
 
         validateAndBuildEntry() {
@@ -3943,6 +3946,17 @@
         saveEntry(entry) {
           this.upsertEntry(entry);
           UI.setFormMode(`已保存：${DateUtils.formatShortDate(entry.date)}`);
+          return this.confirmSavedEntry(entry);
+        },
+
+        confirmSavedEntry(entry) {
+          const savedEntries = StorageService.loadEntries();
+          const savedEntry = savedEntries.find((item) => item.date === entry.date);
+          const isConfirmed = Boolean(savedEntry);
+          if (isConfirmed) {
+            state.entries = savedEntries;
+          }
+          return isConfirmed;
         },
 
         upsertEntry(entry) {
@@ -3986,7 +4000,11 @@
             return;
           }
 
-          App.saveEntry(entry);
+          const isSaved = App.saveEntry(entry);
+          if (!isSaved) {
+            UI.showStatus("保存失败：本地记录未写入，请再试一次");
+            return;
+          }
           UI.showStatus(`已保存 ${DateUtils.formatShortDate(entry.date)} 的记录`);
         },
 
@@ -3997,9 +4015,13 @@
             return;
           }
 
-          App.saveEntry(entry);
+          const isSaved = App.saveEntry(entry);
+          if (!isSaved) {
+            UI.showStatus("保存失败：本地记录未写入，暂不打开 Obsidian");
+            return;
+          }
           App.sendToObsidian(entry);
-          UI.showStatus(`已保存并发送到 Obsidian：${DateUtils.formatShortDate(entry.date)}`);
+          UI.showStatus(`本地已保存，正在打开 Obsidian：${DateUtils.formatShortDate(entry.date)}`);
         },
 
         recordActions(event) {
