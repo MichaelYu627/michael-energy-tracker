@@ -917,6 +917,30 @@
       display: none;
     }
 
+    .meal-detail-field[hidden] {
+      display: none;
+    }
+
+    .meal-detail-card {
+      display: grid;
+      gap: 10px;
+      padding: 14px;
+      border-radius: 20px;
+      background: rgba(255, 251, 245, 0.78);
+      border: 1px solid rgba(109, 90, 60, 0.12);
+    }
+
+    .meal-detail-card label {
+      color: #2f493e;
+      font-weight: 800;
+    }
+
+    .meal-detail-hint {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
     .workout-details {
       border-radius: 22px;
       background: rgba(255, 251, 245, 0.78);
@@ -1980,6 +2004,13 @@
                   <label for="cookedYes">是</label>
                 </div>
               </div>
+              <div class="field full meal-detail-field" id="mealDetailField" hidden>
+                <div class="meal-detail-card">
+                  <label for="mealDetails">今天具体吃了什么</label>
+                  <textarea id="mealDetails" name="mealDetails" placeholder="例如：早餐鸡蛋、牛奶、燕麦；午餐牛肉、青菜、米饭；晚餐鱼、豆腐、蔬菜。"></textarea>
+                  <div class="meal-detail-hint">这里会一起保存到本地记录，并写入 Obsidian 的当天日志。</div>
+                </div>
+              </div>
               <div class="field full">
                 <label>今天吃得健康营养丰富吗</label>
                 <div class="toggle-group">
@@ -2033,8 +2064,7 @@
               </div>
             </div>
             <div class="button-row">
-              <button class="btn-primary" type="submit">保存记录</button>
-              <button class="btn-secondary" id="saveToObsidianBtn" type="button">保存记录并发到 Obsidian</button>
+              <button class="btn-primary" id="saveToObsidianBtn" type="submit">保存记录并发到 Obsidian</button>
               <button class="btn-secondary" id="resetFormBtn" type="button">重置表单</button>
             </div>
             <div class="footer-note">
@@ -2229,7 +2259,7 @@
         storageKey: "michael-energy-tracker-v1",
         seededKey: "michael-energy-tracker-seeded",
         templateSettingsKey: "michael-energy-template-settings-v1",
-        exportVersion: 8,
+        exportVersion: 9,
         obsidianVault: "Michael&Jarvis",
         obsidianFolder: "我的训练日志",
         currentWeightDefault: 83.4,
@@ -2278,6 +2308,7 @@
         workoutItemsEditor: document.getElementById("workoutItemsEditor"),
         workoutDetailField: document.getElementById("workoutDetailField"),
         workoutDetailsPanel: document.getElementById("workoutDetailsPanel"),
+        mealDetailField: document.getElementById("mealDetailField"),
         workoutTemplateGrid: document.getElementById("workoutTemplateGrid"),
         addWorkoutRoutineBtn: document.getElementById("addWorkoutRoutineBtn"),
         addWorkoutItemBtn: document.getElementById("addWorkoutItemBtn"),
@@ -2552,6 +2583,7 @@
             energyBoost: this.normalizeNumber(raw.energyBoost, 0),
             exercised: this.normalizeBoolean(raw.exercised) || workoutItems.length > 0,
             cooked: this.normalizeBoolean(raw.cooked),
+            mealDetails: String(raw.mealDetails || raw.foodDetails || raw.meals || "").trim(),
             healthyFood: this.normalizeBoolean(raw.healthyFood),
             ateOut: this.normalizeBoolean(raw.ateOut),
             deepWorkTasks: this.normalizeNumber(raw.deepWorkTasks, 0),
@@ -3514,6 +3546,11 @@
             : "选择训练后再记录动作";
         },
 
+        refreshMealDetails() {
+          const isCookedChecked = document.getElementById("cookedYes").checked;
+          elements.mealDetailField.hidden = !isCookedChecked;
+        },
+
         resetForm() {
           elements.form.reset();
           elements.form.entryDate.value = DateUtils.getTodayISO();
@@ -3527,12 +3564,14 @@
           elements.form.morningEnergy.value = "";
           elements.form.afternoonEnergy.value = "";
           elements.form.eveningEnergy.value = "";
+          elements.form.mealDetails.value = "";
           elements.form.dailyStory.value = "";
           document.getElementById("exerciseNo").checked = true;
           document.getElementById("cookedNo").checked = true;
           document.getElementById("healthyFoodNo").checked = true;
           document.getElementById("ateOutNo").checked = true;
           this.clearWorkoutEditor();
+          this.refreshMealDetails();
           this.syncAllSliders();
           this.setFormMode("保存或更新当天记录");
         },
@@ -3551,6 +3590,7 @@
           elements.form.morningEnergy.value = entry.morningEnergy ?? "";
           elements.form.afternoonEnergy.value = entry.afternoonEnergy ?? "";
           elements.form.eveningEnergy.value = entry.eveningEnergy ?? "";
+          elements.form.mealDetails.value = entry.mealDetails || "";
           elements.form.mood.value = entry.mood || "";
           elements.form.dailyStory.value = entry.dailyStory || "";
           document.getElementById(EntryModel.isExerciseDay(entry) ? "exerciseYes" : "exerciseNo").checked = true;
@@ -3558,6 +3598,7 @@
           document.getElementById(entry.healthyFood ? "healthyFoodYes" : "healthyFoodNo").checked = true;
           document.getElementById(entry.ateOut ? "ateOutYes" : "ateOutNo").checked = true;
           this.renderWorkoutEditor(entry.workoutItems || []);
+          this.refreshMealDetails();
           this.syncAllSliders();
           this.setFormMode(`正在编辑：${DateUtils.formatShortDate(entry.date)}`);
           window.scrollTo({ top: 0, behavior: "smooth" });
@@ -3704,7 +3745,7 @@
           elements.todayTimeValue.textContent = `${latestEntry.bedtime} / ${latestEntry.wakeTime}`;
           elements.todayWakeupsValue.textContent = `${latestEntry.wakeups} 次`;
           elements.todayHabitsValue.textContent = `${EntryModel.getWorkoutSummary(latestEntry)} / ${latestEntry.cooked ? "做饭" : "未做饭"}`;
-          elements.todayFuelValue.textContent = `补能 +${latestEntry.energyBoost || 0}% / ${latestEntry.healthyFood ? "营养好" : "营养弱"} / ${latestEntry.ateOut ? "外食" : "未外食"}`;
+          elements.todayFuelValue.textContent = `补能 +${latestEntry.energyBoost || 0}% / ${latestEntry.healthyFood ? "营养好" : "营养弱"} / ${latestEntry.ateOut ? "外食" : "未外食"}${latestEntry.mealDetails ? " / 已记食物" : ""}`;
           elements.todayWorkValue.textContent = `深工 ${latestEntry.deepWorkTasks} / 琐事 ${latestEntry.adminTasks}`;
           elements.todayRhythmValue.textContent = rhythmInsight.rhythmText;
           elements.todayWeightValue.textContent = this.formatWeight(latestEntry.weight);
@@ -3752,6 +3793,7 @@
             .map((entry) => {
               const mood = this.escapeHtml(entry.mood || "没有填写心情");
               const storyHtml = this.escapeHtml(entry.dailyStory || "").replaceAll("\n", "<br />");
+              const mealDetailsHtml = this.escapeHtml(entry.mealDetails || "").replaceAll("\n", "<br />");
               const workoutItems = WorkoutModel.normalizeItems(entry.workoutItems);
               const workoutAverage = EntryModel.getWorkoutAverageRating(entry);
               const workoutSummary = EntryModel.getWorkoutSummary(entry);
@@ -3785,6 +3827,7 @@
                       入睡 ${this.escapeHtml(entry.bedtime)}，起床 ${this.escapeHtml(entry.wakeTime)}，起夜 ${entry.wakeups} 次，
                       ${workoutSummary}，
                       ${entry.cooked ? "自己做饭" : "没做饭"}，
+                      ${entry.mealDetails ? `食物：${mealDetailsHtml}，` : ""}
                       ${entry.healthyFood ? "营养补给到位" : "营养补给一般"}，
                       补能 +${entry.energyBoost || 0}%，
                       ${entry.ateOut ? "有外食" : "没有外食"}，
@@ -3860,6 +3903,7 @@
             energyBoost: formData.get("energyBoost"),
             exercised: formData.get("exercised") === "true" || workoutItems.length > 0,
             cooked: formData.get("cooked"),
+            mealDetails: formData.get("mealDetails"),
             healthyFood: formData.get("healthyFood"),
             ateOut: formData.get("ateOut"),
             deepWorkTasks: formData.get("deepWorkTasks"),
@@ -3894,6 +3938,7 @@
             `- 今日补能加分：+${entry.energyBoost || 0}%`,
             `- 训练概览：${workoutSummary}${workoutAverage !== null ? `，平均状态 ${workoutAverage.toFixed(1)}/10` : ""}`,
             `- 自己做饭：${entry.cooked ? "是" : "否"}`,
+            `- 今日食物：${entry.mealDetails || "未记录"}`,
             `- 健康营养补给：${entry.healthyFood ? "是" : "否"}`,
             `- 外食：${entry.ateOut ? "是" : "否"}`,
             `- 深度工作：${entry.deepWorkTasks} 次`,
@@ -3994,18 +4039,7 @@
       const Handlers = {
         submit(event) {
           event.preventDefault();
-          const { entry, validationMessage } = App.validateAndBuildEntry();
-          if (validationMessage) {
-            UI.showStatus(validationMessage);
-            return;
-          }
-
-          const isSaved = App.saveEntry(entry);
-          if (!isSaved) {
-            UI.showStatus("保存失败：本地记录未写入，请再试一次");
-            return;
-          }
-          UI.showStatus(`已保存 ${DateUtils.formatShortDate(entry.date)} 的记录`);
+          this.saveToObsidian();
         },
 
         saveToObsidian() {
@@ -4169,6 +4203,13 @@
           UI.refreshWorkoutMeta();
         },
 
+        cookedToggleChange() {
+          if (document.getElementById("cookedNo").checked) {
+            elements.form.mealDetails.value = "";
+          }
+          UI.refreshMealDetails();
+        },
+
         resize() {
           if (!window.Chart) {
             UI.render(state.entries);
@@ -4179,7 +4220,6 @@
       function bindEvents() {
         elements.form.addEventListener("submit", Handlers.submit);
         elements.recordList.addEventListener("click", Handlers.recordActions);
-        elements.saveToObsidianBtn.addEventListener("click", Handlers.saveToObsidian);
         elements.form.sleepScore.addEventListener("input", Handlers.sleepSliderInput);
         elements.weightSlider.addEventListener("input", Handlers.weightSliderInput);
         elements.energyBoostSlider.addEventListener("input", Handlers.energyBoostSliderInput);
@@ -4195,6 +4235,8 @@
         elements.workoutItemsEditor.addEventListener("input", Handlers.workoutEditorInput);
         document.getElementById("exerciseNo").addEventListener("change", Handlers.workoutToggleChange);
         document.getElementById("exerciseYes").addEventListener("change", Handlers.workoutToggleChange);
+        document.getElementById("cookedNo").addEventListener("change", Handlers.cookedToggleChange);
+        document.getElementById("cookedYes").addEventListener("change", Handlers.cookedToggleChange);
         document.getElementById("exportBtn").addEventListener("click", Handlers.exportJson);
         document.getElementById("importBtn").addEventListener("click", Handlers.importTrigger);
         elements.importFileInput.addEventListener("change", Handlers.importFile);
