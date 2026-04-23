@@ -2260,6 +2260,31 @@
                       </div>
                       <button class="btn-primary btn-slim" id="addRecoveryLogBtn" type="button">添加补能并发到 Obsidian</button>
                     </div>
+                    <div class="append-log-block">
+                      <h3>追加晚上睡前复盘</h3>
+                      <div class="mini-field-grid">
+                        <div class="field">
+                          <label for="nightReviewTime">时间</label>
+                          <input id="nightReviewTime" type="time" />
+                        </div>
+                        <div class="field">
+                          <label for="nightReviewMood">睡前状态</label>
+                          <select id="nightReviewMood">
+                            <option value="平静">平静</option>
+                            <option value="满足">满足</option>
+                            <option value="疲惫">疲惫</option>
+                            <option value="焦虑">焦虑</option>
+                            <option value="感恩">感恩</option>
+                            <option value="其他">其他</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div class="field">
+                        <label for="nightReviewText">今晚想复盘什么</label>
+                        <textarea id="nightReviewText" placeholder="例如：今天哪里做得不错，哪里消耗了能量，明天醒来最重要的一件事是什么。"></textarea>
+                      </div>
+                      <button class="btn-primary btn-slim" id="addNightReviewBtn" type="button">添加睡前复盘并发到 Obsidian</button>
+                    </div>
                   </div>
                   <div class="daily-log-list" id="dailyAppendList"></div>
                 </div>
@@ -2563,6 +2588,10 @@
         recoveryLogBoost: document.getElementById("recoveryLogBoost"),
         recoveryLogNote: document.getElementById("recoveryLogNote"),
         addRecoveryLogBtn: document.getElementById("addRecoveryLogBtn"),
+        nightReviewTime: document.getElementById("nightReviewTime"),
+        nightReviewMood: document.getElementById("nightReviewMood"),
+        nightReviewText: document.getElementById("nightReviewText"),
+        addNightReviewBtn: document.getElementById("addNightReviewBtn"),
         dailyAppendList: document.getElementById("dailyAppendList"),
         chartCanvas: document.getElementById("sleepChart"),
         chartStatusLabel: document.getElementById("chartStatusLabel"),
@@ -3858,6 +3887,9 @@
           elements.recoveryLogType.value = "午睡";
           elements.recoveryLogBoost.value = 10;
           elements.recoveryLogNote.value = "";
+          elements.nightReviewTime.value = currentTime;
+          elements.nightReviewMood.value = "平静";
+          elements.nightReviewText.value = "";
           this.refreshMealLogPreview();
         },
 
@@ -4483,6 +4515,35 @@
           return true;
         },
 
+        appendNightReview(log) {
+          const todayEntry = this.getTodayEntryForAppend();
+          if (!todayEntry) return false;
+
+          const reviewText = [
+            todayEntry.dailyStory || "",
+            "",
+            `【睡前复盘 ${log.time || ""}｜${log.mood}】`,
+            log.text
+          ].filter(Boolean).join("\n");
+          const nextEntry = EntryModel.normalize({
+            ...todayEntry,
+            dailyStory: reviewText
+          });
+
+          const isSaved = this.saveEntry(nextEntry);
+          if (!isSaved) return false;
+
+          this.sendAppendToObsidian(nextEntry, [
+            `\n### 追加晚上睡前复盘 ${log.time || ""}`,
+            "",
+            `- 睡前状态：${log.mood}`,
+            "",
+            log.text,
+            ""
+          ].join("\n"));
+          return true;
+        },
+
         validateAndBuildEntry() {
           const entry = this.buildEntryFromForm();
           const validationMessage = EntryModel.validate(entry);
@@ -4601,6 +4662,25 @@
           if (App.appendRecoveryLog(log)) {
             UI.resetAppendInputs();
             UI.showStatus(`已追加补能：${log.type} +${log.boost}%`);
+          }
+        },
+
+        addNightReview() {
+          const text = elements.nightReviewText.value.trim();
+          if (!text) {
+            UI.showStatus("请先填写今晚的睡前复盘");
+            return;
+          }
+
+          const log = {
+            time: elements.nightReviewTime.value || DateUtils.getCurrentTimeString(),
+            mood: elements.nightReviewMood.value,
+            text
+          };
+
+          if (App.appendNightReview(log)) {
+            UI.resetAppendInputs();
+            UI.showStatus("已追加睡前复盘");
           }
         },
 
@@ -4783,6 +4863,7 @@
         elements.clearWorkoutItemsBtn.addEventListener("click", Handlers.clearWorkoutItems);
         elements.addMealLogBtn.addEventListener("click", Handlers.addMealLog);
         elements.addRecoveryLogBtn.addEventListener("click", Handlers.addRecoveryLog);
+        elements.addNightReviewBtn.addEventListener("click", Handlers.addNightReview);
         elements.mealLogType.addEventListener("change", Handlers.mealLogInputChange);
         elements.mealLogFood.addEventListener("input", Handlers.mealLogInputChange);
         elements.mealLogCooked.addEventListener("change", Handlers.mealLogInputChange);
