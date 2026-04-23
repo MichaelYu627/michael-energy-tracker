@@ -943,11 +943,30 @@
 
     .append-log-card {
       display: grid;
-      gap: 14px;
-      padding: 16px;
-      border-radius: 22px;
-      background: linear-gradient(135deg, rgba(255, 251, 245, 0.9), rgba(238, 247, 238, 0.72));
-      border: 1px solid rgba(31, 122, 92, 0.14);
+      gap: 16px;
+      padding: 18px;
+      border-radius: 28px;
+      background:
+        radial-gradient(circle at 12% 0%, rgba(62, 163, 117, 0.18), transparent 34%),
+        linear-gradient(135deg, rgba(255, 251, 245, 0.94), rgba(238, 247, 238, 0.78));
+      border: 1px solid rgba(31, 122, 92, 0.16);
+      box-shadow: 0 18px 42px rgba(48, 73, 58, 0.08);
+    }
+
+    .append-log-title {
+      display: grid;
+      gap: 4px;
+    }
+
+    .append-log-title strong {
+      color: #1f5c46;
+      font-size: 18px;
+    }
+
+    .append-log-title span {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
     }
 
     .append-log-grid {
@@ -958,11 +977,12 @@
 
     .append-log-block {
       display: grid;
-      gap: 10px;
-      padding: 14px;
-      border-radius: 18px;
-      background: rgba(255, 255, 255, 0.68);
+      gap: 12px;
+      padding: 16px;
+      border-radius: 22px;
+      background: rgba(255, 255, 255, 0.74);
       border: 1px solid rgba(109, 90, 60, 0.1);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
     }
 
     .append-log-block h3 {
@@ -978,20 +998,69 @@
     }
 
     .checkbox-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      color: #5c574e;
-      font-size: 13px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
     }
 
-    .checkbox-row label {
-      display: inline-flex;
+    .checkbox-chip {
+      display: block;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .checkbox-chip input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .checkbox-chip span {
+      display: flex;
       align-items: center;
-      gap: 6px;
-      padding: 8px 10px;
-      border-radius: 999px;
-      background: rgba(229, 218, 199, 0.5);
+      justify-content: center;
+      min-height: 42px;
+      padding: 9px 10px;
+      border-radius: 15px;
+      background: rgba(229, 218, 199, 0.54);
+      color: #5c574e;
+      border: 1px solid rgba(109, 90, 60, 0.08);
+      font-size: 13px;
+      font-weight: 800;
+      transition: 180ms ease;
+    }
+
+    .checkbox-chip input:focus-visible + span {
+      outline: 3px solid rgba(31, 122, 92, 0.22);
+      outline-offset: 2px;
+    }
+
+    .checkbox-chip input:checked + span {
+      color: #fff;
+      transform: translateY(-1px);
+      box-shadow: 0 10px 20px rgba(31, 122, 92, 0.18);
+    }
+
+    .checkbox-chip.cooked input:checked + span {
+      background: linear-gradient(135deg, #1f7a5c, #2ea978);
+    }
+
+    .checkbox-chip.healthy input:checked + span {
+      background: linear-gradient(135deg, #2b8a3e, #77b255);
+    }
+
+    .checkbox-chip.outside input:checked + span {
+      background: linear-gradient(135deg, #b85c38, #df8a47);
+    }
+
+    .append-preview {
+      padding: 10px 12px;
+      border-radius: 16px;
+      background: rgba(31, 122, 92, 0.08);
+      color: #315245;
+      font-size: 13px;
+      line-height: 1.55;
+      border: 1px solid rgba(31, 122, 92, 0.1);
     }
 
     .daily-log-list {
@@ -1576,6 +1645,10 @@
         grid-template-columns: 1fr;
       }
 
+      .checkbox-row {
+        grid-template-columns: 1fr;
+      }
+
       .record-item {
         grid-template-columns: 1fr;
       }
@@ -2112,8 +2185,11 @@
               <div class="field full">
                 <div class="append-log-card">
                   <div class="field-head">
-                    <label>今日追加记录</label>
-                    <span class="inline-meta">早上保存主记录后，后面只追加餐食和午睡/补能</span>
+                    <div class="append-log-title">
+                      <strong>今日追加记录</strong>
+                      <span>早上保存主记录后，后面只追加餐食和午睡/补能，不用重填整张表。</span>
+                    </div>
+                    <span class="inline-meta">持续补充能量事件</span>
                   </div>
                   <div class="append-log-grid">
                     <div class="append-log-block">
@@ -2138,10 +2214,20 @@
                         <textarea id="mealLogFood" placeholder="例如：牛肉、青菜、米饭、鸡蛋"></textarea>
                       </div>
                       <div class="checkbox-row">
-                        <label><input id="mealLogCooked" type="checkbox" checked /> 自己做</label>
-                        <label><input id="mealLogHealthy" type="checkbox" checked /> 健康营养</label>
-                        <label><input id="mealLogAteOut" type="checkbox" /> 外食</label>
+                        <label class="checkbox-chip cooked">
+                          <input id="mealLogCooked" type="checkbox" checked />
+                          <span>自己做</span>
+                        </label>
+                        <label class="checkbox-chip healthy">
+                          <input id="mealLogHealthy" type="checkbox" checked />
+                          <span>健康营养</span>
+                        </label>
+                        <label class="checkbox-chip outside">
+                          <input id="mealLogAteOut" type="checkbox" />
+                          <span>外食</span>
+                        </label>
                       </div>
+                      <div class="append-preview" id="mealLogPreview">本餐将记录为：自己做 / 健康营养 / 非外食</div>
                       <button class="btn-primary btn-slim" id="addMealLogBtn" type="button">添加这一餐并发到 Obsidian</button>
                     </div>
                     <div class="append-log-block">
@@ -2470,6 +2556,7 @@
         mealLogCooked: document.getElementById("mealLogCooked"),
         mealLogHealthy: document.getElementById("mealLogHealthy"),
         mealLogAteOut: document.getElementById("mealLogAteOut"),
+        mealLogPreview: document.getElementById("mealLogPreview"),
         addMealLogBtn: document.getElementById("addMealLogBtn"),
         recoveryLogTime: document.getElementById("recoveryLogTime"),
         recoveryLogType: document.getElementById("recoveryLogType"),
@@ -3771,6 +3858,18 @@
           elements.recoveryLogType.value = "午睡";
           elements.recoveryLogBoost.value = 10;
           elements.recoveryLogNote.value = "";
+          this.refreshMealLogPreview();
+        },
+
+        refreshMealLogPreview() {
+          const typeText = elements.mealLogType.value || "这一餐";
+          const foodText = elements.mealLogFood.value.trim() || "还没填写食物";
+          const tags = [
+            elements.mealLogCooked.checked ? "自己做" : "非自己做",
+            elements.mealLogHealthy.checked ? "健康营养" : "营养未确认",
+            elements.mealLogAteOut.checked ? "外食" : "非外食"
+          ];
+          elements.mealLogPreview.textContent = `${typeText}：${foodText}｜${tags.join(" / ")}`;
         },
 
         renderDailyAppendList(entries = state.entries) {
@@ -4505,6 +4604,10 @@
           }
         },
 
+        mealLogInputChange() {
+          UI.refreshMealLogPreview();
+        },
+
         recordActions(event) {
           const target = event.target.closest("button[data-action]");
           if (!target) return;
@@ -4680,6 +4783,11 @@
         elements.clearWorkoutItemsBtn.addEventListener("click", Handlers.clearWorkoutItems);
         elements.addMealLogBtn.addEventListener("click", Handlers.addMealLog);
         elements.addRecoveryLogBtn.addEventListener("click", Handlers.addRecoveryLog);
+        elements.mealLogType.addEventListener("change", Handlers.mealLogInputChange);
+        elements.mealLogFood.addEventListener("input", Handlers.mealLogInputChange);
+        elements.mealLogCooked.addEventListener("change", Handlers.mealLogInputChange);
+        elements.mealLogHealthy.addEventListener("change", Handlers.mealLogInputChange);
+        elements.mealLogAteOut.addEventListener("change", Handlers.mealLogInputChange);
         elements.workoutItemsEditor.addEventListener("click", Handlers.workoutEditorClick);
         elements.workoutItemsEditor.addEventListener("input", Handlers.workoutEditorInput);
         document.getElementById("exerciseNo").addEventListener("change", Handlers.workoutToggleChange);
