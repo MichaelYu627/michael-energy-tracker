@@ -437,10 +437,15 @@
 
     .battery-footer-row {
       display: flex;
+      flex-wrap: wrap;
       justify-content: space-between;
       gap: 10px;
       color: rgba(226, 248, 252, 0.78);
       font-size: 12px;
+    }
+
+    .battery-footer-row span:first-child {
+      flex: 1 1 100%;
     }
 
     .battery-quote {
@@ -1865,6 +1870,22 @@
                   </div>
                 </div>
               </div>
+              <div class="field slider-field">
+                <label for="energyBoostSlider">今日补能加分（%）</label>
+                <div class="slider-shell">
+                  <div class="slider-top">
+                    <span>午睡、按摩、冥想、深度恢复都可以加回来</span>
+                    <strong class="slider-value" id="energyBoostValue">0%</strong>
+                  </div>
+                  <input id="energyBoostSlider" name="energyBoost" type="range" min="0" max="40" step="1" value="0" />
+                  <div class="slider-ticks">
+                    <span>0</span>
+                    <span>10</span>
+                    <span>20</span>
+                    <span>40</span>
+                  </div>
+                </div>
+              </div>
               <div class="field full">
                 <label>今天有正式训练吗</label>
                 <div class="toggle-group">
@@ -2014,7 +2035,7 @@
                 <strong id="todayHabitsValue">--</strong>
               </div>
               <div class="vital">
-                <span>营养 / 外食 / 工作</span>
+                <span>补能 / 营养 / 外食</span>
                 <strong id="todayFuelValue">--</strong>
               </div>
               <div class="vital">
@@ -2154,10 +2175,13 @@
         storageKey: "michael-energy-tracker-v1",
         seededKey: "michael-energy-tracker-seeded",
         templateSettingsKey: "michael-energy-template-settings-v1",
-        exportVersion: 7,
+        exportVersion: 8,
         obsidianVault: "Michael&Jarvis",
         obsidianFolder: "我的训练日志",
         currentWeightDefault: 83.4,
+        morningBatteryHour: 6,
+        hourlyEntropyDrain: 2,
+        healthyFoodBatteryBonus: 10,
         reminderSleepThreshold: 60,
         reminderLateSleepMinutes: 22 * 60 + 30,
         recoverySleepThreshold: 75,
@@ -2191,6 +2215,8 @@
         sleepScoreValue: document.getElementById("sleepScoreValue"),
         weightSlider: document.getElementById("weightSlider"),
         weightValue: document.getElementById("weightValue"),
+        energyBoostSlider: document.getElementById("energyBoostSlider"),
+        energyBoostValue: document.getElementById("energyBoostValue"),
         bedtimeSlider: document.getElementById("bedtimeSlider"),
         bedtimeValue: document.getElementById("bedtimeValue"),
         wakeTimeSlider: document.getElementById("wakeTimeSlider"),
@@ -2245,10 +2271,13 @@
 
       const DateUtils = {
         getTodayISO() {
-          const now = new Date();
-          const month = String(now.getMonth() + 1).padStart(2, "0");
-          const day = String(now.getDate()).padStart(2, "0");
-          return `${now.getFullYear()}-${month}-${day}`;
+          return this.dateToISO(new Date());
+        },
+
+        dateToISO(date) {
+          const month = String(date.getMonth() + 1).padStart(2, "0");
+          const day = String(date.getDate()).padStart(2, "0");
+          return `${date.getFullYear()}-${month}-${day}`;
         },
 
         parseDate(dateString) {
@@ -2464,6 +2493,7 @@
             wakeups: this.normalizeNumber(raw.wakeups, 0),
             energy: this.normalizeNumber(raw.energy, 0),
             weight: this.normalizeNullableNumber(raw.weight),
+            energyBoost: this.normalizeNumber(raw.energyBoost, 0),
             exercised: this.normalizeBoolean(raw.exercised) || workoutItems.length > 0,
             cooked: this.normalizeBoolean(raw.cooked),
             healthyFood: this.normalizeBoolean(raw.healthyFood),
@@ -2486,6 +2516,7 @@
           if (entry.energy < 1 || entry.energy > 10) return "主观能量值需要在 1 到 10 之间。";
           if (entry.wakeups < 0 || entry.wakeups > 10) return "起夜次数需要在 0 到 10 之间。";
           if (entry.weight !== null && (entry.weight < 20 || entry.weight > 300)) return "今日体重请填写在 20 到 300 kg 之间。";
+          if (entry.energyBoost < 0 || entry.energyBoost > 40) return "今日补能加分需要在 0% 到 40% 之间。";
           if (entry.deepWorkTasks < 0 || entry.deepWorkTasks > 10) return "深度工作次数请填写在 0 到 10 之间。";
           if (entry.adminTasks < 0 || entry.adminTasks > 20) return "琐事处理次数请填写在 0 到 20 之间。";
           if (entry.morningEnergy !== null && (entry.morningEnergy < 1 || entry.morningEnergy > 10)) return "上午能量感受请填写在 1 到 10 之间。";
@@ -2818,6 +2849,7 @@
             return {
               total: 0,
               sleepBase: 0,
+              recoveryBonus: 0,
               nutritionBonus: 0,
               exerciseBonus: 0,
               outsidePenalty: 0,
@@ -2827,17 +2859,19 @@
           }
 
           const sleepBase = entry.sleepScore * 0.6;
-          const nutritionBonus = entry.healthyFood ? 10 : 0;
+          const recoveryBonus = Math.max(0, entry.energyBoost || 0);
+          const nutritionBonus = entry.healthyFood ? CONFIG.healthyFoodBatteryBonus : 0;
           const exerciseBonus = EntryModel.isExerciseDay(entry) ? 10 : 0;
           const outsidePenalty = entry.ateOut ? 10 : 0;
           const deepWorkPenalty = Math.max(0, entry.deepWorkTasks) * 15;
           const adminPenalty = Math.max(0, entry.adminTasks) * 5;
-          const rawTotal = sleepBase + nutritionBonus + exerciseBonus - outsidePenalty - deepWorkPenalty - adminPenalty;
+          const rawTotal = sleepBase + recoveryBonus + nutritionBonus + exerciseBonus - outsidePenalty - deepWorkPenalty - adminPenalty;
           const total = this.clamp(rawTotal, 0, 100);
 
           return {
             total,
             sleepBase,
+            recoveryBonus,
             nutritionBonus,
             exerciseBonus,
             outsidePenalty,
@@ -2921,6 +2955,7 @@
 
           const breakdown = [
             `睡眠 ${todayScore.sleepBase.toFixed(1)}`,
+            `补能 +${todayScore.recoveryBonus}`,
             `营养 +${todayScore.nutritionBonus}`,
             `锻炼 +${todayScore.exerciseBonus}`,
             `外食 -${todayScore.outsidePenalty}`,
@@ -3239,6 +3274,10 @@
           elements.weightValue.textContent = `${Number(elements.weightSlider.value).toFixed(1)} kg`;
         },
 
+        syncEnergyBoostSlider() {
+          elements.energyBoostValue.textContent = `+${Number(elements.energyBoostSlider.value).toFixed(0)}%`;
+        },
+
         syncBedtimeSlider() {
           const timeString = DateUtils.bedtimeSliderToTimeString(elements.bedtimeSlider.value);
           elements.form.bedtime.value = timeString;
@@ -3254,6 +3293,7 @@
         syncAllSliders() {
           this.syncSleepScoreSlider();
           this.syncWeightSlider();
+          this.syncEnergyBoostSlider();
           this.syncBedtimeSlider();
           this.syncWakeTimeSlider();
         },
@@ -3418,6 +3458,7 @@
           elements.form.entryDate.value = DateUtils.getTodayISO();
           elements.form.sleepScore.value = 80;
           elements.weightSlider.value = CONFIG.currentWeightDefault;
+          elements.energyBoostSlider.value = 0;
           elements.bedtimeSlider.value = 22 * 60;
           elements.wakeTimeSlider.value = 6 * 60;
           elements.form.deepWorkTasks.value = "";
@@ -3443,6 +3484,7 @@
           elements.form.wakeups.value = entry.wakeups;
           elements.form.energy.value = entry.energy;
           elements.weightSlider.value = entry.weight ?? CONFIG.currentWeightDefault;
+          elements.energyBoostSlider.value = entry.energyBoost ?? 0;
           elements.form.deepWorkTasks.value = entry.deepWorkTasks ?? 0;
           elements.form.adminTasks.value = entry.adminTasks ?? 0;
           elements.form.morningEnergy.value = entry.morningEnergy ?? "";
@@ -3474,13 +3516,45 @@
           elements.energyBreakdown.textContent = dashboard.breakdown || "睡眠底盘、饮食、锻炼和工作消耗都会显示在这里。";
         },
 
+        getHeroBatteryAnchor(now) {
+          const anchor = new Date(now);
+          if (now.getHours() < CONFIG.morningBatteryHour) {
+            anchor.setDate(anchor.getDate() - 1);
+          }
+          anchor.setHours(CONFIG.morningBatteryHour, 0, 0, 0);
+          return {
+            date: DateUtils.dateToISO(anchor),
+            time: anchor
+          };
+        },
+
+        getHeroBatteryEntry(entries, anchorDate, latestEntry) {
+          const entryMap = Analytics.buildEntryMap(entries);
+          if (entryMap.has(anchorDate)) return entryMap.get(anchorDate);
+          return [...entries].reverse().find((entry) => entry.date <= anchorDate) || latestEntry || null;
+        },
+
         calculateHeroBattery(entries, latestEntry) {
           const now = new Date();
-          const elapsedHours = now.getHours() + now.getMinutes() / 60 + now.getSeconds() / 3600;
-          const dashboard = Analytics.calculateGrowthDashboard(entries, latestEntry);
-          const baseLevel = dashboard.score === null ? 100 : dashboard.score;
-          const entropyDrain = elapsedHours * 2;
+          const anchor = this.getHeroBatteryAnchor(now);
+          const batteryEntry = this.getHeroBatteryEntry(entries, anchor.date, latestEntry);
+          const elapsedHours = Math.max(0, (now.getTime() - anchor.time.getTime()) / (60 * 60 * 1000));
+          const sleepBase = batteryEntry ? batteryEntry.sleepScore : 100;
+          const recoveryBonus = Math.max(0, batteryEntry?.energyBoost || 0);
+          const nutritionBonus = batteryEntry?.healthyFood ? CONFIG.healthyFoodBatteryBonus : 0;
+          const baseLevel = Analytics.clamp(sleepBase + recoveryBonus + nutritionBonus, 0, 100);
+          const entropyDrain = elapsedHours * CONFIG.hourlyEntropyDrain;
           const level = Analytics.clamp(baseLevel - entropyDrain, 0, 100);
+          const sourceLabel = batteryEntry
+            ? DateUtils.formatShortDate(batteryEntry.date)
+            : "暂无记录";
+          const baseDetail = {
+            anchorDate: anchor.date,
+            sourceLabel,
+            sleepBase,
+            recoveryBonus,
+            nutritionBonus
+          };
 
           if (level <= 20) {
             return {
@@ -3488,10 +3562,11 @@
               baseLevel,
               entropyDrain,
               elapsedHours,
+              ...baseDetail,
               className: "level-red",
               status: "红色补能",
               zoneText: "20% 以下红色",
-              caption: "电量进入红区，今天先补觉、吃饭、降低硬扛强度，让系统重新有电。"
+              caption: "电量进入红区，先安排午睡、热饭、补水或短暂断开，让系统重新有电。"
             };
           }
 
@@ -3501,10 +3576,11 @@
               baseLevel,
               entropyDrain,
               elapsedHours,
+              ...baseDetail,
               className: "level-yellow",
               status: "黄色省电",
               zoneText: "50%-20% 黄色",
-              caption: "电量进入省电区，适合收束琐事、补水、拉伸，别再无意识切换消耗。"
+              caption: "电量进入省电区，适合收束琐事、补水、拉伸，午睡或健康食物都能把电量加回来。"
             };
           }
 
@@ -3513,10 +3589,11 @@
             baseLevel,
             entropyDrain,
             elapsedHours,
+            ...baseDetail,
             className: "level-green",
             status: "绿色续航",
             zoneText: "100%-51% 绿色",
-            caption: "电量仍在绿色区，适合把最重要的深度工作放到前面，趁系统有序时推进。"
+            caption: "电量仍在绿色区，适合把最重要的深度工作放到前面；午睡和健康食物会继续给系统补能。"
           };
         },
 
@@ -3531,8 +3608,8 @@
           elements.heroBatteryPercent.textContent = `${battery.level.toFixed(1)}%`;
           elements.heroBatteryStatus.textContent = battery.status;
           elements.heroBatteryCaption.textContent = battery.caption;
-          elements.heroBatteryDrain.textContent = `自然熵增：已过 ${battery.elapsedHours.toFixed(1)}h，每小时 -2%`;
-          elements.heroBatteryRule.textContent = `基准 ${battery.baseLevel.toFixed(1)} - 熵增 ${battery.entropyDrain.toFixed(1)}`;
+          elements.heroBatteryDrain.textContent = `基于 ${battery.sourceLabel}，6:00 后已过 ${battery.elapsedHours.toFixed(1)}h`;
+          elements.heroBatteryRule.textContent = `睡眠 ${battery.sleepBase} + 补能 ${battery.recoveryBonus}% + 营养 ${battery.nutritionBonus}% - 熵增 ${battery.entropyDrain.toFixed(1)}%`;
           elements.heroBatteryZone.textContent = battery.zoneText;
         },
 
@@ -3566,7 +3643,7 @@
           elements.todayTimeValue.textContent = `${latestEntry.bedtime} / ${latestEntry.wakeTime}`;
           elements.todayWakeupsValue.textContent = `${latestEntry.wakeups} 次`;
           elements.todayHabitsValue.textContent = `${EntryModel.getWorkoutSummary(latestEntry)} / ${latestEntry.cooked ? "做饭" : "未做饭"}`;
-          elements.todayFuelValue.textContent = `${latestEntry.healthyFood ? "营养好" : "营养弱"} / ${latestEntry.ateOut ? "外食" : "未外食"}`;
+          elements.todayFuelValue.textContent = `补能 +${latestEntry.energyBoost || 0}% / ${latestEntry.healthyFood ? "营养好" : "营养弱"} / ${latestEntry.ateOut ? "外食" : "未外食"}`;
           elements.todayWorkValue.textContent = `深工 ${latestEntry.deepWorkTasks} / 琐事 ${latestEntry.adminTasks}`;
           elements.todayRhythmValue.textContent = rhythmInsight.rhythmText;
           elements.todayWeightValue.textContent = this.formatWeight(latestEntry.weight);
@@ -3648,6 +3725,7 @@
                       ${workoutSummary}，
                       ${entry.cooked ? "自己做饭" : "没做饭"}，
                       ${entry.healthyFood ? "营养补给到位" : "营养补给一般"}，
+                      补能 +${entry.energyBoost || 0}%，
                       ${entry.ateOut ? "有外食" : "没有外食"}，
                       深度工作 ${entry.deepWorkTasks} 次，
                       琐事处理 ${entry.adminTasks} 次，
@@ -3718,6 +3796,7 @@
             wakeups: formData.get("wakeups"),
             energy: formData.get("energy"),
             weight: formData.get("weight"),
+            energyBoost: formData.get("energyBoost"),
             exercised: formData.get("exercised") === "true" || workoutItems.length > 0,
             cooked: formData.get("cooked"),
             healthyFood: formData.get("healthyFood"),
@@ -3751,6 +3830,7 @@
             `- 起夜次数：${entry.wakeups} 次`,
             `- 主观能量：${entry.energy}/10`,
             `- 今日体重：${UI.formatWeight(entry.weight)}`,
+            `- 今日补能加分：+${entry.energyBoost || 0}%`,
             `- 训练概览：${workoutSummary}${workoutAverage !== null ? `，平均状态 ${workoutAverage.toFixed(1)}/10` : ""}`,
             `- 自己做饭：${entry.cooked ? "是" : "否"}`,
             `- 健康营养补给：${entry.healthyFood ? "是" : "否"}`,
@@ -3931,6 +4011,10 @@
           UI.syncWeightSlider();
         },
 
+        energyBoostSliderInput() {
+          UI.syncEnergyBoostSlider();
+        },
+
         bedtimeSliderInput() {
           UI.syncBedtimeSlider();
         },
@@ -4015,6 +4099,7 @@
         elements.saveToObsidianBtn.addEventListener("click", Handlers.saveToObsidian);
         elements.form.sleepScore.addEventListener("input", Handlers.sleepSliderInput);
         elements.weightSlider.addEventListener("input", Handlers.weightSliderInput);
+        elements.energyBoostSlider.addEventListener("input", Handlers.energyBoostSliderInput);
         elements.bedtimeSlider.addEventListener("input", Handlers.bedtimeSliderInput);
         elements.wakeTimeSlider.addEventListener("input", Handlers.wakeTimeSliderInput);
         document.getElementById("resetFormBtn").addEventListener("click", Handlers.resetForm);
