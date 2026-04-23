@@ -910,6 +910,55 @@
       border: 1px solid rgba(109, 90, 60, 0.12);
     }
 
+    .workout-detail-field[hidden] {
+      display: none;
+    }
+
+    .workout-details {
+      border-radius: 22px;
+      background: rgba(255, 251, 245, 0.78);
+      border: 1px solid rgba(109, 90, 60, 0.12);
+      overflow: hidden;
+    }
+
+    .workout-details summary {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 16px;
+      cursor: pointer;
+      color: #2f493e;
+      font-weight: 800;
+      list-style: none;
+    }
+
+    .workout-details summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .workout-details summary::after {
+      content: "展开";
+      flex-shrink: 0;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(31, 122, 92, 0.1);
+      color: #1f7a5c;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .workout-details[open] summary::after {
+      content: "收起";
+    }
+
+    .workout-details .workout-editor {
+      border: 0;
+      border-top: 1px solid rgba(109, 90, 60, 0.1);
+      border-radius: 0;
+      background: rgba(255, 255, 255, 0.36);
+    }
+
     .workout-toolbar {
       display: flex;
       flex-wrap: wrap;
@@ -1895,27 +1944,29 @@
                   <label for="exerciseYes">是</label>
                 </div>
               </div>
-              <div class="field full">
-                <div class="field-head">
-                  <label for="workoutItemsEditor">今日训练明细</label>
-                  <span class="inline-meta" id="workoutMetaLabel">不训练也可以直接保存</span>
-                </div>
-                <div class="workout-editor">
-                  <div class="template-block">
-                    <div class="template-head">
-                      <label for="workoutTemplateGrid">常用动作模板</label>
-                      <span>先调数量，再加入今天的训练明细</span>
+              <div class="field full workout-detail-field" id="workoutDetailField" hidden>
+                <details class="workout-details" id="workoutDetailsPanel" open>
+                  <summary>
+                    <span>今日训练模板与明细</span>
+                    <span class="inline-meta" id="workoutMetaLabel">选择训练后再记录动作</span>
+                  </summary>
+                  <div class="workout-editor">
+                    <div class="template-block">
+                      <div class="template-head">
+                        <label for="workoutTemplateGrid">常用动作模板</label>
+                        <span>先调数量，再加入今天的训练明细</span>
+                      </div>
+                      <div class="template-grid" id="workoutTemplateGrid"></div>
                     </div>
-                    <div class="template-grid" id="workoutTemplateGrid"></div>
+                    <div class="workout-toolbar">
+                      <button class="btn-secondary btn-slim" id="addWorkoutRoutineBtn" type="button">导入今日常用七项</button>
+                      <button class="btn-secondary btn-slim" id="addWorkoutItemBtn" type="button">添加训练项目</button>
+                      <button class="btn-secondary btn-slim" id="clearWorkoutItemsBtn" type="button">清空训练明细</button>
+                    </div>
+                    <div class="workout-list" id="workoutItemsEditor"></div>
+                    <div class="workout-empty" id="workoutEmptyState">今天如果训练了，可以直接导入常用七项，也可以只添加单个动作。</div>
                   </div>
-                  <div class="workout-toolbar">
-                    <button class="btn-secondary btn-slim" id="addWorkoutRoutineBtn" type="button">导入今日常用七项</button>
-                    <button class="btn-secondary btn-slim" id="addWorkoutItemBtn" type="button">添加训练项目</button>
-                    <button class="btn-secondary btn-slim" id="clearWorkoutItemsBtn" type="button">清空训练明细</button>
-                  </div>
-                  <div class="workout-list" id="workoutItemsEditor"></div>
-                  <div class="workout-empty" id="workoutEmptyState">今天如果没有训练，保持空白直接保存就行；如果训练了，可以把项目、组数和状态一起记下来。</div>
-                </div>
+                </details>
               </div>
               <div class="field full">
                 <label>今天自己做饭了吗</label>
@@ -2222,6 +2273,8 @@
         wakeTimeSlider: document.getElementById("wakeTimeSlider"),
         wakeTimeValue: document.getElementById("wakeTimeValue"),
         workoutItemsEditor: document.getElementById("workoutItemsEditor"),
+        workoutDetailField: document.getElementById("workoutDetailField"),
+        workoutDetailsPanel: document.getElementById("workoutDetailsPanel"),
         workoutTemplateGrid: document.getElementById("workoutTemplateGrid"),
         addWorkoutRoutineBtn: document.getElementById("addWorkoutRoutineBtn"),
         addWorkoutItemBtn: document.getElementById("addWorkoutItemBtn"),
@@ -3438,6 +3491,11 @@
         refreshWorkoutMeta() {
           const workoutItems = this.getWorkoutItemsFromEditor();
           const isExerciseChecked = document.getElementById("exerciseYes").checked;
+          const wasHidden = elements.workoutDetailField.hidden;
+          elements.workoutDetailField.hidden = !isExerciseChecked;
+          if (isExerciseChecked && wasHidden) {
+            elements.workoutDetailsPanel.open = true;
+          }
           elements.workoutEmptyState.style.display = workoutItems.length ? "none" : "block";
 
           if (workoutItems.length) {
@@ -3449,8 +3507,8 @@
           }
 
           elements.workoutMetaLabel.textContent = isExerciseChecked
-            ? "今天已标记训练，可继续补充项目明细"
-            : "不训练也可以直接保存";
+            ? "已展开今日训练模板"
+            : "选择训练后再记录动作";
         },
 
         resetForm() {
@@ -4083,6 +4141,9 @@
         },
 
         workoutToggleChange() {
+          if (document.getElementById("exerciseNo").checked) {
+            UI.clearWorkoutEditor();
+          }
           UI.refreshWorkoutMeta();
         },
 
