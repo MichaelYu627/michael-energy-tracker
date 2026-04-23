@@ -1,90 +1,105 @@
 {
-  "date": "2026-04-22",
-  "tagline": "89分的黑马也需要一个安静的角落喘口气",
+  "date": "2026-04-23",
+  "tagline": "89→32，小黑猫教你什么叫外部变量不可控",
   "briefing": {
     "headlines": [
       {
         "level": "red",
-        "title": "Claude Opus 4.7 正式发布",
-        "summary": "最强编码模型，软件工程和复杂长任务显著提升，视觉能力支持更高分辨率"
+        "title": "Claude Code 定价风波",
+        "summary": "Anthropic 测试从 Pro 移除 Claude Code，仅影响 2% 新用户，现有用户不变"
       },
       {
         "level": "red",
-        "title": "Claude Mythos 因安全风险限制发布",
-        "summary": "能自动发现零日漏洞，Anthropic 选择不公开，启动 Project Glasswing"
+        "title": "GPT-Rosalind 生命科学模型发布",
+        "summary": "OpenAI 首个垂直领域前沿推理模型，Codex 免费研究插件"
       },
       {
-        "level": "yellow",
-        "title": "Amazon 再投 250 亿美元给 Anthropic",
-        "summary": "Anthropic 锁定 5GW 算力，未来十年 AWS 花费超 1000 亿"
+        "level": "red",
+        "title": "ChatGPT Images 2.0 登顶",
+        "summary": "gpt-image-2 上线 12 小时碾压所有对手，+242 分领先"
       }
     ],
     "github_stars": [
       {
         "name": "caveman",
-        "stars": 42563,
+        "stars": 43706,
         "url": "https://github.com/JuliusBrussee/caveman",
-        "desc": "省 65% token 的 Claude Code 技能"
+        "desc": "省 65% token 的极简沟通技能"
       },
       {
-        "name": "planning-with-files",
-        "stars": 19295,
-        "url": "https://github.com/OthmanAdi/planning-with-files",
-        "desc": "Manus 风格持久化 Markdown 规划"
+        "name": "claude-skills",
+        "stars": 12372,
+        "url": "https://github.com/alirezarezvani/claude-skills",
+        "desc": "232+ 跨平台技能合集（Claude/Codex/Gemini）"
       },
       {
-        "name": "humanizer",
-        "stars": 14790,
-        "url": "https://github.com/blader/humanizer",
-        "desc": "消除 AI 写作痕迹"
+        "name": "fireworks-tech-graph",
+        "stars": 4187,
+        "url": "https://github.com/yizhiyanhua-ai/fireworks-tech-graph",
+        "desc": "SVG/PNG 技术架构图生成"
+      }
+    ],
+    "codex_picks": [
+      {
+        "name": "claude-skills",
+        "stars": 12372,
+        "url": "https://github.com/alirezarezvani/claude-skills",
+        "desc": "232+ 技能，兼容 Codex + Claude Code + 8 个平台"
+      },
+      {
+        "name": "codex-yolo",
+        "stars": 8,
+        "url": "https://github.com/codex-yolo/codex-yolo",
+        "desc": "Codex 并行 agent 自动审批"
       }
     ],
     "youtube_top": [
       {
-        "title": "CNN: Anthropic 延迟 Mythos 发布",
-        "channel": "CNN",
-        "views": "1.2M",
-        "url": "https://youtu.be/htBaVVh_k90"
+        "title": "Introducing the Codex app",
+        "channel": "OpenAI",
+        "views": "384K",
+        "url": "https://youtu.be/HFM3se4lNiw"
       },
       {
-        "title": "Fireship: 7 个开源 AI 工具",
-        "channel": "Fireship",
-        "views": "804K",
-        "url": "https://youtu.be/Xn-gtHDsaPY"
+        "title": "Claude Opus 4.6 介绍",
+        "channel": "Anthropic",
+        "views": "367K",
+        "url": "https://youtu.be/dPn3GBI8lII"
       },
       {
-        "title": "OpenAI 关闭 Sora 视频平台",
-        "channel": "NBC News",
-        "views": "742K",
-        "url": "https://youtu.be/MIISc5gNRto"
+        "title": "Getting started with Codex",
+        "channel": "OpenAI",
+        "views": "227K",
+        "url": "https://youtu.be/px7XlbYgk7I"
       }
     ]
   },
   "reminders": [
     {
-      "type": "success",
-      "icon": "🟢",
-      "text": "睡眠 V 型反弹完成：47→89，只用了 4 天。22:00 纪律是你的操作手册。"
+      "type": "danger",
+      "icon": "🔴",
+      "text": "睡眠 32 分，近两周最低。今天唯一的 KPI：睡回来。关门隔离猫，22:00 入睡。"
     },
     {
       "type": "success",
-      "icon": "🔥",
-      "text": "复利成长值 92.56（+21.16），训练 7 项全满，能量 10/10——近两周巅峰。"
+      "icon": "🟢",
+      "text": "纪律没破！22:00 上床纪律守住了。这次是外部变量（猫），不是自我放纵。"
     },
     {
       "type": "warning",
-      "icon": "👁️",
-      "text": "眼结石根因是屏幕时间过长。每工作 50 分钟，望远 5 分钟。保护你最贵的硬件。"
+      "icon": "🐱",
+      "text": "花 5 块钱买磁吸扣装在柜门上，消除小黑猫这个结构性风险源。"
     },
     {
       "type": "info",
-      "icon": "💧",
-      "text": "允许自己脆弱。89 分的黑马也需要喘气的角落——你今天给了自己这个角落。"
+      "icon": "💪",
+      "text": "崩溃后的应对是教科书级别：补睡、营养补给、不硬练、计划再补觉。这就是能量守恒内化的证据。"
     }
   ],
   "action_items": [
-    "安装 Caveman 技能，测试 token 节省效果",
-    "今晚主动问晨曦要不要一起睡",
-    "小程序审核跟进，觅应收款先跑通再开新战线"
+    "今晚睡觉关卧室门，猫隔离到客厅",
+    "本周买磁吸扣/儿童锁装在猫爱搞的柜门上",
+    "恢复后逛 claude-skills（232+ 技能超市）挑适合觅应的技能",
+    "恢复后看 Getting started with Codex（53 分钟教程）"
   ]
 }
