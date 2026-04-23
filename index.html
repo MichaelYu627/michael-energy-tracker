@@ -248,6 +248,11 @@
     }
 
     .battery-shell {
+      --battery-level: 68%;
+      --battery-main: rgba(25, 211, 180, 0.84);
+      --battery-top: rgba(94, 244, 255, 0.9);
+      --battery-bottom: rgba(31, 122, 92, 0.88);
+      --battery-glow: rgba(71, 244, 255, 0.24);
       position: relative;
       width: min(280px, 72vw);
       height: min(380px, 72vw);
@@ -259,6 +264,27 @@
       box-shadow:
         inset 0 0 0 1px rgba(255, 255, 255, 0.08),
         0 28px 60px rgba(4, 15, 24, 0.35);
+    }
+
+    .battery-shell.level-green {
+      --battery-main: rgba(25, 211, 180, 0.84);
+      --battery-top: rgba(94, 244, 255, 0.9);
+      --battery-bottom: rgba(31, 122, 92, 0.88);
+      --battery-glow: rgba(71, 244, 255, 0.26);
+    }
+
+    .battery-shell.level-yellow {
+      --battery-main: rgba(255, 190, 72, 0.88);
+      --battery-top: rgba(255, 237, 164, 0.92);
+      --battery-bottom: rgba(209, 123, 31, 0.86);
+      --battery-glow: rgba(255, 196, 91, 0.3);
+    }
+
+    .battery-shell.level-red {
+      --battery-main: rgba(223, 80, 65, 0.9);
+      --battery-top: rgba(255, 151, 128, 0.92);
+      --battery-bottom: rgba(145, 34, 35, 0.9);
+      --battery-glow: rgba(255, 96, 80, 0.34);
     }
 
     .battery-cap {
@@ -300,12 +326,12 @@
       left: 0;
       right: 0;
       bottom: 0;
-      height: 68%;
+      height: var(--battery-level);
       background:
-        linear-gradient(180deg, rgba(94, 244, 255, 0.88), rgba(25, 211, 180, 0.82) 40%, rgba(255, 176, 76, 0.8) 100%);
+        linear-gradient(180deg, var(--battery-top), var(--battery-main) 42%, var(--battery-bottom) 100%);
       border-radius: 40px 40px 16px 16px;
-      box-shadow: 0 0 28px rgba(71, 244, 255, 0.22);
-      animation: batteryLift 5.8s ease-in-out infinite alternate;
+      box-shadow: 0 0 34px var(--battery-glow);
+      transition: height 900ms ease, background 500ms ease, box-shadow 500ms ease;
     }
 
     .battery-liquid::before {
@@ -319,8 +345,8 @@
       background:
         radial-gradient(circle at 30% 46%, rgba(255, 255, 255, 0.8), transparent 16%),
         radial-gradient(circle at 70% 44%, rgba(255, 244, 214, 0.58), transparent 18%),
-        linear-gradient(180deg, rgba(212, 255, 248, 0.92), rgba(88, 226, 236, 0.82));
-      animation: waveShift 6.2s ease-in-out infinite;
+        linear-gradient(180deg, rgba(255, 255, 247, 0.92), var(--battery-top));
+      animation: waveShift 5.6s ease-in-out infinite;
     }
 
     .battery-liquid::after {
@@ -358,7 +384,7 @@
 
     .battery-score strong {
       font-family: var(--font-number);
-      font-size: clamp(52px, 10vw, 78px);
+      font-size: clamp(42px, 8vw, 64px);
       line-height: 0.88;
       color: #f6fff8;
       text-shadow: 0 0 24px rgba(71, 244, 255, 0.25);
@@ -375,6 +401,28 @@
       color: rgba(226, 248, 252, 0.72);
       font-size: 13px;
       line-height: 1.6;
+    }
+
+    .battery-drain {
+      display: inline-flex;
+      width: fit-content;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      color: rgba(226, 248, 252, 0.76);
+      font-size: 12px;
+      line-height: 1;
+    }
+
+    .battery-drain::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--battery-top);
+      box-shadow: 0 0 12px var(--battery-glow);
     }
 
     .battery-footer {
@@ -1285,16 +1333,6 @@
       }
     }
 
-    @keyframes batteryLift {
-      0% {
-        transform: translateY(2%);
-      }
-
-      100% {
-        transform: translateY(-2%);
-      }
-    }
-
     @keyframes pulseNode {
       0%,
       100% {
@@ -1687,23 +1725,24 @@
             <div class="constellation-node"></div>
             <div class="constellation-line"></div>
           </div>
-          <div class="battery-shell" aria-hidden="true">
+          <div class="battery-shell level-green" id="heroBatteryShell" role="img" aria-label="当天自然能量电池">
             <div class="battery-cap"></div>
             <div class="battery-core">
               <div class="battery-grid"></div>
               <div class="battery-copy">
                 <span class="battery-kicker">Living Battery</span>
                 <div class="battery-score">
-                  <strong>01</strong>
-                  <span>结构先于结果</span>
+                  <strong id="heroBatteryPercent">100%</strong>
+                  <span id="heroBatteryStatus">绿色区间</span>
                 </div>
-                <div class="battery-caption">看得见的是河流，看不见的是河床。你正在训练自己的能量河床。</div>
+                <div class="battery-caption" id="heroBatteryCaption">看得见的是河流，看不见的是河床。你正在训练自己的能量河床。</div>
+                <div class="battery-drain" id="heroBatteryDrain">自然熵增：每小时 -2%</div>
               </div>
-              <div class="battery-liquid"></div>
+              <div class="battery-liquid" id="heroBatteryLiquid"></div>
               <div class="battery-footer">
                 <div class="battery-footer-row">
-                  <span>Input: 睡眠 / 营养 / 训练</span>
-                  <span>Output: 工作 / 切换 / 外食</span>
+                  <span id="heroBatteryRule">自然熵增：每小时 -2%</span>
+                  <span id="heroBatteryZone">100%-51% 绿色</span>
                 </div>
                 <div class="battery-quote">规律不是束缚，而是让你在复杂世界里还能持续发光的物理结构。</div>
               </div>
@@ -2138,7 +2177,8 @@
       const state = {
         entries: [],
         sleepChart: null,
-        templateSettings: {}
+        templateSettings: {},
+        heroBatteryTimer: null
       };
 
       const elements = {
@@ -2165,6 +2205,13 @@
         chartCanvas: document.getElementById("sleepChart"),
         chartStatusLabel: document.getElementById("chartStatusLabel"),
         heroDateLabel: document.getElementById("heroDateLabel"),
+        heroBatteryShell: document.getElementById("heroBatteryShell"),
+        heroBatteryPercent: document.getElementById("heroBatteryPercent"),
+        heroBatteryStatus: document.getElementById("heroBatteryStatus"),
+        heroBatteryCaption: document.getElementById("heroBatteryCaption"),
+        heroBatteryDrain: document.getElementById("heroBatteryDrain"),
+        heroBatteryRule: document.getElementById("heroBatteryRule"),
+        heroBatteryZone: document.getElementById("heroBatteryZone"),
         todayStatusLabel: document.getElementById("todayStatusLabel"),
         todayEnergyValue: document.getElementById("todayEnergyValue"),
         todayMoodValue: document.getElementById("todayMoodValue"),
@@ -3427,6 +3474,68 @@
           elements.energyBreakdown.textContent = dashboard.breakdown || "睡眠底盘、饮食、锻炼和工作消耗都会显示在这里。";
         },
 
+        calculateHeroBattery(entries, latestEntry) {
+          const now = new Date();
+          const elapsedHours = now.getHours() + now.getMinutes() / 60 + now.getSeconds() / 3600;
+          const dashboard = Analytics.calculateGrowthDashboard(entries, latestEntry);
+          const baseLevel = dashboard.score === null ? 100 : dashboard.score;
+          const entropyDrain = elapsedHours * 2;
+          const level = Analytics.clamp(baseLevel - entropyDrain, 0, 100);
+
+          if (level <= 20) {
+            return {
+              level,
+              baseLevel,
+              entropyDrain,
+              elapsedHours,
+              className: "level-red",
+              status: "红色补能",
+              zoneText: "20% 以下红色",
+              caption: "电量进入红区，今天先补觉、吃饭、降低硬扛强度，让系统重新有电。"
+            };
+          }
+
+          if (level <= 50) {
+            return {
+              level,
+              baseLevel,
+              entropyDrain,
+              elapsedHours,
+              className: "level-yellow",
+              status: "黄色省电",
+              zoneText: "50%-20% 黄色",
+              caption: "电量进入省电区，适合收束琐事、补水、拉伸，别再无意识切换消耗。"
+            };
+          }
+
+          return {
+            level,
+            baseLevel,
+            entropyDrain,
+            elapsedHours,
+            className: "level-green",
+            status: "绿色续航",
+            zoneText: "100%-51% 绿色",
+            caption: "电量仍在绿色区，适合把最重要的深度工作放到前面，趁系统有序时推进。"
+          };
+        },
+
+        renderHeroBattery(entries, latestEntry) {
+          if (!elements.heroBatteryShell) return;
+
+          const battery = this.calculateHeroBattery(entries, latestEntry);
+          elements.heroBatteryShell.style.setProperty("--battery-level", `${battery.level}%`);
+          elements.heroBatteryShell.classList.remove("level-green", "level-yellow", "level-red");
+          elements.heroBatteryShell.classList.add(battery.className);
+          elements.heroBatteryShell.setAttribute("aria-label", `当天自然能量电池：${battery.level.toFixed(1)}%，${battery.status}`);
+          elements.heroBatteryPercent.textContent = `${battery.level.toFixed(1)}%`;
+          elements.heroBatteryStatus.textContent = battery.status;
+          elements.heroBatteryCaption.textContent = battery.caption;
+          elements.heroBatteryDrain.textContent = `自然熵增：已过 ${battery.elapsedHours.toFixed(1)}h，每小时 -2%`;
+          elements.heroBatteryRule.textContent = `基准 ${battery.baseLevel.toFixed(1)} - 熵增 ${battery.entropyDrain.toFixed(1)}`;
+          elements.heroBatteryZone.textContent = battery.zoneText;
+        },
+
         renderTodaySummary(latestEntry) {
           const todayISO = DateUtils.getTodayISO();
           elements.heroDateLabel.textContent = `今天 · ${DateUtils.formatDateLabel(todayISO)}`;
@@ -3577,6 +3686,7 @@
 
         render(entries) {
           const latestEntry = Analytics.getLatestEntry(entries);
+          this.renderHeroBattery(entries, latestEntry);
           this.renderTodaySummary(latestEntry);
           this.renderGrowthDashboard(entries, latestEntry);
           this.renderMetrics(entries, latestEntry);
@@ -3931,6 +4041,10 @@
         bindEvents();
         UI.resetForm();
         UI.render(state.entries);
+        // 首页电池每 15 秒刷新一次，让“每小时 -2%”在手机上持续可见。
+        state.heroBatteryTimer = window.setInterval(() => {
+          UI.renderHeroBattery(state.entries, Analytics.getLatestEntry(state.entries));
+        }, 15 * 1000);
       }
 
       initialize();
