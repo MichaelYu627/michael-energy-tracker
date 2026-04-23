@@ -941,6 +941,78 @@
       line-height: 1.6;
     }
 
+    .append-log-card {
+      display: grid;
+      gap: 14px;
+      padding: 16px;
+      border-radius: 22px;
+      background: linear-gradient(135deg, rgba(255, 251, 245, 0.9), rgba(238, 247, 238, 0.72));
+      border: 1px solid rgba(31, 122, 92, 0.14);
+    }
+
+    .append-log-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .append-log-block {
+      display: grid;
+      gap: 10px;
+      padding: 14px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.68);
+      border: 1px solid rgba(109, 90, 60, 0.1);
+    }
+
+    .append-log-block h3 {
+      margin: 0;
+      color: #2f493e;
+      font-size: 15px;
+    }
+
+    .mini-field-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .checkbox-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      color: #5c574e;
+      font-size: 13px;
+    }
+
+    .checkbox-row label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      background: rgba(229, 218, 199, 0.5);
+    }
+
+    .daily-log-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .daily-log-item {
+      padding: 10px 12px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.66);
+      color: #4d473f;
+      font-size: 13px;
+      line-height: 1.55;
+      border: 1px solid rgba(109, 90, 60, 0.08);
+    }
+
+    .daily-log-item strong {
+      color: #1f5c46;
+    }
+
     .workout-details {
       border-radius: 22px;
       background: rgba(255, 251, 245, 0.78);
@@ -1452,6 +1524,10 @@
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
 
+      .append-log-grid {
+        grid-template-columns: 1fr;
+      }
+
       .template-grid {
         grid-template-columns: 1fr;
       }
@@ -1494,6 +1570,10 @@
 
       .template-adjuster {
         grid-template-columns: 40px minmax(0, 1fr) auto 40px;
+      }
+
+      .mini-field-grid {
+        grid-template-columns: 1fr;
       }
 
       .record-item {
@@ -2029,6 +2109,75 @@
                   <label for="ateOutYes">是</label>
                 </div>
               </div>
+              <div class="field full">
+                <div class="append-log-card">
+                  <div class="field-head">
+                    <label>今日追加记录</label>
+                    <span class="inline-meta">早上保存主记录后，后面只追加餐食和午睡/补能</span>
+                  </div>
+                  <div class="append-log-grid">
+                    <div class="append-log-block">
+                      <h3>追加一餐</h3>
+                      <div class="mini-field-grid">
+                        <div class="field">
+                          <label for="mealLogTime">时间</label>
+                          <input id="mealLogTime" type="time" />
+                        </div>
+                        <div class="field">
+                          <label for="mealLogType">餐次</label>
+                          <select id="mealLogType">
+                            <option value="上午餐">上午餐</option>
+                            <option value="晚餐">晚餐</option>
+                            <option value="加餐">加餐</option>
+                            <option value="其他">其他</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div class="field">
+                        <label for="mealLogFood">具体吃了什么</label>
+                        <textarea id="mealLogFood" placeholder="例如：牛肉、青菜、米饭、鸡蛋"></textarea>
+                      </div>
+                      <div class="checkbox-row">
+                        <label><input id="mealLogCooked" type="checkbox" checked /> 自己做</label>
+                        <label><input id="mealLogHealthy" type="checkbox" checked /> 健康营养</label>
+                        <label><input id="mealLogAteOut" type="checkbox" /> 外食</label>
+                      </div>
+                      <button class="btn-primary btn-slim" id="addMealLogBtn" type="button">添加这一餐并发到 Obsidian</button>
+                    </div>
+                    <div class="append-log-block">
+                      <h3>追加午睡 / 补能</h3>
+                      <div class="mini-field-grid">
+                        <div class="field">
+                          <label for="recoveryLogTime">时间</label>
+                          <input id="recoveryLogTime" type="time" />
+                        </div>
+                        <div class="field">
+                          <label for="recoveryLogType">类型</label>
+                          <select id="recoveryLogType">
+                            <option value="午睡">午睡</option>
+                            <option value="按摩">按摩</option>
+                            <option value="冥想">冥想</option>
+                            <option value="散步">散步</option>
+                            <option value="其他补能">其他补能</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div class="mini-field-grid">
+                        <div class="field">
+                          <label for="recoveryLogBoost">补能加分（%）</label>
+                          <input id="recoveryLogBoost" type="number" min="1" max="40" step="1" value="10" />
+                        </div>
+                        <div class="field">
+                          <label for="recoveryLogNote">备注</label>
+                          <input id="recoveryLogNote" type="text" placeholder="例如：睡了 25 分钟，醒来舒服很多" />
+                        </div>
+                      </div>
+                      <button class="btn-primary btn-slim" id="addRecoveryLogBtn" type="button">添加补能并发到 Obsidian</button>
+                    </div>
+                  </div>
+                  <div class="daily-log-list" id="dailyAppendList"></div>
+                </div>
+              </div>
               <div class="field">
                 <label for="deepWorkTasks">深度工作次数</label>
                 <input id="deepWorkTasks" name="deepWorkTasks" type="number" min="0" max="10" step="1" placeholder="例如 2" />
@@ -2259,7 +2408,7 @@
         storageKey: "michael-energy-tracker-v1",
         seededKey: "michael-energy-tracker-seeded",
         templateSettingsKey: "michael-energy-template-settings-v1",
-        exportVersion: 9,
+        exportVersion: 10,
         obsidianVault: "Michael&Jarvis",
         obsidianFolder: "我的训练日志",
         currentWeightDefault: 83.4,
@@ -2315,6 +2464,19 @@
         clearWorkoutItemsBtn: document.getElementById("clearWorkoutItemsBtn"),
         workoutEmptyState: document.getElementById("workoutEmptyState"),
         workoutMetaLabel: document.getElementById("workoutMetaLabel"),
+        mealLogTime: document.getElementById("mealLogTime"),
+        mealLogType: document.getElementById("mealLogType"),
+        mealLogFood: document.getElementById("mealLogFood"),
+        mealLogCooked: document.getElementById("mealLogCooked"),
+        mealLogHealthy: document.getElementById("mealLogHealthy"),
+        mealLogAteOut: document.getElementById("mealLogAteOut"),
+        addMealLogBtn: document.getElementById("addMealLogBtn"),
+        recoveryLogTime: document.getElementById("recoveryLogTime"),
+        recoveryLogType: document.getElementById("recoveryLogType"),
+        recoveryLogBoost: document.getElementById("recoveryLogBoost"),
+        recoveryLogNote: document.getElementById("recoveryLogNote"),
+        addRecoveryLogBtn: document.getElementById("addRecoveryLogBtn"),
+        dailyAppendList: document.getElementById("dailyAppendList"),
         chartCanvas: document.getElementById("sleepChart"),
         chartStatusLabel: document.getElementById("chartStatusLabel"),
         heroDateLabel: document.getElementById("heroDateLabel"),
@@ -2359,6 +2521,13 @@
       const DateUtils = {
         getTodayISO() {
           return this.dateToISO(new Date());
+        },
+
+        getCurrentTimeString() {
+          const now = new Date();
+          const hour = String(now.getHours()).padStart(2, "0");
+          const minute = String(now.getMinutes()).padStart(2, "0");
+          return `${hour}:${minute}`;
         },
 
         dateToISO(date) {
@@ -2570,8 +2739,46 @@
           return Number.isFinite(number) ? number : null;
         },
 
+        normalizeMealItems(items) {
+          if (!Array.isArray(items)) return [];
+          return items
+            .map((item) => ({
+              time: String(item.time || "").trim(),
+              type: String(item.type || item.mealType || "餐食").trim(),
+              food: String(item.food || item.details || item.content || "").trim(),
+              cooked: this.normalizeBoolean(item.cooked),
+              healthy: this.normalizeBoolean(item.healthy),
+              ateOut: this.normalizeBoolean(item.ateOut),
+              note: String(item.note || "").trim()
+            }))
+            .filter((item) => item.food || item.note);
+        },
+
+        normalizeRecoveryItems(items) {
+          if (!Array.isArray(items)) return [];
+          return items
+            .map((item) => ({
+              time: String(item.time || "").trim(),
+              type: String(item.type || item.recoveryType || "补能").trim(),
+              boost: this.normalizeNumber(item.boost ?? item.energyBoost, 0),
+              note: String(item.note || item.details || "").trim()
+            }))
+            .filter((item) => item.boost > 0 || item.note);
+        },
+
+        formatMealDetails(mealItems, fallback = "") {
+          const items = this.normalizeMealItems(mealItems);
+          if (!items.length) return String(fallback || "").trim();
+          return items
+            .map((item) => `${item.time ? `${item.time} ` : ""}${item.type}：${item.food}${item.note ? `（${item.note}）` : ""}`)
+            .join("\n");
+        },
+
         normalize(raw) {
           const workoutItems = WorkoutModel.normalizeItems(raw.workoutItems || raw.trainingItems || []);
+          const mealItems = this.normalizeMealItems(raw.mealItems || raw.mealLogs || []);
+          const recoveryItems = this.normalizeRecoveryItems(raw.recoveryItems || raw.recoveryLogs || []);
+          const mealDetails = this.formatMealDetails(mealItems, raw.mealDetails || raw.foodDetails || raw.meals || "");
           return {
             date: String(raw.date || ""),
             sleepScore: this.normalizeNumber(raw.sleepScore, 0),
@@ -2582,10 +2789,12 @@
             weight: this.normalizeNullableNumber(raw.weight),
             energyBoost: this.normalizeNumber(raw.energyBoost, 0),
             exercised: this.normalizeBoolean(raw.exercised) || workoutItems.length > 0,
-            cooked: this.normalizeBoolean(raw.cooked),
-            mealDetails: String(raw.mealDetails || raw.foodDetails || raw.meals || "").trim(),
-            healthyFood: this.normalizeBoolean(raw.healthyFood),
-            ateOut: this.normalizeBoolean(raw.ateOut),
+            cooked: this.normalizeBoolean(raw.cooked) || mealItems.some((item) => item.cooked),
+            mealDetails,
+            mealItems,
+            recoveryItems,
+            healthyFood: this.normalizeBoolean(raw.healthyFood) || mealItems.some((item) => item.healthy),
+            ateOut: this.normalizeBoolean(raw.ateOut) || mealItems.some((item) => item.ateOut),
             deepWorkTasks: this.normalizeNumber(raw.deepWorkTasks, 0),
             adminTasks: this.normalizeNumber(raw.adminTasks, this.normalizeNumber(raw.completedTasks, 0)),
             morningEnergy: this.normalizeNullableNumber(raw.morningEnergy),
@@ -3551,6 +3760,53 @@
           elements.mealDetailField.hidden = !isCookedChecked;
         },
 
+        resetAppendInputs() {
+          const currentTime = DateUtils.getCurrentTimeString();
+          elements.mealLogTime.value = currentTime;
+          elements.recoveryLogTime.value = currentTime;
+          elements.mealLogFood.value = "";
+          elements.mealLogCooked.checked = true;
+          elements.mealLogHealthy.checked = true;
+          elements.mealLogAteOut.checked = false;
+          elements.recoveryLogType.value = "午睡";
+          elements.recoveryLogBoost.value = 10;
+          elements.recoveryLogNote.value = "";
+        },
+
+        renderDailyAppendList(entries = state.entries) {
+          const todayEntry = entries.find((entry) => entry.date === DateUtils.getTodayISO());
+          const mealItems = EntryModel.normalizeMealItems(todayEntry?.mealItems || []);
+          const recoveryItems = EntryModel.normalizeRecoveryItems(todayEntry?.recoveryItems || []);
+          const rows = [];
+
+          mealItems.forEach((item) => {
+            rows.push(`
+              <div class="daily-log-item">
+                <strong>${this.escapeHtml(item.time || "未记时间")} ${this.escapeHtml(item.type)}</strong>
+                ${this.escapeHtml(item.food)}
+                ${item.cooked ? " / 自己做" : ""}
+                ${item.healthy ? " / 健康" : ""}
+                ${item.ateOut ? " / 外食" : ""}
+                ${item.note ? `<br />${this.escapeHtml(item.note)}` : ""}
+              </div>
+            `);
+          });
+
+          recoveryItems.forEach((item) => {
+            rows.push(`
+              <div class="daily-log-item">
+                <strong>${this.escapeHtml(item.time || "未记时间")} ${this.escapeHtml(item.type)}</strong>
+                补能 +${Number(item.boost || 0).toFixed(0)}%
+                ${item.note ? `<br />${this.escapeHtml(item.note)}` : ""}
+              </div>
+            `);
+          });
+
+          elements.dailyAppendList.innerHTML = rows.length
+            ? rows.join("")
+            : '<div class="daily-log-item">今天还没有追加餐食或补能。先保存早上的主记录，后面就可以只追加小事件。</div>';
+        },
+
         resetForm() {
           elements.form.reset();
           elements.form.entryDate.value = DateUtils.getTodayISO();
@@ -3572,6 +3828,8 @@
           document.getElementById("ateOutNo").checked = true;
           this.clearWorkoutEditor();
           this.refreshMealDetails();
+          this.resetAppendInputs();
+          this.renderDailyAppendList();
           this.syncAllSliders();
           this.setFormMode("保存或更新当天记录");
         },
@@ -3745,7 +4003,7 @@
           elements.todayTimeValue.textContent = `${latestEntry.bedtime} / ${latestEntry.wakeTime}`;
           elements.todayWakeupsValue.textContent = `${latestEntry.wakeups} 次`;
           elements.todayHabitsValue.textContent = `${EntryModel.getWorkoutSummary(latestEntry)} / ${latestEntry.cooked ? "做饭" : "未做饭"}`;
-          elements.todayFuelValue.textContent = `补能 +${latestEntry.energyBoost || 0}% / ${latestEntry.healthyFood ? "营养好" : "营养弱"} / ${latestEntry.ateOut ? "外食" : "未外食"}${latestEntry.mealDetails ? " / 已记食物" : ""}`;
+          elements.todayFuelValue.textContent = `餐食 ${latestEntry.mealItems?.length || 0} / 补能 ${latestEntry.recoveryItems?.length || 0} 次 / +${latestEntry.energyBoost || 0}% / ${latestEntry.healthyFood ? "营养好" : "营养弱"} / ${latestEntry.ateOut ? "外食" : "未外食"}`;
           elements.todayWorkValue.textContent = `深工 ${latestEntry.deepWorkTasks} / 琐事 ${latestEntry.adminTasks}`;
           elements.todayRhythmValue.textContent = rhythmInsight.rhythmText;
           elements.todayWeightValue.textContent = this.formatWeight(latestEntry.weight);
@@ -3795,9 +4053,38 @@
               const storyHtml = this.escapeHtml(entry.dailyStory || "").replaceAll("\n", "<br />");
               const mealDetailsHtml = this.escapeHtml(entry.mealDetails || "").replaceAll("\n", "<br />");
               const workoutItems = WorkoutModel.normalizeItems(entry.workoutItems);
+              const mealItems = EntryModel.normalizeMealItems(entry.mealItems || []);
+              const recoveryItems = EntryModel.normalizeRecoveryItems(entry.recoveryItems || []);
               const workoutAverage = EntryModel.getWorkoutAverageRating(entry);
               const workoutSummary = EntryModel.getWorkoutSummary(entry);
               const growthDashboard = Analytics.calculateGrowthDashboard(entries, entry);
+              const mealLogDetails = mealItems.length
+                ? `
+                  <div class="record-workouts">
+                    ${mealItems.map((item) => `
+                      <div class="record-workout-item">
+                        <strong>${this.escapeHtml(item.time || "")} ${this.escapeHtml(item.type)}</strong> · ${this.escapeHtml(item.food)}
+                        ${item.cooked ? " · 自己做" : ""}
+                        ${item.healthy ? " · 健康" : ""}
+                        ${item.ateOut ? " · 外食" : ""}
+                        ${item.note ? `<br />${this.escapeHtml(item.note)}` : ""}
+                      </div>
+                    `).join("")}
+                  </div>
+                `
+                : "";
+              const recoveryLogDetails = recoveryItems.length
+                ? `
+                  <div class="record-workouts">
+                    ${recoveryItems.map((item) => `
+                      <div class="record-workout-item">
+                        <strong>${this.escapeHtml(item.time || "")} ${this.escapeHtml(item.type)}</strong> · 补能 +${Number(item.boost || 0).toFixed(0)}%
+                        ${item.note ? `<br />${this.escapeHtml(item.note)}` : ""}
+                      </div>
+                    `).join("")}
+                  </div>
+                `
+                : "";
               const workoutDetails = workoutItems.length
                 ? `
                   <div class="record-workouts">
@@ -3838,6 +4125,8 @@
                       心情：${mood}
                     </div>
                     ${entry.dailyStory ? `<div class="record-story"><strong>今天发生的事：</strong>${storyHtml}</div>` : ""}
+                    ${mealLogDetails}
+                    ${recoveryLogDetails}
                     ${workoutDetails}
                   </div>
                   <div class="record-actions">
@@ -3875,6 +4164,7 @@
           this.renderReminders(entries, latestEntry);
           this.renderRecordList(entries);
           this.renderDataOverview(entries, latestEntry);
+          this.renderDailyAppendList(entries);
           ChartRenderer.render(entries, latestEntry);
         }
       };
@@ -3892,8 +4182,10 @@
         buildEntryFromForm() {
           const formData = new FormData(elements.form);
           const workoutItems = UI.getWorkoutItemsFromEditor();
+          const entryDate = formData.get("entryDate");
+          const existingEntry = state.entries.find((entry) => entry.date === entryDate) || null;
           return EntryModel.normalize({
-            date: formData.get("entryDate"),
+            date: entryDate,
             sleepScore: formData.get("sleepScore"),
             bedtime: formData.get("bedtime"),
             wakeTime: formData.get("wakeTime"),
@@ -3913,7 +4205,9 @@
             eveningEnergy: formData.get("eveningEnergy"),
             mood: formData.get("mood"),
             dailyStory: formData.get("dailyStory"),
-            workoutItems
+            workoutItems,
+            mealItems: existingEntry?.mealItems || [],
+            recoveryItems: existingEntry?.recoveryItems || []
           });
         },
 
@@ -3923,6 +4217,8 @@
 
         buildObsidianMarkdown(entry) {
           const workoutItems = WorkoutModel.normalizeItems(entry.workoutItems);
+          const mealItems = EntryModel.normalizeMealItems(entry.mealItems || []);
+          const recoveryItems = EntryModel.normalizeRecoveryItems(entry.recoveryItems || []);
           const workoutAverage = EntryModel.getWorkoutAverageRating(entry);
           const workoutSummary = EntryModel.getWorkoutSummary(entry);
           const growthDashboard = Analytics.calculateGrowthDashboard(state.entries, entry);
@@ -3968,6 +4264,35 @@
             sections.push("");
           }
 
+          if (mealItems.length) {
+            sections.push("### 今日餐食", "");
+            mealItems.forEach((item) => {
+              const line = [
+                `- ${item.time || "未记时间"} ${item.type}`,
+                `食物：${item.food}`,
+                item.cooked ? "自己做" : "",
+                item.healthy ? "健康营养" : "",
+                item.ateOut ? "外食" : "",
+                item.note ? `备注：${item.note}` : ""
+              ].filter(Boolean).join("｜");
+              sections.push(line);
+            });
+            sections.push("");
+          }
+
+          if (recoveryItems.length) {
+            sections.push("### 今日补能", "");
+            recoveryItems.forEach((item) => {
+              const line = [
+                `- ${item.time || "未记时间"} ${item.type}`,
+                `补能 +${Number(item.boost || 0).toFixed(0)}%`,
+                item.note ? `备注：${item.note}` : ""
+              ].filter(Boolean).join("｜");
+              sections.push(line);
+            });
+            sections.push("");
+          }
+
           sections.push("### 今天发生的事情", "", entry.dailyStory || "无", "");
           sections.push("---", "");
           return sections.join("\n");
@@ -3980,6 +4305,83 @@
           window.setTimeout(() => {
             window.location.href = url;
           }, 650);
+        },
+
+        sendAppendToObsidian(entry, content) {
+          const file = this.buildObsidianNotePath(entry);
+          const url = `obsidian://new?vault=${encodeURIComponent(CONFIG.obsidianVault)}&file=${encodeURIComponent(file)}&append=true&content=${encodeURIComponent(content)}`;
+          window.setTimeout(() => {
+            window.location.href = url;
+          }, 650);
+        },
+
+        getTodayEntryForAppend() {
+          const todayISO = DateUtils.getTodayISO();
+          const existingEntry = state.entries.find((entry) => entry.date === todayISO);
+          if (existingEntry) return existingEntry;
+
+          const { entry, validationMessage } = this.validateAndBuildEntry();
+          if (entry.date === todayISO && !validationMessage) {
+            this.saveEntry(entry);
+            return entry;
+          }
+
+          UI.showStatus("请先保存今天的主记录，再追加餐食或午睡补能");
+          return null;
+        },
+
+        appendMealLog(log) {
+          const todayEntry = this.getTodayEntryForAppend();
+          if (!todayEntry) return false;
+
+          const mealItems = [...EntryModel.normalizeMealItems(todayEntry.mealItems || []), log];
+          const nextEntry = EntryModel.normalize({
+            ...todayEntry,
+            mealItems,
+            mealDetails: EntryModel.formatMealDetails(mealItems, todayEntry.mealDetails),
+            cooked: todayEntry.cooked || log.cooked,
+            healthyFood: todayEntry.healthyFood || log.healthy,
+            ateOut: todayEntry.ateOut || log.ateOut
+          });
+
+          const isSaved = this.saveEntry(nextEntry);
+          if (!isSaved) return false;
+
+          this.sendAppendToObsidian(nextEntry, [
+            `\n### 追加餐食 ${log.time || ""} ${log.type}`,
+            "",
+            `- 食物：${log.food}`,
+            `- 自己做：${log.cooked ? "是" : "否"}`,
+            `- 健康营养：${log.healthy ? "是" : "否"}`,
+            `- 外食：${log.ateOut ? "是" : "否"}`,
+            log.note ? `- 备注：${log.note}` : "",
+            ""
+          ].filter((line) => line !== "").join("\n"));
+          return true;
+        },
+
+        appendRecoveryLog(log) {
+          const todayEntry = this.getTodayEntryForAppend();
+          if (!todayEntry) return false;
+
+          const recoveryItems = [...EntryModel.normalizeRecoveryItems(todayEntry.recoveryItems || []), log];
+          const nextEntry = EntryModel.normalize({
+            ...todayEntry,
+            recoveryItems,
+            energyBoost: Analytics.clamp((todayEntry.energyBoost || 0) + log.boost, 0, 40)
+          });
+
+          const isSaved = this.saveEntry(nextEntry);
+          if (!isSaved) return false;
+
+          this.sendAppendToObsidian(nextEntry, [
+            `\n### 追加补能 ${log.time || ""} ${log.type}`,
+            "",
+            `- 补能加分：+${log.boost}%`,
+            log.note ? `- 备注：${log.note}` : "",
+            ""
+          ].filter((line) => line !== "").join("\n"));
+          return true;
         },
 
         validateAndBuildEntry() {
@@ -4056,6 +4458,51 @@
           }
           App.sendToObsidian(entry);
           UI.showStatus(`本地已保存，正在打开 Obsidian：${DateUtils.formatShortDate(entry.date)}`);
+        },
+
+        addMealLog() {
+          const food = elements.mealLogFood.value.trim();
+          if (!food) {
+            UI.showStatus("请先填写这一餐具体吃了什么");
+            return;
+          }
+
+          const log = {
+            time: elements.mealLogTime.value || DateUtils.getCurrentTimeString(),
+            type: elements.mealLogType.value,
+            food,
+            cooked: elements.mealLogCooked.checked,
+            healthy: elements.mealLogHealthy.checked,
+            ateOut: elements.mealLogAteOut.checked,
+            note: ""
+          };
+
+          if (App.appendMealLog(log)) {
+            elements.mealLogFood.value = "";
+            elements.mealLogAteOut.checked = false;
+            UI.resetAppendInputs();
+            UI.showStatus(`已追加餐食：${log.type}`);
+          }
+        },
+
+        addRecoveryLog() {
+          const boost = Number(elements.recoveryLogBoost.value);
+          if (!Number.isFinite(boost) || boost <= 0) {
+            UI.showStatus("补能加分需要大于 0");
+            return;
+          }
+
+          const log = {
+            time: elements.recoveryLogTime.value || DateUtils.getCurrentTimeString(),
+            type: elements.recoveryLogType.value,
+            boost: Math.min(40, Math.round(boost)),
+            note: elements.recoveryLogNote.value.trim()
+          };
+
+          if (App.appendRecoveryLog(log)) {
+            UI.resetAppendInputs();
+            UI.showStatus(`已追加补能：${log.type} +${log.boost}%`);
+          }
         },
 
         recordActions(event) {
@@ -4231,6 +4678,8 @@
         elements.addWorkoutRoutineBtn.addEventListener("click", Handlers.addWorkoutRoutine);
         elements.addWorkoutItemBtn.addEventListener("click", Handlers.addWorkoutItem);
         elements.clearWorkoutItemsBtn.addEventListener("click", Handlers.clearWorkoutItems);
+        elements.addMealLogBtn.addEventListener("click", Handlers.addMealLog);
+        elements.addRecoveryLogBtn.addEventListener("click", Handlers.addRecoveryLog);
         elements.workoutItemsEditor.addEventListener("click", Handlers.workoutEditorClick);
         elements.workoutItemsEditor.addEventListener("input", Handlers.workoutEditorInput);
         document.getElementById("exerciseNo").addEventListener("change", Handlers.workoutToggleChange);
