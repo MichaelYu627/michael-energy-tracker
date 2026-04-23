@@ -891,6 +891,74 @@
       margin-top: 16px;
     }
 
+    .main-record-status {
+      display: grid;
+      gap: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+      border-radius: 22px;
+      background:
+        radial-gradient(circle at 0% 0%, rgba(31, 122, 92, 0.16), transparent 34%),
+        rgba(255, 251, 245, 0.82);
+      border: 1px solid rgba(31, 122, 92, 0.14);
+    }
+
+    .main-record-status-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .main-record-status-title {
+      display: grid;
+      gap: 4px;
+    }
+
+    .main-record-status-title strong {
+      color: #1f5c46;
+      font-size: 16px;
+    }
+
+    .main-record-status-title span {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .progress-chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .progress-chip {
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: rgba(229, 218, 199, 0.56);
+      color: #5c574e;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .progress-chip.done {
+      background: rgba(31, 122, 92, 0.12);
+      color: #1f7a5c;
+    }
+
+    .progress-chip.todo {
+      background: rgba(196, 138, 7, 0.13);
+      color: #9a6805;
+    }
+
+    .entry-form.main-record-collapsed .form-grid > .field:not(.append-log-field) {
+      display: none;
+    }
+
+    .entry-form.main-record-collapsed .button-row {
+      display: none;
+    }
+
     .field-head {
       display: flex;
       align-items: center;
@@ -1628,6 +1696,10 @@
         grid-template-columns: 1fr;
       }
 
+      .main-record-status-head {
+        display: grid;
+      }
+
       .battery-shell {
         width: min(100%, 280px);
         height: 380px;
@@ -2018,7 +2090,17 @@
             <h2>今日录入</h2>
             <span id="formModeLabel">保存或更新当天记录</span>
           </div>
-          <form id="entryForm">
+          <div class="main-record-status" id="mainRecordStatus">
+            <div class="main-record-status-head">
+              <div class="main-record-status-title">
+                <strong id="mainRecordStatusTitle">今日主记录待保存</strong>
+                <span id="mainRecordStatusText">先保存睡眠、体重、训练等基础信息，后面就只需要追加小事件。</span>
+              </div>
+              <button class="btn-secondary btn-slim" id="toggleMainRecordBtn" type="button">展开主记录</button>
+            </div>
+            <div class="progress-chip-row" id="mainRecordProgress"></div>
+          </div>
+          <form class="entry-form" id="entryForm">
             <div class="form-grid">
               <div class="field">
                 <label for="entryDate">日期</label>
@@ -2182,7 +2264,7 @@
                   <label for="ateOutYes">是</label>
                 </div>
               </div>
-              <div class="field full">
+              <div class="field full append-log-field">
                 <div class="append-log-card">
                   <div class="field-head">
                     <div class="append-log-title">
@@ -2546,11 +2628,16 @@
         entries: [],
         sleepChart: null,
         templateSettings: {},
-        heroBatteryTimer: null
+        heroBatteryTimer: null,
+        mainRecordExpanded: false
       };
 
       const elements = {
         form: document.getElementById("entryForm"),
+        mainRecordStatusTitle: document.getElementById("mainRecordStatusTitle"),
+        mainRecordStatusText: document.getElementById("mainRecordStatusText"),
+        mainRecordProgress: document.getElementById("mainRecordProgress"),
+        toggleMainRecordBtn: document.getElementById("toggleMainRecordBtn"),
         recordList: document.getElementById("recordList"),
         statusBanner: document.getElementById("statusBanner"),
         importFileInput: document.getElementById("importFileInput"),
@@ -3965,7 +4052,7 @@
           this.setFormMode("保存或更新当天记录");
         },
 
-        fillForm(entry) {
+        fillForm(entry, options = {}) {
           elements.form.entryDate.value = entry.date;
           elements.form.sleepScore.value = entry.sleepScore;
           elements.bedtimeSlider.value = DateUtils.bedtimeTimeStringToSliderValue(entry.bedtime);
@@ -3990,7 +4077,9 @@
           this.refreshMealDetails();
           this.syncAllSliders();
           this.setFormMode(`正在编辑：${DateUtils.formatShortDate(entry.date)}`);
-          window.scrollTo({ top: 0, behavior: "smooth" });
+          if (options.scroll !== false) {
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          }
         },
 
         renderGrowthDashboard(entries, latestEntry) {
@@ -4102,6 +4191,70 @@
           elements.heroBatteryDrain.textContent = `基于 ${battery.sourceLabel}，6:00 后已过 ${battery.elapsedHours.toFixed(1)}h`;
           elements.heroBatteryRule.textContent = `睡眠${battery.sleepBase} + 补能${battery.recoveryBonus} + 营养${battery.nutritionBonus} - 熵增${battery.entropyDrain.toFixed(1)}`;
           elements.heroBatteryZone.textContent = battery.zoneText;
+        },
+
+        getTodayMainRecordStatus(entries) {
+          const todayEntry = entries.find((entry) => entry.date === DateUtils.getTodayISO()) || null;
+          if (!todayEntry) {
+            return {
+              todayEntry: null,
+              chips: [
+                { label: "主记录未保存", done: false },
+                { label: "餐食待追加", done: false },
+                { label: "补能待追加", done: false },
+                { label: "睡前复盘待追加", done: false }
+              ],
+              missing: ["主记录", "餐食", "午睡/补能", "睡前复盘"]
+            };
+          }
+
+          const hasMeals = EntryModel.normalizeMealItems(todayEntry.mealItems || []).length > 0;
+          const hasRecovery = EntryModel.normalizeRecoveryItems(todayEntry.recoveryItems || []).length > 0;
+          const hasNightReview = /睡前复盘/.test(todayEntry.dailyStory || "");
+          const chips = [
+            { label: "主记录已保存", done: true },
+            { label: hasMeals ? "餐食已追加" : "餐食待追加", done: hasMeals },
+            { label: hasRecovery ? "补能已追加" : "补能待追加", done: hasRecovery },
+            { label: hasNightReview ? "睡前复盘已追加" : "睡前复盘待追加", done: hasNightReview }
+          ];
+          const missing = chips.filter((item) => !item.done).map((item) => item.label.replace("待追加", "").replace("未保存", ""));
+          return { todayEntry, chips, missing };
+        },
+
+        renderMainRecordStatus(entries) {
+          const status = this.getTodayMainRecordStatus(entries);
+          const shouldCollapseMain = Boolean(status.todayEntry) && !state.mainRecordExpanded;
+
+          elements.form.classList.toggle("main-record-collapsed", shouldCollapseMain);
+          elements.mainRecordProgress.innerHTML = status.chips
+            .map((item) => `<span class="progress-chip ${item.done ? "done" : "todo"}">${this.escapeHtml(item.label)}</span>`)
+            .join("");
+
+          if (!status.todayEntry) {
+            elements.mainRecordStatusTitle.textContent = "今日主记录还没保存";
+            elements.mainRecordStatusText.textContent = "先把睡眠、体重、训练等基础信息保存一次，后面就只追加餐食、补能和睡前复盘。";
+            elements.toggleMainRecordBtn.textContent = "开始填写主记录";
+            state.mainRecordExpanded = true;
+            elements.form.classList.remove("main-record-collapsed");
+            return;
+          }
+
+          elements.mainRecordStatusTitle.textContent = shouldCollapseMain
+            ? "今日主记录已保存，基础表单已收起"
+            : "正在查看/修改今日主记录";
+          elements.mainRecordStatusText.textContent = status.missing.length
+            ? `今天还可以补：${status.missing.join("、")}。`
+            : "今天关键记录都已经补齐，剩下就是按需追加新的能量事件。";
+          elements.toggleMainRecordBtn.textContent = shouldCollapseMain ? "展开修改主记录" : "收起已保存内容";
+        },
+
+        toggleMainRecordEditor() {
+          const todayEntry = state.entries.find((entry) => entry.date === DateUtils.getTodayISO()) || null;
+          state.mainRecordExpanded = !state.mainRecordExpanded;
+          if (state.mainRecordExpanded && todayEntry) {
+            this.fillForm(todayEntry, { scroll: false });
+          }
+          this.renderMainRecordStatus(state.entries);
         },
 
         renderTodaySummary(latestEntry) {
@@ -4291,6 +4444,7 @@
           this.renderHeroBattery(entries, latestEntry);
           this.renderTodaySummary(latestEntry);
           this.renderGrowthDashboard(entries, latestEntry);
+          this.renderMainRecordStatus(entries);
           this.renderMetrics(entries, latestEntry);
           this.renderReminders(entries, latestEntry);
           this.renderRecordList(entries);
@@ -4551,6 +4705,9 @@
         },
 
         saveEntry(entry) {
+          if (entry.date === DateUtils.getTodayISO()) {
+            state.mainRecordExpanded = false;
+          }
           this.upsertEntry(entry);
           UI.setFormMode(`已保存：${DateUtils.formatShortDate(entry.date)}`);
           return this.confirmSavedEntry(entry);
@@ -4744,7 +4901,9 @@
         },
 
         resetForm() {
+          state.mainRecordExpanded = true;
           UI.resetForm();
+          UI.renderMainRecordStatus(state.entries);
         },
 
         sleepSliderInput() {
@@ -4849,6 +5008,7 @@
 
       function bindEvents() {
         elements.form.addEventListener("submit", Handlers.submit);
+        elements.toggleMainRecordBtn.addEventListener("click", () => UI.toggleMainRecordEditor());
         elements.recordList.addEventListener("click", Handlers.recordActions);
         elements.form.sleepScore.addEventListener("input", Handlers.sleepSliderInput);
         elements.weightSlider.addEventListener("input", Handlers.weightSliderInput);
