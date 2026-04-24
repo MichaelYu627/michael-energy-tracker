@@ -3652,10 +3652,75 @@
       };
 
       // 每个事件类型的面板渲染器：输入 prefill（可空）→ 返回 HTML 字符串
-      const PanelRenderers = {};
+      const PanelRenderers = {
+  sleep(prefill) {
+    const p = prefill || {};
+    const today = state.entries.find((e) => e.date === DateUtils.getTodayISO()) || {};
+    return `
+      <div class="capture-panel" data-panel-type="sleep">
+        <h3>😴 记睡眠</h3>
+        <div class="field-row">
+          <div class="field" style="flex:1;min-width:200px">
+            <label>睡眠分 <strong id="sleepPanelScoreValue">${p.sleepScore ?? today.sleepScore ?? 80}</strong></label>
+            <input type="range" id="sleepPanelScore" min="0" max="100" step="1" value="${p.sleepScore ?? today.sleepScore ?? 80}">
+          </div>
+          <div class="field">
+            <label>起夜次数</label>
+            <input type="number" id="sleepPanelWakeups" min="0" max="10" value="${p.wakeups ?? today.wakeups ?? 0}">
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field" style="flex:1">
+            <label>入睡时间</label>
+            <input type="time" id="sleepPanelBedtime" value="${p.bedtime || today.bedtime || '22:00'}">
+          </div>
+          <div class="field" style="flex:1">
+            <label>起床时间</label>
+            <input type="time" id="sleepPanelWakeTime" value="${p.wakeTime || today.wakeTime || '06:00'}">
+          </div>
+        </div>
+        <div class="panel-actions">
+          <button class="btn-primary" id="sleepPanelSave" type="button">💾 保存</button>
+          <label class="immediate-push-check">
+            <input type="checkbox" id="sleepPanelImmediate"> 立刻推到 Obsidian
+          </label>
+        </div>
+        <div class="panel-error" id="sleepPanelError" style="color:#c62828;font-size:12px;margin-top:8px"></div>
+      </div>
+    `;
+  }
+};
 
       // 每个事件类型的面板事件绑定器：prefill 同上 → 给面板里的元素绑事件
-      const PanelBinders = {};
+      const PanelBinders = {
+  sleep(prefill) {
+    document.getElementById("sleepPanelScore").addEventListener("input", (e) => {
+      document.getElementById("sleepPanelScoreValue").textContent = e.target.value;
+    });
+    document.getElementById("sleepPanelSave").addEventListener("click", () => {
+      const data = {
+        sleepScore: Number(document.getElementById("sleepPanelScore").value),
+        bedtime: document.getElementById("sleepPanelBedtime").value,
+        wakeTime: document.getElementById("sleepPanelWakeTime").value,
+        wakeups: Number(document.getElementById("sleepPanelWakeups").value)
+      };
+      const err = EventModel.types.sleep.validate(data);
+      if (err) {
+        document.getElementById("sleepPanelError").textContent = err;
+        return;
+      }
+      const event = prefill
+        ? { ...prefill, data, capturedAt: Date.now() }
+        : EventModel.buildQueueItem("sleep", DateUtils.getTodayISO(), DateUtils.getCurrentTimeString(), data);
+      App.applyEvent(event);
+      if (document.getElementById("sleepPanelImmediate").checked) {
+        App.pushEventsToObsidian([event]);
+      }
+      UI.showStatus(`已保存：😴 睡眠`);
+      PanelManager.close();
+    });
+  }
+};
 
       const StorageService = {
         loadEntries() {
