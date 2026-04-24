@@ -4949,6 +4949,14 @@
           elements.dataUpdatedValue.textContent = `最近更新：${DateUtils.formatShortDate(latestEntry.date)}`;
         },
 
+        renderTodayTimeline() {
+          // Task 14 填充
+        },
+
+        renderPendingCapsule() {
+          // Task 15 填充
+        },
+
         render(entries) {
           const latestEntry = Analytics.getLatestEntry(entries);
           this.renderHeroBattery(entries, latestEntry);
@@ -4972,6 +4980,33 @@
 
         render() {
           UI.render(this.syncEntries());
+        },
+
+        applyEvent(event) {
+          const entries = state.entries;
+          const existingEntry = entries.find((e) => e.date === event.date) || EntryModel.normalize({ date: event.date });
+          const nextEntry = EventModel.types[event.eventType].applyToEntry(existingEntry, event.data);
+          const nextEntries = entries.filter((e) => e.date !== event.date).concat(nextEntry);
+          state.entries = StorageService.saveEntries(nextEntries);
+          SyncQueue.add(event);
+          UI.render(state.entries);
+          UI.renderTodayTimeline();
+          UI.renderPendingCapsule();
+          return true;
+        },
+
+        pushEventsToObsidian(events) {
+          if (!events.length) return;
+          const date = events[0].date;
+          const content = "\n\n" + EventModel.renderBatchMarkdown(events);
+          const file = `${CONFIG.obsidianFolder}/训练日志 ${DateUtils.formatShortYearDate(date)}`;
+          const url = `obsidian://new?vault=${encodeURIComponent(CONFIG.obsidianVault)}&file=${encodeURIComponent(file)}&append=true&content=${encodeURIComponent(content)}`;
+          // 同步调用，自定义协议必须这样
+          window.location.href = url;
+          // 乐观清队列（无法从 URL scheme 得知成败）
+          events.forEach((e) => SyncQueue.removeById(e.id));
+          UI.renderTodayTimeline();
+          UI.renderPendingCapsule();
         },
 
         buildEntryFromForm() {
