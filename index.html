@@ -6117,6 +6117,14 @@
           App.pushEventsToObsidian(pending);
           UI.showStatus(`已推 ${pending.length} 条到 Obsidian · ${DateUtils.formatShortDate(today)}`);
         });
+        document.getElementById("todayTimeline").addEventListener("click", (event) => {
+          const item = event.target.closest(".timeline-item[data-event-id]");
+          if (!item) return;
+          const id = item.dataset.eventId;
+          const existing = SyncQueue.load().find((e) => e.id === id);
+          if (!existing) return;
+          PanelManager.open(existing.eventType, { prefill: existing });
+        });
       }
 
       function initialize() {
