@@ -3712,6 +3712,48 @@
     </div>
   `;
 },
+  meal(prefill) {
+  const p = prefill?.data || {};
+  const time = prefill?.time || DateUtils.getCurrentTimeString();
+  return `
+    <div class="capture-panel" data-panel-type="meal">
+      <h3>🍱 记一餐</h3>
+      <div class="field-row">
+        <div class="field">
+          <label>时间</label>
+          <input type="time" id="mealPanelTime" value="${time}">
+        </div>
+        <div class="field" style="flex:1">
+          <label>餐次</label>
+          <select id="mealPanelType">
+            <option value="早餐" ${p.type === "早餐" ? "selected" : ""}>早餐</option>
+            <option value="上午餐" ${p.type === "上午餐" ? "selected" : ""}>上午餐</option>
+            <option value="午餐" ${!p.type || p.type === "午餐" ? "selected" : ""}>午餐</option>
+            <option value="加餐" ${p.type === "加餐" ? "selected" : ""}>加餐</option>
+            <option value="晚餐" ${p.type === "晚餐" ? "selected" : ""}>晚餐</option>
+            <option value="其他" ${p.type === "其他" ? "selected" : ""}>其他</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label>吃了什么</label>
+        <textarea id="mealPanelFood" placeholder="例如：牛肉 青菜 米饭" rows="2">${p.food || ""}</textarea>
+      </div>
+      <div class="field-row">
+        <label class="immediate-push-check"><input type="checkbox" id="mealPanelCooked" ${p.cooked !== false ? "checked" : ""}> 自己做</label>
+        <label class="immediate-push-check"><input type="checkbox" id="mealPanelHealthy" ${p.healthy !== false ? "checked" : ""}> 健康营养</label>
+        <label class="immediate-push-check"><input type="checkbox" id="mealPanelAteOut" ${p.ateOut ? "checked" : ""}> 外食</label>
+      </div>
+      <div class="panel-actions">
+        <button class="btn-primary" id="mealPanelSave" type="button">💾 保存</button>
+        <label class="immediate-push-check">
+          <input type="checkbox" id="mealPanelImmediate"> 立刻推到 Obsidian
+        </label>
+      </div>
+      <div class="panel-error" id="mealPanelError" style="color:#c62828;font-size:12px;margin-top:8px"></div>
+    </div>
+  `;
+},
 };
 
       // 每个事件类型的面板事件绑定器：prefill 同上 → 给面板里的元素绑事件
@@ -3762,6 +3804,32 @@
       App.pushEventsToObsidian([event]);
     }
     UI.showStatus(`已保存：⚖️ 体重`);
+    PanelManager.close();
+  });
+},
+  meal(prefill) {
+  document.getElementById("mealPanelSave").addEventListener("click", () => {
+    const data = {
+      time: document.getElementById("mealPanelTime").value,
+      type: document.getElementById("mealPanelType").value,
+      food: document.getElementById("mealPanelFood").value.trim(),
+      cooked: document.getElementById("mealPanelCooked").checked,
+      healthy: document.getElementById("mealPanelHealthy").checked,
+      ateOut: document.getElementById("mealPanelAteOut").checked
+    };
+    const err = EventModel.types.meal.validate(data);
+    if (err) {
+      document.getElementById("mealPanelError").textContent = err;
+      return;
+    }
+    const event = prefill
+      ? { ...prefill, time: data.time, data, capturedAt: Date.now() }
+      : EventModel.buildQueueItem("meal", DateUtils.getTodayISO(), data.time, data);
+    App.applyEvent(event);
+    if (document.getElementById("mealPanelImmediate").checked) {
+      App.pushEventsToObsidian([event]);
+    }
+    UI.showStatus(`已保存：🍱 ${data.type}`);
     PanelManager.close();
   });
 },
