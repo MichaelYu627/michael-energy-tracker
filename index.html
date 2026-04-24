@@ -1719,6 +1719,23 @@
   border-radius: var(--radius-sm);
   border: 1px solid var(--line);
 }
+.training-item-row input[type="text"],
+.training-item-row input[type="number"] {
+  /* 覆盖 .capture-panel input 的 width:100% + flex 行内 style 不生效的问题 */
+  min-width: 0 !important;
+  width: auto !important;
+}
+.training-item-row input.tr-rating {
+  /* rating 固定宽度，不参与 flex 拉伸 */
+  flex: 0 0 60px !important;
+  width: 60px !important;
+}
+.training-item-row button[data-action="remove-tr-item"] {
+  /* 防止 × 按钮被拉伸，保持内容大小 */
+  flex: 0 0 auto !important;
+  width: auto !important;
+  padding: 8px 12px;
+}
 
 /* 待同步胶囊 · 陶土橙温暖系 */
 .pending-sync-capsule {
