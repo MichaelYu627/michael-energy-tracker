@@ -3602,6 +3602,61 @@
         }
       };
 
+      const PanelManager = {
+        activeType: null,
+
+        open(eventType, options = {}) {
+          this.activeType = eventType;
+          this.render(options);
+        },
+
+        close() {
+          this.activeType = null;
+          this.render();
+        },
+
+        toggle(eventType) {
+          if (this.activeType === eventType) {
+            this.close();
+          } else {
+            this.open(eventType);
+          }
+        },
+
+        render(options = {}) {
+          // 胶囊按钮 active 状态
+          document.querySelectorAll(".capture-pill").forEach((btn) => {
+            btn.classList.toggle("active", btn.dataset.eventType === this.activeType);
+          });
+
+          const container = document.getElementById("capturePanelContainer");
+          if (!container) return;
+
+          if (!this.activeType) {
+            container.innerHTML = "";
+            return;
+          }
+
+          // 调用面板专属的渲染函数（下面 Phase C 各任务里定义）
+          const renderer = PanelRenderers[this.activeType];
+          if (!renderer) {
+            container.innerHTML = `<div class="capture-panel"><p>面板 ${this.activeType} 待实现</p></div>`;
+            return;
+          }
+          container.innerHTML = renderer(options.prefill || null);
+
+          // 调用绑定函数（每个面板自己处理 input/save）
+          const binder = PanelBinders[this.activeType];
+          if (binder) binder(options.prefill || null);
+        }
+      };
+
+      // 每个事件类型的面板渲染器：输入 prefill（可空）→ 返回 HTML 字符串
+      const PanelRenderers = {};
+
+      // 每个事件类型的面板事件绑定器：prefill 同上 → 给面板里的元素绑事件
+      const PanelBinders = {};
+
       const StorageService = {
         loadEntries() {
           const raw = localStorage.getItem(CONFIG.storageKey);
@@ -5499,6 +5554,11 @@
         document.getElementById("importBtn").addEventListener("click", Handlers.importTrigger);
         elements.importFileInput.addEventListener("change", Handlers.importFile);
         window.addEventListener("resize", Handlers.resize);
+        document.getElementById("captureBar").addEventListener("click", (event) => {
+          const pill = event.target.closest(".capture-pill[data-event-type]");
+          if (!pill) return;
+          PanelManager.toggle(pill.dataset.eventType);
+        });
       }
 
       function initialize() {
