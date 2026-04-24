@@ -5418,11 +5418,54 @@
         },
 
         renderTodayTimeline() {
-          // Task 14 填充
+          const container = document.getElementById("todayTimeline");
+          if (!container) return;
+          const today = DateUtils.getTodayISO();
+          const pending = SyncQueue.filterByDate(today);
+
+          // 时间线只展示"待同步"事件（pending 队列）。已推事件无源可查（URL scheme 不返回成败），
+          // 所以 timeline 的心智是"今天还有几条没同步"。
+
+          if (!pending.length) {
+            container.innerHTML = `<div class="timeline-empty">今天还没有记录，点上面的胶囊开始。</div>`;
+            return;
+          }
+
+          const sorted = [...pending].sort((a, b) => (a.time || "").localeCompare(b.time || ""));
+          container.innerHTML = sorted.map((event) => {
+            const def = EventModel.types[event.eventType];
+            const summary = this.summarizeEvent(event);
+            return `
+              <div class="timeline-item pending" data-event-id="${event.id}">
+                <span class="tl-status"></span>
+                <span class="tl-time">${event.time || "--:--"}</span>
+                <span class="tl-content">${def.emoji} ${def.label} · ${summary}</span>
+              </div>
+            `;
+          }).join("");
+        },
+
+        summarizeEvent(event) {
+          const d = event.data || {};
+          switch (event.eventType) {
+            case "sleep": return `${d.sleepScore} 分 · ${d.bedtime}-${d.wakeTime}`;
+            case "meal": return `${d.type}：${d.food || "无内容"}`;
+            case "training": return `${(d.workoutItems || []).length} 个动作`;
+            case "recovery": return `${d.type} · +${d.boost}%`;
+            case "weight": return `${d.weight?.toFixed(1) ?? "--"} kg`;
+            case "reflection": return `${d.mood} · ${d.energy}/10`;
+            case "mood": return `${d.tag}${d.note ? " · " + d.note : ""}`;
+            default: return "";
+          }
         },
 
         renderPendingCapsule() {
-          // Task 15 填充
+          const capsule = document.getElementById("pendingSyncCapsule");
+          const countEl = document.getElementById("pendingSyncCount");
+          if (!capsule || !countEl) return;
+          const count = SyncQueue.countByDate(DateUtils.getTodayISO());
+          countEl.textContent = count;
+          capsule.hidden = count === 0;
         },
 
         render(entries) {
@@ -5437,6 +5480,8 @@
           this.renderDataOverview(entries, latestEntry);
           this.renderDailyAppendList(entries);
           ChartRenderer.render(entries, latestEntry);
+          this.renderTodayTimeline();
+          this.renderPendingCapsule();
         }
       };
 
@@ -6061,6 +6106,16 @@
           const pill = event.target.closest(".capture-pill[data-event-type]");
           if (!pill) return;
           PanelManager.toggle(pill.dataset.eventType);
+        });
+        document.getElementById("pushAllBtn").addEventListener("click", () => {
+          const today = DateUtils.getTodayISO();
+          const pending = SyncQueue.filterByDate(today);
+          if (!pending.length) {
+            UI.showStatus("今天没有待同步事件");
+            return;
+          }
+          App.pushEventsToObsidian(pending);
+          UI.showStatus(`已推 ${pending.length} 条到 Obsidian · ${DateUtils.formatShortDate(today)}`);
         });
       }
 
