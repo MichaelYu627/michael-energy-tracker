@@ -3863,6 +3863,43 @@
     </div>
   `;
 },
+  mood(prefill) {
+  const p = prefill?.data || {};
+  const time = prefill?.time || DateUtils.getCurrentTimeString();
+  const selectedTag = p.tag || "🙂";
+  const tags = ["😫", "😕", "😐", "🙂", "😄", "🤔", "😡", "🥺"];
+  return `
+    <div class="capture-panel" data-panel-type="mood">
+      <h3>💭 记心情</h3>
+      <div class="field-row">
+        <div class="field">
+          <label>时间</label>
+          <input type="time" id="moodPanelTime" value="${time}">
+        </div>
+      </div>
+      <div class="field">
+        <label>此刻心情</label>
+        <div id="moodPanelTagGroup" style="display:flex;gap:6px;flex-wrap:wrap">
+          ${tags.map((tag) => `
+            <button type="button" class="mood-tag-btn${tag === selectedTag ? ' active' : ''}" data-tag="${tag}"
+                    style="font-size:20px;padding:6px 12px;border:1px solid ${tag === selectedTag ? '#1e7b64' : '#ccc'};background:${tag === selectedTag ? '#e8f5e9' : 'white'};border-radius:8px;cursor:pointer">${tag}</button>
+          `).join("")}
+        </div>
+      </div>
+      <div class="field">
+        <label>想说什么（可选）</label>
+        <input type="text" id="moodPanelNote" placeholder="例如：会议太多，没时间深度工作" value="${p.note || ""}">
+      </div>
+      <div class="panel-actions">
+        <button class="btn-primary" id="moodPanelSave" type="button">💾 保存</button>
+        <label class="immediate-push-check">
+          <input type="checkbox" id="moodPanelImmediate"> 立刻推到 Obsidian
+        </label>
+      </div>
+      <div class="panel-error" id="moodPanelError" style="color:#c62828;font-size:12px;margin-top:8px"></div>
+    </div>
+  `;
+}
 };
 
       // 每个事件类型的面板事件绑定器：prefill 同上 → 给面板里的元素绑事件
@@ -4050,6 +4087,42 @@
     PanelManager.close();
   });
 },
+  mood(prefill) {
+  let selectedTag = prefill?.data?.tag || "🙂";
+  document.getElementById("moodPanelTagGroup").addEventListener("click", (event) => {
+    const btn = event.target.closest(".mood-tag-btn");
+    if (!btn) return;
+    selectedTag = btn.dataset.tag;
+    document.querySelectorAll(".mood-tag-btn").forEach((b) => {
+      const active = b.dataset.tag === selectedTag;
+      b.classList.toggle("active", active);
+      b.style.border = `1px solid ${active ? "#1e7b64" : "#ccc"}`;
+      b.style.background = active ? "#e8f5e9" : "white";
+    });
+  });
+
+  document.getElementById("moodPanelSave").addEventListener("click", () => {
+    const data = {
+      time: document.getElementById("moodPanelTime").value,
+      tag: selectedTag,
+      note: document.getElementById("moodPanelNote").value.trim()
+    };
+    const err = EventModel.types.mood.validate(data);
+    if (err) {
+      document.getElementById("moodPanelError").textContent = err;
+      return;
+    }
+    const event = prefill
+      ? { ...prefill, time: data.time, data, capturedAt: Date.now() }
+      : EventModel.buildQueueItem("mood", DateUtils.getTodayISO(), data.time, data);
+    App.applyEvent(event);
+    if (document.getElementById("moodPanelImmediate").checked) {
+      App.pushEventsToObsidian([event]);
+    }
+    UI.showStatus(`已保存：💭 ${data.tag}`);
+    PanelManager.close();
+  });
+}
 };
 
       const StorageService = {
