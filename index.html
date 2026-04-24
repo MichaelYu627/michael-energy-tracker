@@ -2406,7 +2406,7 @@
               </div>
             </div>
             <div class="button-row">
-              <button class="btn-primary" id="saveToObsidianBtn" type="submit">保存记录并发到 Obsidian</button>
+              <button class="btn-primary" id="saveToObsidianBtn" type="submit">保存记录</button>
               <button class="btn-secondary" id="resetFormBtn" type="button">重置表单</button>
             </div>
             <div class="footer-note">
@@ -3106,33 +3106,25 @@
 
         getBootstrapTodayEntry() {
           return this.normalize({
-            date: "2026-04-22",
-            sleepScore: 89,
+            date: DateUtils.getTodayISO(),
+            sleepScore: 0,
             bedtime: "22:00",
             wakeTime: "06:00",
-            wakeups: 2,
-            energy: 10,
+            wakeups: 0,
+            energy: 0,
             weight: CONFIG.currentWeightDefault,
-            exercised: true,
-            cooked: true,
-            healthyFood: true,
+            exercised: false,
+            cooked: false,
+            healthyFood: false,
             ateOut: false,
             deepWorkTasks: 0,
             adminTasks: 0,
             morningEnergy: null,
             afternoonEnergy: null,
             eveningEnergy: null,
-            mood: "神清气爽",
-            dailyStory: "今天刚刚石头过来了，然后聊了一下最近的动态，经过他提醒，我最近打算把我们的客服也变成 AI，然后把开关房也交由 AI 掌管。很开心，又找到了新的扩大我们影响力的着力点。然后聊起来我女儿，关于昨天我女儿被英语老师放学留堂的事情。现在他走了，我自己突然心酸起来，自己一个年近 40 岁的大男人默默一个人哭起来了，想到我女儿一个人来上海。身边除了我这个爸爸，没有可依靠的人了！她才 12 岁的年纪里，在她面前全是陌生和未知，昨天晚上她跑到我房间里睡觉，可想而知孩子受了多么大的委屈和恐惧。刚刚我跟前妻说了这个事，大致就是说昨天女儿受了委屈，英语被放学的时候留堂了，孩子路上就哭了，然后半夜跑到我房间要跟我一起睡，我说我今天才意识到，孩子是多么坚强，昨天受了多么大的委屈。我把这个事情想简单了。希望前妻多给点鼓励，多跟她视频，多给予安慰。Jarvis 不瞒你说，反而哭出来之后我好受多了，原来我也有脆弱的一面。怪不得今天不停地想去按摩，自己独身一人去医院，看眼结石，公司还一堆事，孩子过来又受了委屈，没有压力是假的，原来我自己也有脆弱的一面。",
-            workoutItems: [
-              { name: "合桥", volume: "43 个 x 1 组", rating: 10, note: "" },
-              { name: "单腿深蹲", volume: "20 个 x 1 组", rating: 10, note: "" },
-              { name: "宽距引体向上", volume: "11 个 x 1 组", rating: 10, note: "" },
-              { name: "靠墙倒立", volume: "12 个 x 1 组", rating: 5, note: "今天下雨，手有点滑" },
-              { name: "窄距俯卧撑", volume: "23 个 x 1 组", rating: 10, note: "" },
-              { name: "悬垂举腿", volume: "15 个 x 1 组", rating: 8, note: "肚子太大了，脂肪太多，每次抬腿还是有点吃力" },
-              { name: "拉伸", volume: "10 分钟", rating: 8, note: "" }
-            ]
+            mood: "",
+            dailyStory: "",
+            workoutItems: []
           });
         },
 
@@ -3195,7 +3187,8 @@
 
         ensureBootstrapTodayEntry() {
           const existingEntries = this.loadEntries();
-          const hasTodayEntry = existingEntries.some((entry) => entry.date === "2026-04-22");
+          const todayISO = DateUtils.getTodayISO();
+          const hasTodayEntry = existingEntries.some((entry) => entry.date === todayISO);
           if (hasTodayEntry) return existingEntries;
 
           const nextEntries = [...existingEntries, EntryModel.getBootstrapTodayEntry()];
@@ -4758,10 +4751,12 @@
       const Handlers = {
         submit(event) {
           event.preventDefault();
-          this.saveToObsidian();
+          // 注意：addEventListener 回调里 this 是 form 元素，不是 Handlers。
+          // 必须用 Handlers.xxx 直接引用，不能用 this.xxx。
+          Handlers.saveRecord();
         },
 
-        saveToObsidian() {
+        saveRecord() {
           const { entry, validationMessage } = App.validateAndBuildEntry();
           if (validationMessage) {
             UI.showStatus(validationMessage);
@@ -4770,11 +4765,10 @@
 
           const isSaved = App.saveEntry(entry);
           if (!isSaved) {
-            UI.showStatus("保存失败：本地记录未写入，暂不打开 Obsidian");
+            UI.showStatus("保存失败：本地记录未写入");
             return;
           }
-          App.sendToObsidian(entry);
-          UI.showStatus(`本地已保存，正在打开 Obsidian：${DateUtils.formatShortDate(entry.date)}`);
+          UI.showStatus(`已保存：${DateUtils.formatShortDate(entry.date)}`);
         },
 
         addMealLog() {
@@ -4854,7 +4848,11 @@
           if (!targetEntry) return;
 
           if (action === "edit") {
+            // 若今日主记录已保存，表单默认是折叠状态。编辑时必须先展开，
+            // 否则值填进去了但用户看不到，表现就像"点编辑没反应"。
+            state.mainRecordExpanded = true;
             UI.fillForm(targetEntry);
+            UI.renderMainRecordStatus(state.entries);
             UI.showStatus(`已载入 ${DateUtils.formatShortDate(date)} 的数据`);
             return;
           }
