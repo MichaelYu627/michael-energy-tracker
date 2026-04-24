@@ -3688,7 +3688,30 @@
         <div class="panel-error" id="sleepPanelError" style="color:#c62828;font-size:12px;margin-top:8px"></div>
       </div>
     `;
-  }
+  },
+  weight(prefill) {
+  const p = prefill || {};
+  const today = state.entries.find((e) => e.date === DateUtils.getTodayISO()) || {};
+  const defaultWeight = p.weight ?? today.weight ?? CONFIG.currentWeightDefault;
+  return `
+    <div class="capture-panel" data-panel-type="weight">
+      <h3>⚖️ 记体重</h3>
+      <div class="field-row">
+        <div class="field" style="flex:1">
+          <label>今日体重（kg）<strong id="weightPanelValue">${defaultWeight}</strong></label>
+          <input type="range" id="weightPanelSlider" min="40" max="140" step="0.1" value="${defaultWeight}">
+        </div>
+      </div>
+      <div class="panel-actions">
+        <button class="btn-primary" id="weightPanelSave" type="button">💾 保存</button>
+        <label class="immediate-push-check">
+          <input type="checkbox" id="weightPanelImmediate"> 立刻推到 Obsidian
+        </label>
+      </div>
+      <div class="panel-error" id="weightPanelError" style="color:#c62828;font-size:12px;margin-top:8px"></div>
+    </div>
+  `;
+},
 };
 
       // 每个事件类型的面板事件绑定器：prefill 同上 → 给面板里的元素绑事件
@@ -3719,7 +3742,29 @@
       UI.showStatus(`已保存：😴 睡眠`);
       PanelManager.close();
     });
-  }
+  },
+  weight(prefill) {
+  document.getElementById("weightPanelSlider").addEventListener("input", (e) => {
+    document.getElementById("weightPanelValue").textContent = Number(e.target.value).toFixed(1);
+  });
+  document.getElementById("weightPanelSave").addEventListener("click", () => {
+    const data = { weight: Number(document.getElementById("weightPanelSlider").value) };
+    const err = EventModel.types.weight.validate(data);
+    if (err) {
+      document.getElementById("weightPanelError").textContent = err;
+      return;
+    }
+    const event = prefill
+      ? { ...prefill, data, capturedAt: Date.now() }
+      : EventModel.buildQueueItem("weight", DateUtils.getTodayISO(), DateUtils.getCurrentTimeString(), data);
+    App.applyEvent(event);
+    if (document.getElementById("weightPanelImmediate").checked) {
+      App.pushEventsToObsidian([event]);
+    }
+    UI.showStatus(`已保存：⚖️ 体重`);
+    PanelManager.close();
+  });
+},
 };
 
       const StorageService = {
