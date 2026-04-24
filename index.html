@@ -2927,6 +2927,241 @@
         }
       };
 
+      const EventModel = {
+        // 每种事件的定义：emoji / 显示名 / 字段列表 / 验证函数 / 应用逻辑 / markdown 渲染
+        types: {
+          sleep: {
+            emoji: "😴",
+            label: "睡眠",
+            mode: "overwrite",
+            validate(data) {
+              if (typeof data.sleepScore !== "number" || data.sleepScore < 0 || data.sleepScore > 100) {
+                return "睡眠分需要在 0-100 之间";
+              }
+              if (!data.bedtime || !data.wakeTime) return "入睡和起床时间必填";
+              if (typeof data.wakeups !== "number" || data.wakeups < 0 || data.wakeups > 10) {
+                return "起夜次数需要在 0-10 之间";
+              }
+              return "";
+            },
+            applyToEntry(entry, data) {
+              return EntryModel.normalize({
+                ...entry,
+                sleepScore: data.sleepScore,
+                bedtime: data.bedtime,
+                wakeTime: data.wakeTime,
+                wakeups: data.wakeups
+              });
+            },
+            toMarkdown(event) {
+              const d = event.data;
+              return [
+                `### 😴 睡眠 ${event.time}`,
+                `- 睡眠分：${d.sleepScore}`,
+                `- 入睡：${d.bedtime} / 起床：${d.wakeTime}`,
+                `- 起夜：${d.wakeups} 次`
+              ].join("\n");
+            }
+          },
+
+          meal: {
+            emoji: "🍱",
+            label: "餐食",
+            mode: "append",
+            validate(data) {
+              if (!data.food || !data.food.trim()) return "请填写吃了什么";
+              if (!data.type) return "请选择餐次";
+              return "";
+            },
+            applyToEntry(entry, data) {
+              const mealItems = [...(entry.mealItems || []), {
+                time: data.time,
+                type: data.type,
+                food: data.food,
+                cooked: !!data.cooked,
+                healthy: !!data.healthy,
+                ateOut: !!data.ateOut,
+                note: ""
+              }];
+              return EntryModel.normalize({
+                ...entry,
+                mealItems,
+                mealDetails: EntryModel.formatMealDetails(mealItems, entry.mealDetails),
+                cooked: entry.cooked || data.cooked,
+                healthyFood: entry.healthyFood || data.healthy,
+                ateOut: entry.ateOut || data.ateOut
+              });
+            },
+            toMarkdown(event) {
+              const d = event.data;
+              const tags = [d.cooked ? "自己做" : null, d.healthy ? "健康" : null, d.ateOut ? "外食" : null].filter(Boolean).join(" · ") || "无标签";
+              return [
+                `### 🍱 ${d.type} ${event.time}`,
+                `- ${d.food}`,
+                `- ${tags}`
+              ].join("\n");
+            }
+          },
+
+          training: {
+            emoji: "💪",
+            label: "训练",
+            mode: "overwrite",
+            validate(data) {
+              if (!Array.isArray(data.workoutItems) || data.workoutItems.length === 0) {
+                return "请至少添加一个训练动作";
+              }
+              return "";
+            },
+            applyToEntry(entry, data) {
+              return EntryModel.normalize({
+                ...entry,
+                workoutItems: data.workoutItems,
+                exercised: true
+              });
+            },
+            toMarkdown(event) {
+              const items = (event.data.workoutItems || []).map(
+                (it) => `- ${it.name} · ${it.volume}${it.note ? "｜" + it.note : ""}${it.rating ? "｜⭐ " + it.rating : ""}`
+              );
+              return [`### 💪 训练 ${event.time}`, ...items].join("\n");
+            }
+          },
+
+          recovery: {
+            emoji: "🛋",
+            label: "补能",
+            mode: "append",
+            validate(data) {
+              if (!data.type) return "请选择补能类型";
+              if (typeof data.boost !== "number" || data.boost < 1 || data.boost > 40) {
+                return "补能加分需要在 1-40 之间";
+              }
+              return "";
+            },
+            applyToEntry(entry, data) {
+              const recoveryItems = [...(entry.recoveryItems || []), {
+                time: data.time,
+                type: data.type,
+                boost: data.boost,
+                note: data.note || ""
+              }];
+              const nextBoost = Math.min(40, (entry.energyBoost || 0) + data.boost);
+              return EntryModel.normalize({
+                ...entry,
+                recoveryItems,
+                energyBoost: nextBoost
+              });
+            },
+            toMarkdown(event) {
+              const d = event.data;
+              const lines = [
+                `### 🛋 ${d.type} ${event.time}`,
+                `- 补能加分：+${d.boost}%`
+              ];
+              if (d.note) lines.push(`- ${d.note}`);
+              return lines.join("\n");
+            }
+          },
+
+          weight: {
+            emoji: "⚖️",
+            label: "体重",
+            mode: "overwrite",
+            validate(data) {
+              if (typeof data.weight !== "number" || data.weight < 20 || data.weight > 300) {
+                return "体重需要在 20-300 kg 之间";
+              }
+              return "";
+            },
+            applyToEntry(entry, data) {
+              return EntryModel.normalize({ ...entry, weight: data.weight });
+            },
+            toMarkdown(event) {
+              return `### ⚖️ 体重 ${event.time}\n- ${event.data.weight.toFixed(1)} kg`;
+            }
+          },
+
+          reflection: {
+            emoji: "🌙",
+            label: "复盘",
+            mode: "overwrite",
+            validate(data) {
+              if (typeof data.energy !== "number" || data.energy < 1 || data.energy > 10) {
+                return "今日整体能量需要在 1-10 之间";
+              }
+              if (!data.mood) return "请选择睡前状态";
+              return "";
+            },
+            applyToEntry(entry, data) {
+              return EntryModel.normalize({
+                ...entry,
+                mood: data.mood,
+                energy: data.energy,
+                dailyStory: data.dailyStory || ""
+              });
+            },
+            toMarkdown(event) {
+              const d = event.data;
+              const lines = [
+                `### 🌙 复盘 ${event.time}`,
+                `- 睡前状态：${d.mood}`,
+                `- 今日整体能量：${d.energy}/10`
+              ];
+              if (d.dailyStory) lines.push("", d.dailyStory);
+              return lines.join("\n");
+            }
+          },
+
+          mood: {
+            emoji: "💭",
+            label: "心情",
+            mode: "append",
+            validate(data) {
+              if (!data.tag) return "请选择心情";
+              return "";
+            },
+            applyToEntry(entry, data) {
+              const moodLogs = [...(entry.moodLogs || []), {
+                time: data.time,
+                tag: data.tag,
+                note: data.note || ""
+              }];
+              return EntryModel.normalize({ ...entry, moodLogs });
+            },
+            toMarkdown(event) {
+              const d = event.data;
+              const lines = [`### 💭 心情 ${event.time}`, `- ${d.tag}`];
+              if (d.note) lines.push(`- ${d.note}`);
+              return lines.join("\n");
+            }
+          }
+        },
+
+        // 生成唯一 id（timestamp + random 避免快速双击冲突）
+        makeId() {
+          return `evt-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+        },
+
+        // 构造 pendingSync 队列里的一条事件
+        buildQueueItem(eventType, date, time, data) {
+          return {
+            id: this.makeId(),
+            eventType,
+            date,
+            time,
+            capturedAt: Date.now(),
+            data
+          };
+        },
+
+        // 把一组事件按 time 升序拼接成 markdown（多个事件之间空一行）
+        renderBatchMarkdown(events) {
+          const sorted = [...events].sort((a, b) => (a.time || "").localeCompare(b.time || ""));
+          return sorted.map((event) => this.types[event.eventType].toMarkdown(event)).join("\n\n");
+        }
+      };
+
       const EntryModel = {
         normalizeBoolean(value) {
           return value === true || value === "true" || value === 1 || value === "1";
