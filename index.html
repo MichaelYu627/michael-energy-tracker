@@ -2052,6 +2052,28 @@
   align-items: center;
   gap: 4px;
 }
+.capture-panel .meal-tag-check {
+  padding: 6px 14px;
+  border: 1px solid #ccc;
+  border-radius: 18px;
+  cursor: pointer;
+  background: white;
+  font-size: 13px;
+  color: #555;
+  transition: all 0.15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.capture-panel .meal-tag-check input[type="checkbox"] {
+  margin: 0;
+}
+.capture-panel .meal-tag-check:has(input:checked) {
+  background: #e8f5e9;
+  border-color: #1e7b64;
+  color: #1e7b64;
+  font-weight: 600;
+}
 
 /* 待同步胶囊 */
 .pending-sync-capsule {
@@ -3740,9 +3762,9 @@
         <textarea id="mealPanelFood" placeholder="例如：牛肉 青菜 米饭" rows="2">${p.food || ""}</textarea>
       </div>
       <div class="field-row">
-        <label class="immediate-push-check"><input type="checkbox" id="mealPanelCooked" ${p.cooked !== false ? "checked" : ""}> 自己做</label>
-        <label class="immediate-push-check"><input type="checkbox" id="mealPanelHealthy" ${p.healthy !== false ? "checked" : ""}> 健康营养</label>
-        <label class="immediate-push-check"><input type="checkbox" id="mealPanelAteOut" ${p.ateOut ? "checked" : ""}> 外食</label>
+        <label class="meal-tag-check"><input type="checkbox" id="mealPanelCooked" ${p.cooked !== false ? "checked" : ""}> 自己做</label>
+        <label class="meal-tag-check"><input type="checkbox" id="mealPanelHealthy" ${p.healthy !== false ? "checked" : ""}> 健康营养</label>
+        <label class="meal-tag-check"><input type="checkbox" id="mealPanelAteOut" ${p.ateOut ? "checked" : ""}> 外食</label>
       </div>
       <div class="panel-actions">
         <button class="btn-primary" id="mealPanelSave" type="button">💾 保存</button>
