@@ -2601,6 +2601,7 @@
         storageKey: "michael-energy-tracker-v1",
         seededKey: "michael-energy-tracker-seeded",
         templateSettingsKey: "michael-energy-template-settings-v1",
+        pendingSyncKey: "michael-energy-tracker-pending-sync-v1",
         exportVersion: 10,
         obsidianVault: "Michael&Jarvis",
         obsidianFolder: "我的训练日志",
@@ -3152,6 +3153,57 @@
             }
           });
           return [...map.values()].sort((a, b) => a.date.localeCompare(b.date));
+        }
+      };
+
+      const SyncQueue = {
+        load() {
+          const raw = localStorage.getItem(CONFIG.pendingSyncKey);
+          if (!raw) return [];
+          try {
+            const parsed = JSON.parse(raw);
+            return Array.isArray(parsed) ? parsed : [];
+          } catch (error) {
+            console.error("读取待同步队列失败:", error);
+            return [];
+          }
+        },
+
+        save(queue) {
+          localStorage.setItem(CONFIG.pendingSyncKey, JSON.stringify(queue));
+        },
+
+        add(event) {
+          // 去重：同 id 的事件就地更新，不重复入队
+          const queue = this.load();
+          const existingIndex = queue.findIndex((item) => item.id === event.id);
+          if (existingIndex >= 0) {
+            queue[existingIndex] = event;
+          } else {
+            queue.push(event);
+          }
+          this.save(queue);
+          return queue;
+        },
+
+        removeById(id) {
+          const queue = this.load().filter((item) => item.id !== id);
+          this.save(queue);
+          return queue;
+        },
+
+        filterByDate(date) {
+          return this.load().filter((item) => item.date === date);
+        },
+
+        clearByDate(date) {
+          const queue = this.load().filter((item) => item.date !== date);
+          this.save(queue);
+          return queue;
+        },
+
+        countByDate(date) {
+          return this.filterByDate(date).length;
         }
       };
 
