@@ -3794,6 +3794,38 @@
     </div>
   `;
 },
+  training(prefill) {
+  const p = prefill?.data || {};
+  const today = state.entries.find((e) => e.date === DateUtils.getTodayISO()) || {};
+  const existingItems = p.workoutItems || today.workoutItems || [];
+  return `
+    <div class="capture-panel" data-panel-type="training">
+      <h3>💪 记训练</h3>
+      <div class="panel-actions" style="margin-bottom:12px">
+        <button class="btn-secondary btn-slim" id="trainingLoadTemplatesBtn" type="button">一键导入常用七项</button>
+        <button class="btn-secondary btn-slim" id="trainingClearBtn" type="button">清空</button>
+      </div>
+      <div id="trainingItemsList" style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px">
+        ${existingItems.map((it, idx) => `
+          <div class="training-item-row" data-idx="${idx}" style="display:flex;gap:6px;align-items:center">
+            <input type="text" class="tr-name" value="${it.name || ""}" placeholder="动作" style="flex:1">
+            <input type="text" class="tr-volume" value="${it.volume || ""}" placeholder="组数" style="flex:1">
+            <input type="number" class="tr-rating" value="${it.rating || 8}" min="0" max="10" style="width:60px">
+            <button class="btn-warning btn-slim" type="button" data-action="remove-tr-item">×</button>
+          </div>
+        `).join("")}
+      </div>
+      <button class="btn-secondary btn-slim" id="trainingAddItemBtn" type="button" style="margin-bottom:12px">+ 添加动作</button>
+      <div class="panel-actions">
+        <button class="btn-primary" id="trainingPanelSave" type="button">💾 保存</button>
+        <label class="immediate-push-check">
+          <input type="checkbox" id="trainingPanelImmediate"> 立刻推到 Obsidian
+        </label>
+      </div>
+      <div class="panel-error" id="trainingPanelError" style="color:#c62828;font-size:12px;margin-top:8px"></div>
+    </div>
+  `;
+},
 };
 
       // 每个事件类型的面板事件绑定器：prefill 同上 → 给面板里的元素绑事件
@@ -3894,6 +3926,67 @@
       App.pushEventsToObsidian([event]);
     }
     UI.showStatus(`已保存：🛋 ${data.type}`);
+    PanelManager.close();
+  });
+},
+  training(prefill) {
+  const list = document.getElementById("trainingItemsList");
+
+  function renderRow(item) {
+    const row = document.createElement("div");
+    row.className = "training-item-row";
+    row.style.cssText = "display:flex;gap:6px;align-items:center";
+    row.innerHTML = `
+      <input type="text" class="tr-name" value="${item.name || ""}" placeholder="动作" style="flex:1">
+      <input type="text" class="tr-volume" value="${item.volume || ""}" placeholder="组数" style="flex:1">
+      <input type="number" class="tr-rating" value="${item.rating || 8}" min="0" max="10" style="width:60px">
+      <button class="btn-warning btn-slim" type="button" data-action="remove-tr-item">×</button>
+    `;
+    list.appendChild(row);
+  }
+
+  document.getElementById("trainingLoadTemplatesBtn").addEventListener("click", () => {
+    list.innerHTML = "";
+    CONFIG.workoutTemplates.forEach((tpl) => renderRow({ name: tpl.name, volume: tpl.volume, rating: tpl.rating, note: tpl.note }));
+  });
+
+  document.getElementById("trainingClearBtn").addEventListener("click", () => {
+    list.innerHTML = "";
+  });
+
+  document.getElementById("trainingAddItemBtn").addEventListener("click", () => {
+    renderRow({ name: "", volume: "", rating: 8, note: "" });
+  });
+
+  list.addEventListener("click", (event) => {
+    const btn = event.target.closest("[data-action='remove-tr-item']");
+    if (!btn) return;
+    btn.parentElement.remove();
+  });
+
+  document.getElementById("trainingPanelSave").addEventListener("click", () => {
+    const rows = list.querySelectorAll(".training-item-row");
+    const workoutItems = Array.from(rows).map((row) => ({
+      name: row.querySelector(".tr-name").value.trim(),
+      volume: row.querySelector(".tr-volume").value.trim(),
+      rating: Number(row.querySelector(".tr-rating").value) || 0,
+      note: ""
+    })).filter((it) => it.name);
+
+    const data = { workoutItems };
+    const err = EventModel.types.training.validate(data);
+    if (err) {
+      document.getElementById("trainingPanelError").textContent = err;
+      return;
+    }
+    const event = prefill
+      ? { ...prefill, data, capturedAt: Date.now() }
+      : EventModel.buildQueueItem("training", DateUtils.getTodayISO(), DateUtils.getCurrentTimeString(), data);
+    App.applyEvent(event);
+    if (document.getElementById("trainingPanelImmediate").checked) {
+      App.pushEventsToObsidian([event]);
+    }
+    UI.showStatus(`已保存：💪 训练 (${workoutItems.length} 个动作)`);
     PanelManager.close();
   });
 },
