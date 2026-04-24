@@ -3826,6 +3826,43 @@
     </div>
   `;
 },
+  reflection(prefill) {
+  const p = prefill?.data || {};
+  const today = state.entries.find((e) => e.date === DateUtils.getTodayISO()) || {};
+  return `
+    <div class="capture-panel" data-panel-type="reflection">
+      <h3>🌙 睡前复盘</h3>
+      <div class="field-row">
+        <div class="field" style="flex:1">
+          <label>睡前状态</label>
+          <select id="reflectionPanelMood">
+            <option value="平静" ${(!p.mood && !today.mood) || p.mood === "平静" || today.mood === "平静" ? "selected" : ""}>平静</option>
+            <option value="满足" ${p.mood === "满足" || today.mood === "满足" ? "selected" : ""}>满足</option>
+            <option value="疲惫" ${p.mood === "疲惫" || today.mood === "疲惫" ? "selected" : ""}>疲惫</option>
+            <option value="焦虑" ${p.mood === "焦虑" || today.mood === "焦虑" ? "selected" : ""}>焦虑</option>
+            <option value="感恩" ${p.mood === "感恩" || today.mood === "感恩" ? "selected" : ""}>感恩</option>
+            <option value="其他" ${p.mood === "其他" || today.mood === "其他" ? "selected" : ""}>其他</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>今日整体能量（1-10）</label>
+          <input type="number" id="reflectionPanelEnergy" min="1" max="10" value="${p.energy ?? today.energy ?? 7}">
+        </div>
+      </div>
+      <div class="field">
+        <label>想复盘什么</label>
+        <textarea id="reflectionPanelStory" rows="5" placeholder="例如：今天哪里做得不错，哪里消耗了能量，明天醒来最重要的一件事。">${p.dailyStory ?? today.dailyStory ?? ""}</textarea>
+      </div>
+      <div class="panel-actions">
+        <button class="btn-primary" id="reflectionPanelSave" type="button">💾 保存</button>
+        <label class="immediate-push-check">
+          <input type="checkbox" id="reflectionPanelImmediate"> 立刻推到 Obsidian
+        </label>
+      </div>
+      <div class="panel-error" id="reflectionPanelError" style="color:#c62828;font-size:12px;margin-top:8px"></div>
+    </div>
+  `;
+},
 };
 
       // 每个事件类型的面板事件绑定器：prefill 同上 → 给面板里的元素绑事件
@@ -3987,6 +4024,29 @@
       App.pushEventsToObsidian([event]);
     }
     UI.showStatus(`已保存：💪 训练 (${workoutItems.length} 个动作)`);
+    PanelManager.close();
+  });
+},
+  reflection(prefill) {
+  document.getElementById("reflectionPanelSave").addEventListener("click", () => {
+    const data = {
+      mood: document.getElementById("reflectionPanelMood").value,
+      energy: Number(document.getElementById("reflectionPanelEnergy").value),
+      dailyStory: document.getElementById("reflectionPanelStory").value.trim()
+    };
+    const err = EventModel.types.reflection.validate(data);
+    if (err) {
+      document.getElementById("reflectionPanelError").textContent = err;
+      return;
+    }
+    const event = prefill
+      ? { ...prefill, data, capturedAt: Date.now() }
+      : EventModel.buildQueueItem("reflection", DateUtils.getTodayISO(), DateUtils.getCurrentTimeString(), data);
+    App.applyEvent(event);
+    if (document.getElementById("reflectionPanelImmediate").checked) {
+      App.pushEventsToObsidian([event]);
+    }
+    UI.showStatus(`已保存：🌙 复盘`);
     PanelManager.close();
   });
 },
