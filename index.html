@@ -683,11 +683,6 @@
       white-space: pre-wrap;
     }
 
-    .period-grid {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 12px;
-    }
 
     .today-story-card {
       margin-top: 14px;
@@ -711,11 +706,6 @@
       word-break: break-word;
     }
 
-    .form-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 12px;
-    }
 
     .field {
       display: flex;
@@ -804,48 +794,11 @@
       box-shadow: 0 8px 20px rgba(51, 43, 24, 0.18);
     }
 
-    .slider-field {
-      gap: 10px;
-    }
 
-    .slider-shell {
-      padding: 14px;
-      border-radius: 18px;
-      background: rgba(255, 251, 245, 0.9);
-      border: 1px solid rgba(109, 90, 60, 0.12);
-    }
 
-    .slider-top {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 10px;
-    }
 
-    .slider-value {
-      font-family: var(--font-number);
-      font-size: 24px;
-      line-height: 1;
-      color: var(--text);
-    }
 
-    .slider-ticks {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      margin-top: 10px;
-      color: var(--muted);
-      font-size: 12px;
-    }
 
-    .slider-note {
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 1.6;
-      margin-top: 10px;
-    }
 
     .toggle-row {
       display: grid;
@@ -853,35 +806,9 @@
       gap: 12px;
     }
 
-    .toggle-group {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      padding: 4px;
-      border-radius: 18px;
-      background: rgba(229, 218, 199, 0.6);
-    }
 
-    .toggle-group input {
-      display: none;
-    }
 
-    .toggle-group label {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 46px;
-      border-radius: 14px;
-      cursor: pointer;
-      color: #5c574e;
-      font-size: 14px;
-      transition: 180ms ease;
-    }
 
-    .toggle-group input:checked + label {
-      background: linear-gradient(135deg, #1f7a5c, #24936d);
-      color: #fff;
-      box-shadow: 0 8px 18px rgba(31, 122, 92, 0.2);
-    }
 
     .button-row,
     .manage-row {
@@ -891,73 +818,16 @@
       margin-top: 16px;
     }
 
-    .main-record-status {
-      display: grid;
-      gap: 12px;
-      padding: 16px;
-      margin-bottom: 16px;
-      border-radius: 22px;
-      background:
-        radial-gradient(circle at 0% 0%, rgba(31, 122, 92, 0.16), transparent 34%),
-        rgba(255, 251, 245, 0.82);
-      border: 1px solid rgba(31, 122, 92, 0.14);
-    }
 
-    .main-record-status-head {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 12px;
-    }
 
-    .main-record-status-title {
-      display: grid;
-      gap: 4px;
-    }
 
-    .main-record-status-title strong {
-      color: #1f5c46;
-      font-size: 16px;
-    }
 
-    .main-record-status-title span {
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.5;
-    }
 
-    .progress-chip-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
 
-    .progress-chip {
-      padding: 7px 10px;
-      border-radius: 999px;
-      background: rgba(229, 218, 199, 0.56);
-      color: #5c574e;
-      font-size: 12px;
-      font-weight: 800;
-    }
 
-    .progress-chip.done {
-      background: rgba(31, 122, 92, 0.12);
-      color: #1f7a5c;
-    }
 
-    .progress-chip.todo {
-      background: rgba(196, 138, 7, 0.13);
-      color: #9a6805;
-    }
 
-    .entry-form.main-record-collapsed .form-grid > .field:not(.append-log-field) {
-      display: none;
-    }
 
-    .entry-form.main-record-collapsed .button-row {
-      display: none;
-    }
 
     .field-head {
       display: flex;
@@ -974,90 +844,18 @@
       text-align: right;
     }
 
-    .workout-editor {
-      padding: 14px;
-      border-radius: 20px;
-      background: rgba(255, 251, 245, 0.78);
-      border: 1px solid rgba(109, 90, 60, 0.12);
-    }
 
-    .workout-detail-field[hidden] {
-      display: none;
-    }
 
-    .meal-detail-field[hidden] {
-      display: none;
-    }
 
-    .meal-detail-card {
-      display: grid;
-      gap: 10px;
-      padding: 14px;
-      border-radius: 20px;
-      background: rgba(255, 251, 245, 0.78);
-      border: 1px solid rgba(109, 90, 60, 0.12);
-    }
 
-    .meal-detail-card label {
-      color: #2f493e;
-      font-weight: 800;
-    }
 
-    .meal-detail-hint {
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 1.6;
-    }
 
-    .append-log-card {
-      display: grid;
-      gap: 16px;
-      padding: 18px;
-      border-radius: 28px;
-      background:
-        radial-gradient(circle at 12% 0%, rgba(62, 163, 117, 0.18), transparent 34%),
-        linear-gradient(135deg, rgba(255, 251, 245, 0.94), rgba(238, 247, 238, 0.78));
-      border: 1px solid rgba(31, 122, 92, 0.16);
-      box-shadow: 0 18px 42px rgba(48, 73, 58, 0.08);
-    }
 
-    .append-log-title {
-      display: grid;
-      gap: 4px;
-    }
 
-    .append-log-title strong {
-      color: #1f5c46;
-      font-size: 18px;
-    }
 
-    .append-log-title span {
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.5;
-    }
 
-    .append-log-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 14px;
-    }
 
-    .append-log-block {
-      display: grid;
-      gap: 12px;
-      padding: 16px;
-      border-radius: 22px;
-      background: rgba(255, 255, 255, 0.74);
-      border: 1px solid rgba(109, 90, 60, 0.1);
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
-    }
 
-    .append-log-block h3 {
-      margin: 0;
-      color: #2f493e;
-      font-size: 15px;
-    }
 
     .mini-field-grid {
       display: grid;
@@ -1065,222 +863,37 @@
       gap: 10px;
     }
 
-    .checkbox-row {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 8px;
-    }
 
-    .checkbox-chip {
-      display: block;
-      cursor: pointer;
-      user-select: none;
-    }
 
-    .checkbox-chip input {
-      position: absolute;
-      opacity: 0;
-      pointer-events: none;
-    }
 
-    .checkbox-chip span {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 42px;
-      padding: 9px 10px;
-      border-radius: 15px;
-      background: rgba(229, 218, 199, 0.54);
-      color: #5c574e;
-      border: 1px solid rgba(109, 90, 60, 0.08);
-      font-size: 13px;
-      font-weight: 800;
-      transition: 180ms ease;
-    }
 
-    .checkbox-chip input:focus-visible + span {
-      outline: 3px solid rgba(31, 122, 92, 0.22);
-      outline-offset: 2px;
-    }
 
-    .checkbox-chip input:checked + span {
-      color: #fff;
-      transform: translateY(-1px);
-      box-shadow: 0 10px 20px rgba(31, 122, 92, 0.18);
-    }
 
-    .checkbox-chip.cooked input:checked + span {
-      background: linear-gradient(135deg, #1f7a5c, #2ea978);
-    }
 
-    .checkbox-chip.healthy input:checked + span {
-      background: linear-gradient(135deg, #2b8a3e, #77b255);
-    }
 
-    .checkbox-chip.outside input:checked + span {
-      background: linear-gradient(135deg, #b85c38, #df8a47);
-    }
 
-    .append-preview {
-      padding: 10px 12px;
-      border-radius: 16px;
-      background: rgba(31, 122, 92, 0.08);
-      color: #315245;
-      font-size: 13px;
-      line-height: 1.55;
-      border: 1px solid rgba(31, 122, 92, 0.1);
-    }
 
-    .daily-log-list {
-      display: grid;
-      gap: 8px;
-    }
 
-    .daily-log-item {
-      padding: 10px 12px;
-      border-radius: 14px;
-      background: rgba(255, 255, 255, 0.66);
-      color: #4d473f;
-      font-size: 13px;
-      line-height: 1.55;
-      border: 1px solid rgba(109, 90, 60, 0.08);
-    }
 
-    .daily-log-item strong {
-      color: #1f5c46;
-    }
 
-    .workout-details {
-      border-radius: 22px;
-      background: rgba(255, 251, 245, 0.78);
-      border: 1px solid rgba(109, 90, 60, 0.12);
-      overflow: hidden;
-    }
 
-    .workout-details summary {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      padding: 16px;
-      cursor: pointer;
-      color: #2f493e;
-      font-weight: 800;
-      list-style: none;
-    }
 
-    .workout-details summary::-webkit-details-marker {
-      display: none;
-    }
 
-    .workout-details summary::after {
-      content: "展开";
-      flex-shrink: 0;
-      padding: 6px 10px;
-      border-radius: 999px;
-      background: rgba(31, 122, 92, 0.1);
-      color: #1f7a5c;
-      font-size: 12px;
-      font-weight: 700;
-    }
 
-    .workout-details[open] summary::after {
-      content: "收起";
-    }
 
-    .workout-details .workout-editor {
-      border: 0;
-      border-top: 1px solid rgba(109, 90, 60, 0.1);
-      border-radius: 0;
-      background: rgba(255, 255, 255, 0.36);
-    }
 
-    .workout-toolbar {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-bottom: 12px;
-    }
 
-    .template-block {
-      margin-bottom: 14px;
-    }
 
-    .template-head {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      margin-bottom: 10px;
-    }
 
-    .template-head span {
-      color: var(--muted);
-      font-size: 12px;
-    }
 
-    .template-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 10px;
-    }
 
-    .template-card {
-      display: grid;
-      gap: 10px;
-      padding: 14px;
-      border-radius: 18px;
-      background: rgba(255, 255, 255, 0.78);
-      border: 1px solid rgba(31, 122, 92, 0.12);
-    }
 
-    .template-card-title {
-      color: #1f5c46;
-      font-size: 14px;
-      font-weight: 700;
-    }
 
-    .template-card-subtitle {
-      color: rgba(31, 92, 70, 0.78);
-      font-weight: 600;
-      font-size: 12px;
-      line-height: 1.5;
-    }
 
-    .template-adjuster {
-      display: grid;
-      grid-template-columns: 42px minmax(0, 1fr) auto 42px;
-      gap: 8px;
-      align-items: center;
-    }
 
-    .template-stepper {
-      padding: 0;
-      min-height: 42px;
-      border-radius: 14px;
-      background: rgba(31, 122, 92, 0.1);
-      color: #1f5c46;
-      border: 1px solid rgba(31, 122, 92, 0.12);
-      font-size: 20px;
-      line-height: 1;
-    }
 
-    .template-count-input {
-      padding: 10px 12px;
-      min-height: 42px;
-      text-align: center;
-      font-weight: 700;
-    }
 
-    .template-unit {
-      color: var(--muted);
-      font-size: 12px;
-      white-space: nowrap;
-    }
 
-    .template-add-btn {
-      width: 100%;
-    }
 
     .btn-slim {
       padding: 10px 14px;
@@ -1289,41 +902,11 @@
       font-weight: 700;
     }
 
-    .workout-list {
-      display: grid;
-      gap: 12px;
-    }
 
-    .workout-item {
-      display: grid;
-      grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr) 120px auto;
-      gap: 10px;
-      align-items: end;
-      padding: 14px;
-      border-radius: 18px;
-      background: rgba(255, 255, 255, 0.78);
-      border: 1px solid rgba(120, 101, 71, 0.08);
-    }
 
-    .workout-item .field {
-      gap: 6px;
-    }
 
-    .workout-note-field {
-      grid-column: 1 / -1;
-    }
 
-    .workout-item-actions {
-      display: flex;
-      align-items: stretch;
-    }
 
-    .workout-empty {
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.7;
-      padding: 14px 2px 4px;
-    }
 
     .data-overview {
       display: grid;
@@ -1657,22 +1240,6 @@
         min-height: auto;
       }
 
-      .workout-item {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-
-      .append-log-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .template-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .workout-item-actions,
-      .workout-note-field {
-        grid-column: 1 / -1;
-      }
     }
 
     @media (max-width: 680px) {
@@ -1689,36 +1256,14 @@
         padding: 18px 16px;
       }
 
-      .form-grid,
       .toggle-row,
-      .vitals,
-      .period-grid {
+      .vitals {
         grid-template-columns: 1fr;
-      }
-
-      .main-record-status-head {
-        display: grid;
       }
 
       .battery-shell {
         width: min(100%, 280px);
         height: 380px;
-      }
-
-      .workout-item {
-        grid-template-columns: 1fr;
-      }
-
-      .template-adjuster {
-        grid-template-columns: 40px minmax(0, 1fr) auto 40px;
-      }
-
-      .mini-field-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .checkbox-row {
-        grid-template-columns: 1fr;
       }
 
       .record-item {
@@ -1992,6 +1537,315 @@
       .jarvis-panel { padding: 18px 14px 16px; }
       .jarvis-tagline { font-size: 16px; padding: 12px 14px; }
     }
+
+/* ===== 快速捕获重设计 · 与主调色板统一 ===== */
+
+/* Capture bar · 胶囊按钮栏 */
+.capture-bar {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 14px 0 18px;
+}
+.capture-pill {
+  padding: 9px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--panel-strong);
+  color: var(--text);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.15s, color 0.15s, border-color 0.15s;
+  box-shadow: 0 1px 2px rgba(81, 57, 20, 0.04);
+}
+.capture-pill:hover {
+  background: var(--bg-deep);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(81, 57, 20, 0.08);
+}
+.capture-pill.active {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+  font-weight: 600;
+  box-shadow: 0 4px 14px rgba(31, 122, 92, 0.28);
+}
+.capture-pill.active:hover {
+  background: var(--accent);
+  transform: translateY(-1px);
+}
+
+.capture-panel-container {
+  min-height: 20px;
+}
+
+/* 展开的事件面板 · 用暖色主调 */
+.capture-panel {
+  background: var(--panel-strong);
+  border: 1px solid var(--accent-soft);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius-md);
+  padding: 18px 20px;
+  margin-top: 6px;
+  box-shadow: 0 8px 24px rgba(81, 57, 20, 0.06);
+  animation: panel-slide-in 0.22s ease-out;
+}
+@keyframes panel-slide-in {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.capture-panel h3 {
+  margin: 0 0 14px;
+  font-size: 16px;
+  color: var(--accent);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+.capture-panel .field-row {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+.capture-panel .field {
+  min-width: 0;
+}
+.capture-panel .field label {
+  color: var(--muted);
+  font-size: 12px;
+  display: block;
+  margin-bottom: 4px;
+}
+.capture-panel input[type="text"],
+.capture-panel input[type="number"],
+.capture-panel input[type="time"],
+.capture-panel select,
+.capture-panel textarea {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  font-size: 14px;
+  color: var(--text);
+  font-family: var(--font-main);
+  width: 100%;
+  transition: border-color 0.15s, background 0.15s;
+}
+.capture-panel input:focus,
+.capture-panel select:focus,
+.capture-panel textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  background: #fff;
+}
+.capture-panel input[type="range"] {
+  width: 100%;
+  accent-color: var(--accent);
+}
+.capture-panel .panel-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--line);
+  flex-wrap: wrap;
+}
+.capture-panel .immediate-push-check {
+  font-size: 13px;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+.capture-panel .panel-error {
+  color: var(--accent-hot);
+  font-size: 12px;
+  margin-top: 8px;
+}
+
+/* Meal tag chips · 明显的勾选态 */
+.capture-panel .meal-tag-check {
+  padding: 7px 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  cursor: pointer;
+  background: var(--bg);
+  font-size: 13px;
+  color: var(--muted);
+  transition: all 0.15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  user-select: none;
+}
+.capture-panel .meal-tag-check input[type="checkbox"] {
+  display: none;
+}
+.capture-panel .meal-tag-check:hover {
+  border-color: var(--accent-soft);
+  color: var(--text);
+}
+.capture-panel .meal-tag-check:has(input:checked) {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent);
+  font-weight: 600;
+}
+.capture-panel .meal-tag-check:has(input:checked)::before {
+  content: "✓";
+  font-weight: 700;
+}
+
+/* Mood tag emoji buttons · 美化 */
+.mood-tag-btn {
+  transition: transform 0.15s, box-shadow 0.15s, background 0.15s, border-color 0.15s !important;
+}
+.mood-tag-btn:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 3px 8px rgba(81, 57, 20, 0.1);
+}
+.mood-tag-btn.active {
+  box-shadow: 0 4px 12px rgba(31, 122, 92, 0.2);
+}
+
+/* Training rows · 更精致的列表 */
+.training-item-row {
+  background: var(--bg);
+  padding: 6px 8px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--line);
+}
+
+/* 待同步胶囊 · 陶土橙温暖系 */
+.pending-sync-capsule {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(135deg, rgba(209, 123, 31, 0.1), rgba(209, 123, 31, 0.04));
+  border: 1px solid rgba(209, 123, 31, 0.3);
+  border-radius: 999px;
+  padding: 10px 18px;
+  margin: 0 auto 14px;
+  max-width: 960px;
+  box-shadow: 0 2px 10px rgba(209, 123, 31, 0.08);
+  transition: all 0.25s ease;
+}
+.pending-sync-text {
+  font-size: 13.5px;
+  color: var(--text);
+  letter-spacing: 0.01em;
+}
+.pending-sync-text strong {
+  color: var(--accent-warm);
+  font-weight: 700;
+  margin: 0 3px;
+  font-family: var(--font-number);
+  font-size: 15px;
+}
+.pending-sync-capsule #pushAllBtn {
+  background: var(--accent-warm);
+  color: #fff;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.12s, box-shadow 0.12s;
+}
+.pending-sync-capsule #pushAllBtn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(209, 123, 31, 0.3);
+}
+
+/* 推送成功态 · 绿色闪光 */
+.pending-sync-capsule.push-success {
+  background: linear-gradient(135deg, rgba(45, 143, 78, 0.18), rgba(45, 143, 78, 0.08));
+  border-color: var(--success);
+  box-shadow: 0 4px 16px rgba(45, 143, 78, 0.18);
+  animation: push-flash 0.5s ease-out;
+}
+.pending-sync-capsule.push-success .pending-sync-text {
+  color: var(--success);
+  font-weight: 600;
+}
+.pending-sync-capsule.push-success strong {
+  color: var(--success);
+}
+.pending-sync-capsule.push-success #pushAllBtn {
+  display: none;
+}
+@keyframes push-flash {
+  0% { transform: scale(1); }
+  35% { transform: scale(1.04); box-shadow: 0 6px 24px rgba(45, 143, 78, 0.32); }
+  100% { transform: scale(1); }
+}
+
+/* 时间线 · 更精致的卡片 */
+.timeline-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.timeline-item {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 14px;
+  background: var(--panel-strong);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 13.5px;
+  color: var(--text);
+  transition: background 0.15s, border-color 0.15s, transform 0.12s;
+}
+.timeline-item:hover {
+  background: var(--accent-soft);
+  border-color: var(--accent-soft);
+  transform: translateX(2px);
+}
+.timeline-item .tl-status {
+  font-size: 14px;
+  width: 20px;
+  text-align: center;
+  flex-shrink: 0;
+}
+.timeline-item .tl-time {
+  color: var(--muted);
+  width: 46px;
+  flex-shrink: 0;
+  font-family: var(--font-number);
+  font-size: 13px;
+  letter-spacing: 0.02em;
+}
+.timeline-item .tl-content {
+  flex: 1;
+  line-height: 1.45;
+}
+.timeline-item.pending .tl-status::before {
+  content: "⏳";
+  filter: saturate(0.85);
+}
+.timeline-item.synced .tl-status::before {
+  content: "✓";
+  color: var(--success);
+  font-weight: 700;
+}
+.timeline-empty {
+  padding: 32px 20px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 13.5px;
+  background: var(--panel);
+  border: 1px dashed var(--line);
+  border-radius: var(--radius-sm);
+  letter-spacing: 0.02em;
+}
   </style>
 </head>
 <body>
@@ -2083,338 +1937,44 @@
       <div class="jarvis-actions" id="jarvisActions"></div>
     </section>
 
-    <section class="panel-grid top">
-      <article class="panel">
-        <div class="panel-content">
-          <div class="section-title">
-            <h2>今日录入</h2>
-            <span id="formModeLabel">保存或更新当天记录</span>
-          </div>
-          <div class="main-record-status" id="mainRecordStatus">
-            <div class="main-record-status-head">
-              <div class="main-record-status-title">
-                <strong id="mainRecordStatusTitle">今日主记录待保存</strong>
-                <span id="mainRecordStatusText">先保存睡眠、体重、训练等基础信息，后面就只需要追加小事件。</span>
-              </div>
-              <button class="btn-secondary btn-slim" id="toggleMainRecordBtn" type="button">展开主记录</button>
-            </div>
-            <div class="progress-chip-row" id="mainRecordProgress"></div>
-          </div>
-          <form class="entry-form" id="entryForm">
-            <div class="form-grid">
-              <div class="field">
-                <label for="entryDate">日期</label>
-                <input id="entryDate" name="entryDate" type="date" required />
-              </div>
-              <div class="field slider-field">
-                <label for="sleepScore">睡眠分</label>
-                <div class="slider-shell">
-                  <div class="slider-top">
-                    <span>今晚整体睡得怎么样</span>
-                    <strong class="slider-value" id="sleepScoreValue">80 分</strong>
-                  </div>
-                  <input id="sleepScore" name="sleepScore" type="range" min="0" max="100" step="1" value="80" required />
-                  <div class="slider-ticks">
-                    <span>0</span>
-                    <span>50</span>
-                    <span>100</span>
-                  </div>
-                </div>
-              </div>
-              <div class="field slider-field">
-                <label for="bedtimeSlider">入睡时间</label>
-                <div class="slider-shell">
-                  <div class="slider-top">
-                    <span>默认围绕 22:00 附近</span>
-                    <strong class="slider-value" id="bedtimeValue">22:00</strong>
-                  </div>
-                  <input id="bedtimeSlider" type="range" min="1200" max="1560" step="5" value="1320" />
-                  <input id="bedtime" name="bedtime" type="hidden" value="22:00" />
-                  <div class="slider-ticks">
-                    <span>20:00</span>
-                    <span>22:00</span>
-                    <span>00:00</span>
-                    <span>02:00</span>
-                  </div>
-                  <div class="slider-note">向右滑过 24:00 会自动显示成次日凌晨时间。</div>
-                </div>
-              </div>
-              <div class="field slider-field">
-                <label for="wakeTimeSlider">起床时间</label>
-                <div class="slider-shell">
-                  <div class="slider-top">
-                    <span>默认围绕 06:00 附近</span>
-                    <strong class="slider-value" id="wakeTimeValue">06:00</strong>
-                  </div>
-                  <input id="wakeTimeSlider" type="range" min="240" max="540" step="5" value="360" />
-                  <input id="wakeTime" name="wakeTime" type="hidden" value="06:00" />
-                  <div class="slider-ticks">
-                    <span>04:00</span>
-                    <span>06:00</span>
-                    <span>08:00</span>
-                    <span>09:00</span>
-                  </div>
-                </div>
-              </div>
-              <div class="field">
-                <label for="wakeups">起夜次数</label>
-                <input id="wakeups" name="wakeups" type="number" min="0" max="10" required />
-              </div>
-              <div class="field">
-                <label for="energy">主观能量值</label>
-                <input id="energy" name="energy" type="number" min="1" max="10" placeholder="1-10" required />
-              </div>
-              <div class="field slider-field">
-                <label for="weightSlider">今日体重（kg）</label>
-                <div class="slider-shell">
-                  <div class="slider-top">
-                    <span>默认定位在你当前体重附近</span>
-                    <strong class="slider-value" id="weightValue">83.4 kg</strong>
-                  </div>
-                  <input id="weightSlider" name="weight" type="range" min="40" max="140" step="0.1" value="83.4" />
-                  <div class="slider-ticks">
-                    <span>40</span>
-                    <span>60</span>
-                    <span>80</span>
-                    <span>100</span>
-                    <span>140</span>
-                  </div>
-                </div>
-              </div>
-              <div class="field slider-field">
-                <label for="energyBoostSlider">今日补能加分（%）</label>
-                <div class="slider-shell">
-                  <div class="slider-top">
-                    <span>午睡、按摩、冥想、深度恢复都可以加回来</span>
-                    <strong class="slider-value" id="energyBoostValue">0%</strong>
-                  </div>
-                  <input id="energyBoostSlider" name="energyBoost" type="range" min="0" max="40" step="1" value="0" />
-                  <div class="slider-ticks">
-                    <span>0</span>
-                    <span>10</span>
-                    <span>20</span>
-                    <span>40</span>
-                  </div>
-                </div>
-              </div>
-              <div class="field full">
-                <label>今天有正式训练吗</label>
-                <div class="toggle-group">
-                  <input id="exerciseNo" type="radio" name="exercised" value="false" checked />
-                  <label for="exerciseNo">否</label>
-                  <input id="exerciseYes" type="radio" name="exercised" value="true" />
-                  <label for="exerciseYes">是</label>
-                </div>
-              </div>
-              <div class="field full workout-detail-field" id="workoutDetailField" hidden>
-                <details class="workout-details" id="workoutDetailsPanel" open>
-                  <summary>
-                    <span>今日训练模板与明细</span>
-                    <span class="inline-meta" id="workoutMetaLabel">选择训练后再记录动作</span>
-                  </summary>
-                  <div class="workout-editor">
-                    <div class="template-block">
-                      <div class="template-head">
-                        <label for="workoutTemplateGrid">常用动作模板</label>
-                        <span>先调数量，再加入今天的训练明细</span>
-                      </div>
-                      <div class="template-grid" id="workoutTemplateGrid"></div>
-                    </div>
-                    <div class="workout-toolbar">
-                      <button class="btn-secondary btn-slim" id="addWorkoutRoutineBtn" type="button">导入今日常用七项</button>
-                      <button class="btn-secondary btn-slim" id="addWorkoutItemBtn" type="button">添加训练项目</button>
-                      <button class="btn-secondary btn-slim" id="clearWorkoutItemsBtn" type="button">清空训练明细</button>
-                    </div>
-                    <div class="workout-list" id="workoutItemsEditor"></div>
-                    <div class="workout-empty" id="workoutEmptyState">今天如果训练了，可以直接导入常用七项，也可以只添加单个动作。</div>
-                  </div>
-                </details>
-              </div>
-              <div class="field full">
-                <label>今天自己做饭了吗</label>
-                <div class="toggle-group">
-                  <input id="cookedNo" type="radio" name="cooked" value="false" checked />
-                  <label for="cookedNo">否</label>
-                  <input id="cookedYes" type="radio" name="cooked" value="true" />
-                  <label for="cookedYes">是</label>
-                </div>
-              </div>
-              <div class="field full meal-detail-field" id="mealDetailField" hidden>
-                <div class="meal-detail-card">
-                  <label for="mealDetails">今天具体吃了什么</label>
-                  <textarea id="mealDetails" name="mealDetails" placeholder="例如：早餐鸡蛋、牛奶、燕麦；午餐牛肉、青菜、米饭；晚餐鱼、豆腐、蔬菜。"></textarea>
-                  <div class="meal-detail-hint">这里会一起保存到本地记录，并写入 Obsidian 的当天日志。</div>
-                </div>
-              </div>
-              <div class="field full">
-                <label>今天吃得健康营养丰富吗</label>
-                <div class="toggle-group">
-                  <input id="healthyFoodNo" type="radio" name="healthyFood" value="false" checked />
-                  <label for="healthyFoodNo">否</label>
-                  <input id="healthyFoodYes" type="radio" name="healthyFood" value="true" />
-                  <label for="healthyFoodYes">是</label>
-                </div>
-              </div>
-              <div class="field full">
-                <label>今天吃了外面的食物吗</label>
-                <div class="toggle-group">
-                  <input id="ateOutNo" type="radio" name="ateOut" value="false" checked />
-                  <label for="ateOutNo">否</label>
-                  <input id="ateOutYes" type="radio" name="ateOut" value="true" />
-                  <label for="ateOutYes">是</label>
-                </div>
-              </div>
-              <div class="field full append-log-field">
-                <div class="append-log-card">
-                  <div class="field-head">
-                    <div class="append-log-title">
-                      <strong>今日追加记录</strong>
-                      <span>早上保存主记录后，后面只追加餐食和午睡/补能，不用重填整张表。</span>
-                    </div>
-                    <span class="inline-meta">持续补充能量事件</span>
-                  </div>
-                  <div class="append-log-grid">
-                    <div class="append-log-block">
-                      <h3>追加一餐</h3>
-                      <div class="mini-field-grid">
-                        <div class="field">
-                          <label for="mealLogTime">时间</label>
-                          <input id="mealLogTime" type="time" />
-                        </div>
-                        <div class="field">
-                          <label for="mealLogType">餐次</label>
-                          <select id="mealLogType">
-                            <option value="上午餐">上午餐</option>
-                            <option value="晚餐">晚餐</option>
-                            <option value="加餐">加餐</option>
-                            <option value="其他">其他</option>
-                          </select>
-                        </div>
-                      </div>
-                      <div class="field">
-                        <label for="mealLogFood">具体吃了什么</label>
-                        <textarea id="mealLogFood" placeholder="例如：牛肉、青菜、米饭、鸡蛋"></textarea>
-                      </div>
-                      <div class="checkbox-row">
-                        <label class="checkbox-chip cooked">
-                          <input id="mealLogCooked" type="checkbox" checked />
-                          <span>自己做</span>
-                        </label>
-                        <label class="checkbox-chip healthy">
-                          <input id="mealLogHealthy" type="checkbox" checked />
-                          <span>健康营养</span>
-                        </label>
-                        <label class="checkbox-chip outside">
-                          <input id="mealLogAteOut" type="checkbox" />
-                          <span>外食</span>
-                        </label>
-                      </div>
-                      <div class="append-preview" id="mealLogPreview">本餐将记录为：自己做 / 健康营养 / 非外食</div>
-                      <button class="btn-primary btn-slim" id="addMealLogBtn" type="button">添加这一餐并发到 Obsidian</button>
-                    </div>
-                    <div class="append-log-block">
-                      <h3>追加午睡 / 补能</h3>
-                      <div class="mini-field-grid">
-                        <div class="field">
-                          <label for="recoveryLogTime">时间</label>
-                          <input id="recoveryLogTime" type="time" />
-                        </div>
-                        <div class="field">
-                          <label for="recoveryLogType">类型</label>
-                          <select id="recoveryLogType">
-                            <option value="午睡">午睡</option>
-                            <option value="按摩">按摩</option>
-                            <option value="冥想">冥想</option>
-                            <option value="散步">散步</option>
-                            <option value="其他补能">其他补能</option>
-                          </select>
-                        </div>
-                      </div>
-                      <div class="mini-field-grid">
-                        <div class="field">
-                          <label for="recoveryLogBoost">补能加分（%）</label>
-                          <input id="recoveryLogBoost" type="number" min="1" max="40" step="1" value="10" />
-                        </div>
-                        <div class="field">
-                          <label for="recoveryLogNote">备注</label>
-                          <input id="recoveryLogNote" type="text" placeholder="例如：睡了 25 分钟，醒来舒服很多" />
-                        </div>
-                      </div>
-                      <button class="btn-primary btn-slim" id="addRecoveryLogBtn" type="button">添加补能并发到 Obsidian</button>
-                    </div>
-                    <div class="append-log-block">
-                      <h3>追加晚上睡前复盘</h3>
-                      <div class="mini-field-grid">
-                        <div class="field">
-                          <label for="nightReviewTime">时间</label>
-                          <input id="nightReviewTime" type="time" />
-                        </div>
-                        <div class="field">
-                          <label for="nightReviewMood">睡前状态</label>
-                          <select id="nightReviewMood">
-                            <option value="平静">平静</option>
-                            <option value="满足">满足</option>
-                            <option value="疲惫">疲惫</option>
-                            <option value="焦虑">焦虑</option>
-                            <option value="感恩">感恩</option>
-                            <option value="其他">其他</option>
-                          </select>
-                        </div>
-                      </div>
-                      <div class="field">
-                        <label for="nightReviewText">今晚想复盘什么</label>
-                        <textarea id="nightReviewText" placeholder="例如：今天哪里做得不错，哪里消耗了能量，明天醒来最重要的一件事是什么。"></textarea>
-                      </div>
-                      <button class="btn-primary btn-slim" id="addNightReviewBtn" type="button">添加睡前复盘并发到 Obsidian</button>
-                    </div>
-                  </div>
-                  <div class="daily-log-list" id="dailyAppendList"></div>
-                </div>
-              </div>
-              <div class="field">
-                <label for="deepWorkTasks">深度工作次数</label>
-                <input id="deepWorkTasks" name="deepWorkTasks" type="number" min="0" max="10" step="1" placeholder="例如 2" />
-              </div>
-              <div class="field">
-                <label for="adminTasks">琐事处理次数</label>
-                <input id="adminTasks" name="adminTasks" type="number" min="0" max="20" step="1" placeholder="例如 3" />
-              </div>
-              <div class="field full">
-                <label>时段能量感受（1-10）</label>
-                <div class="period-grid">
-                  <div class="field">
-                    <label for="morningEnergy">上午</label>
-                    <input id="morningEnergy" name="morningEnergy" type="number" min="1" max="10" step="1" placeholder="1-10" />
-                  </div>
-                  <div class="field">
-                    <label for="afternoonEnergy">下午</label>
-                    <input id="afternoonEnergy" name="afternoonEnergy" type="number" min="1" max="10" step="1" placeholder="1-10" />
-                  </div>
-                  <div class="field">
-                    <label for="eveningEnergy">晚上</label>
-                    <input id="eveningEnergy" name="eveningEnergy" type="number" min="1" max="10" step="1" placeholder="1-10" />
-                  </div>
-                </div>
-              </div>
-              <div class="field full">
-                <label for="mood">心情备注</label>
-                <textarea id="mood" name="mood" placeholder="例如：稳定、神清气爽、提不起劲"></textarea>
-              </div>
-              <div class="field full">
-                <label for="dailyStory">今天发生的事情</label>
-                <textarea id="dailyStory" name="dailyStory" placeholder="例如：今天睡得不错，上午推进了重要事情，下午训练时状态稳定，也把吃饭节奏守住了。"></textarea>
-              </div>
-            </div>
-            <div class="button-row">
-              <button class="btn-primary" id="saveToObsidianBtn" type="submit">保存记录并发到 Obsidian</button>
-              <button class="btn-secondary" id="resetFormBtn" type="button">重置表单</button>
-            </div>
-            <div class="footer-note">
-              Obsidian 目标默认使用 `Michael&Jarvis / 我的训练日志`，会按日期生成训练日志笔记。
-            </div>
-          </form>
-        </div>
-      </article>
+<!-- 重设计：快速捕获面板 -->
+<article class="panel" id="capturePanel">
+  <div class="panel-content">
+    <div class="section-title">
+      <h2>快速捕获</h2>
+      <span id="captureStatusLabel">点一个按钮展开当下要记的那件事</span>
+    </div>
+
+    <div class="capture-bar" id="captureBar">
+      <button class="capture-pill" type="button" data-event-type="sleep">😴 睡眠</button>
+      <button class="capture-pill" type="button" data-event-type="meal">🍱 餐食</button>
+      <button class="capture-pill" type="button" data-event-type="training">💪 训练</button>
+      <button class="capture-pill" type="button" data-event-type="recovery">🛋 补能</button>
+      <button class="capture-pill" type="button" data-event-type="weight">⚖️ 体重</button>
+      <button class="capture-pill" type="button" data-event-type="reflection">🌙 复盘</button>
+      <button class="capture-pill" type="button" data-event-type="mood">💭 心情</button>
+    </div>
+
+    <div class="capture-panel-container" id="capturePanelContainer"></div>
+  </div>
+</article>
+
+<!-- 待同步胶囊（仅当 pendingSync 今日非空时显示） -->
+<div class="pending-sync-capsule" id="pendingSyncCapsule" hidden>
+  <span class="pending-sync-text">⏳ 待同步到 Obsidian：<strong id="pendingSyncCount">0</strong> 条</span>
+  <button class="btn-primary btn-slim" id="pushAllBtn" type="button">📤 一键推到 Obsidian</button>
+</div>
+
+<!-- 今日时间线 -->
+<article class="panel" id="todayTimelinePanel">
+  <div class="panel-content">
+    <div class="section-title">
+      <h2>今日时间线</h2>
+      <span id="todayTimelineLabel">今天记的所有事件</span>
+    </div>
+    <div class="timeline-list" id="todayTimeline"></div>
+  </div>
+</article>
 
       <article class="panel">
         <div class="panel-content">
@@ -2601,6 +2161,7 @@
         storageKey: "michael-energy-tracker-v1",
         seededKey: "michael-energy-tracker-seeded",
         templateSettingsKey: "michael-energy-template-settings-v1",
+        pendingSyncKey: "michael-energy-tracker-pending-sync-v1",
         exportVersion: 10,
         obsidianVault: "Michael&Jarvis",
         obsidianFolder: "我的训练日志",
@@ -2627,59 +2188,13 @@
       const state = {
         entries: [],
         sleepChart: null,
-        templateSettings: {},
-        heroBatteryTimer: null,
-        mainRecordExpanded: false
+        heroBatteryTimer: null
       };
 
       const elements = {
-        form: document.getElementById("entryForm"),
-        mainRecordStatusTitle: document.getElementById("mainRecordStatusTitle"),
-        mainRecordStatusText: document.getElementById("mainRecordStatusText"),
-        mainRecordProgress: document.getElementById("mainRecordProgress"),
-        toggleMainRecordBtn: document.getElementById("toggleMainRecordBtn"),
         recordList: document.getElementById("recordList"),
         statusBanner: document.getElementById("statusBanner"),
         importFileInput: document.getElementById("importFileInput"),
-        saveToObsidianBtn: document.getElementById("saveToObsidianBtn"),
-        formModeLabel: document.getElementById("formModeLabel"),
-        sleepScoreValue: document.getElementById("sleepScoreValue"),
-        weightSlider: document.getElementById("weightSlider"),
-        weightValue: document.getElementById("weightValue"),
-        energyBoostSlider: document.getElementById("energyBoostSlider"),
-        energyBoostValue: document.getElementById("energyBoostValue"),
-        bedtimeSlider: document.getElementById("bedtimeSlider"),
-        bedtimeValue: document.getElementById("bedtimeValue"),
-        wakeTimeSlider: document.getElementById("wakeTimeSlider"),
-        wakeTimeValue: document.getElementById("wakeTimeValue"),
-        workoutItemsEditor: document.getElementById("workoutItemsEditor"),
-        workoutDetailField: document.getElementById("workoutDetailField"),
-        workoutDetailsPanel: document.getElementById("workoutDetailsPanel"),
-        mealDetailField: document.getElementById("mealDetailField"),
-        workoutTemplateGrid: document.getElementById("workoutTemplateGrid"),
-        addWorkoutRoutineBtn: document.getElementById("addWorkoutRoutineBtn"),
-        addWorkoutItemBtn: document.getElementById("addWorkoutItemBtn"),
-        clearWorkoutItemsBtn: document.getElementById("clearWorkoutItemsBtn"),
-        workoutEmptyState: document.getElementById("workoutEmptyState"),
-        workoutMetaLabel: document.getElementById("workoutMetaLabel"),
-        mealLogTime: document.getElementById("mealLogTime"),
-        mealLogType: document.getElementById("mealLogType"),
-        mealLogFood: document.getElementById("mealLogFood"),
-        mealLogCooked: document.getElementById("mealLogCooked"),
-        mealLogHealthy: document.getElementById("mealLogHealthy"),
-        mealLogAteOut: document.getElementById("mealLogAteOut"),
-        mealLogPreview: document.getElementById("mealLogPreview"),
-        addMealLogBtn: document.getElementById("addMealLogBtn"),
-        recoveryLogTime: document.getElementById("recoveryLogTime"),
-        recoveryLogType: document.getElementById("recoveryLogType"),
-        recoveryLogBoost: document.getElementById("recoveryLogBoost"),
-        recoveryLogNote: document.getElementById("recoveryLogNote"),
-        addRecoveryLogBtn: document.getElementById("addRecoveryLogBtn"),
-        nightReviewTime: document.getElementById("nightReviewTime"),
-        nightReviewMood: document.getElementById("nightReviewMood"),
-        nightReviewText: document.getElementById("nightReviewText"),
-        addNightReviewBtn: document.getElementById("addNightReviewBtn"),
-        dailyAppendList: document.getElementById("dailyAppendList"),
         chartCanvas: document.getElementById("sleepChart"),
         chartStatusLabel: document.getElementById("chartStatusLabel"),
         heroDateLabel: document.getElementById("heroDateLabel"),
@@ -2926,6 +2441,241 @@
         }
       };
 
+      const EventModel = {
+        // 每种事件的定义：emoji / 显示名 / 字段列表 / 验证函数 / 应用逻辑 / markdown 渲染
+        types: {
+          sleep: {
+            emoji: "😴",
+            label: "睡眠",
+            mode: "overwrite",
+            validate(data) {
+              if (typeof data.sleepScore !== "number" || data.sleepScore < 0 || data.sleepScore > 100) {
+                return "睡眠分需要在 0-100 之间";
+              }
+              if (!data.bedtime || !data.wakeTime) return "入睡和起床时间必填";
+              if (typeof data.wakeups !== "number" || data.wakeups < 0 || data.wakeups > 10) {
+                return "起夜次数需要在 0-10 之间";
+              }
+              return "";
+            },
+            applyToEntry(entry, data) {
+              return EntryModel.normalize({
+                ...entry,
+                sleepScore: data.sleepScore,
+                bedtime: data.bedtime,
+                wakeTime: data.wakeTime,
+                wakeups: data.wakeups
+              });
+            },
+            toMarkdown(event) {
+              const d = event.data;
+              return [
+                `### 😴 睡眠 ${event.time}`,
+                `- 睡眠分：${d.sleepScore}`,
+                `- 入睡：${d.bedtime} / 起床：${d.wakeTime}`,
+                `- 起夜：${d.wakeups} 次`
+              ].join("\n");
+            }
+          },
+
+          meal: {
+            emoji: "🍱",
+            label: "餐食",
+            mode: "append",
+            validate(data) {
+              if (!data.food || !data.food.trim()) return "请填写吃了什么";
+              if (!data.type) return "请选择餐次";
+              return "";
+            },
+            applyToEntry(entry, data) {
+              const mealItems = [...(entry.mealItems || []), {
+                time: data.time,
+                type: data.type,
+                food: data.food,
+                cooked: !!data.cooked,
+                healthy: !!data.healthy,
+                ateOut: !!data.ateOut,
+                note: ""
+              }];
+              return EntryModel.normalize({
+                ...entry,
+                mealItems,
+                mealDetails: EntryModel.formatMealDetails(mealItems, entry.mealDetails),
+                cooked: entry.cooked || data.cooked,
+                healthyFood: entry.healthyFood || data.healthy,
+                ateOut: entry.ateOut || data.ateOut
+              });
+            },
+            toMarkdown(event) {
+              const d = event.data;
+              const tags = [d.cooked ? "自己做" : null, d.healthy ? "健康" : null, d.ateOut ? "外食" : null].filter(Boolean).join(" · ") || "无标签";
+              return [
+                `### 🍱 ${d.type} ${event.time}`,
+                `- ${d.food}`,
+                `- ${tags}`
+              ].join("\n");
+            }
+          },
+
+          training: {
+            emoji: "💪",
+            label: "训练",
+            mode: "overwrite",
+            validate(data) {
+              if (!Array.isArray(data.workoutItems) || data.workoutItems.length === 0) {
+                return "请至少添加一个训练动作";
+              }
+              return "";
+            },
+            applyToEntry(entry, data) {
+              return EntryModel.normalize({
+                ...entry,
+                workoutItems: data.workoutItems,
+                exercised: true
+              });
+            },
+            toMarkdown(event) {
+              const items = (event.data.workoutItems || []).map(
+                (it) => `- ${it.name} · ${it.volume}${it.note ? "｜" + it.note : ""}${it.rating ? "｜⭐ " + it.rating : ""}`
+              );
+              return [`### 💪 训练 ${event.time}`, ...items].join("\n");
+            }
+          },
+
+          recovery: {
+            emoji: "🛋",
+            label: "补能",
+            mode: "append",
+            validate(data) {
+              if (!data.type) return "请选择补能类型";
+              if (typeof data.boost !== "number" || data.boost < 1 || data.boost > 40) {
+                return "补能加分需要在 1-40 之间";
+              }
+              return "";
+            },
+            applyToEntry(entry, data) {
+              const recoveryItems = [...(entry.recoveryItems || []), {
+                time: data.time,
+                type: data.type,
+                boost: data.boost,
+                note: data.note || ""
+              }];
+              const nextBoost = Math.min(40, (entry.energyBoost || 0) + data.boost);
+              return EntryModel.normalize({
+                ...entry,
+                recoveryItems,
+                energyBoost: nextBoost
+              });
+            },
+            toMarkdown(event) {
+              const d = event.data;
+              const lines = [
+                `### 🛋 ${d.type} ${event.time}`,
+                `- 补能加分：+${d.boost}%`
+              ];
+              if (d.note) lines.push(`- ${d.note}`);
+              return lines.join("\n");
+            }
+          },
+
+          weight: {
+            emoji: "⚖️",
+            label: "体重",
+            mode: "overwrite",
+            validate(data) {
+              if (typeof data.weight !== "number" || data.weight < 20 || data.weight > 300) {
+                return "体重需要在 20-300 kg 之间";
+              }
+              return "";
+            },
+            applyToEntry(entry, data) {
+              return EntryModel.normalize({ ...entry, weight: data.weight });
+            },
+            toMarkdown(event) {
+              return `### ⚖️ 体重 ${event.time}\n- ${event.data.weight.toFixed(1)} kg`;
+            }
+          },
+
+          reflection: {
+            emoji: "🌙",
+            label: "复盘",
+            mode: "overwrite",
+            validate(data) {
+              if (typeof data.energy !== "number" || data.energy < 1 || data.energy > 10) {
+                return "今日整体能量需要在 1-10 之间";
+              }
+              if (!data.mood) return "请选择睡前状态";
+              return "";
+            },
+            applyToEntry(entry, data) {
+              return EntryModel.normalize({
+                ...entry,
+                mood: data.mood,
+                energy: data.energy,
+                dailyStory: data.dailyStory || ""
+              });
+            },
+            toMarkdown(event) {
+              const d = event.data;
+              const lines = [
+                `### 🌙 复盘 ${event.time}`,
+                `- 睡前状态：${d.mood}`,
+                `- 今日整体能量：${d.energy}/10`
+              ];
+              if (d.dailyStory) lines.push("", d.dailyStory);
+              return lines.join("\n");
+            }
+          },
+
+          mood: {
+            emoji: "💭",
+            label: "心情",
+            mode: "append",
+            validate(data) {
+              if (!data.tag) return "请选择心情";
+              return "";
+            },
+            applyToEntry(entry, data) {
+              const moodLogs = [...(entry.moodLogs || []), {
+                time: data.time,
+                tag: data.tag,
+                note: data.note || ""
+              }];
+              return EntryModel.normalize({ ...entry, moodLogs });
+            },
+            toMarkdown(event) {
+              const d = event.data;
+              const lines = [`### 💭 心情 ${event.time}`, `- ${d.tag}`];
+              if (d.note) lines.push(`- ${d.note}`);
+              return lines.join("\n");
+            }
+          }
+        },
+
+        // 生成唯一 id（timestamp + random 避免快速双击冲突）
+        makeId() {
+          return `evt-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+        },
+
+        // 构造 pendingSync 队列里的一条事件
+        buildQueueItem(eventType, date, time, data) {
+          return {
+            id: this.makeId(),
+            eventType,
+            date,
+            time,
+            capturedAt: Date.now(),
+            data
+          };
+        },
+
+        // 把一组事件按 time 升序拼接成 markdown（多个事件之间空一行）
+        renderBatchMarkdown(events) {
+          const sorted = [...events].sort((a, b) => (a.time || "").localeCompare(b.time || ""));
+          return sorted.map((event) => this.types[event.eventType].toMarkdown(event)).join("\n\n");
+        }
+      };
+
       const EntryModel = {
         normalizeBoolean(value) {
           return value === true || value === "true" || value === 1 || value === "1";
@@ -2969,6 +2719,20 @@
             .filter((item) => item.boost > 0 || item.note);
         },
 
+        normalizeMoodLogs(items) {
+          if (!Array.isArray(items)) return [];
+          return items
+            .map((item) => {
+              if (!item || typeof item !== "object") return null;
+              const time = String(item.time || "").trim();
+              const tag = String(item.tag || "").trim();
+              const note = String(item.note || "").trim();
+              if (!tag) return null;
+              return { time, tag, note };
+            })
+            .filter(Boolean);
+        },
+
         formatMealDetails(mealItems, fallback = "") {
           const items = this.normalizeMealItems(mealItems);
           if (!items.length) return String(fallback || "").trim();
@@ -2996,6 +2760,7 @@
             mealDetails,
             mealItems,
             recoveryItems,
+            moodLogs: this.normalizeMoodLogs(raw.moodLogs || []),
             healthyFood: this.normalizeBoolean(raw.healthyFood) || mealItems.some((item) => item.healthy),
             ateOut: this.normalizeBoolean(raw.ateOut) || mealItems.some((item) => item.ateOut),
             deepWorkTasks: this.normalizeNumber(raw.deepWorkTasks, 0),
@@ -3104,38 +2869,6 @@
           ].map((entry) => this.normalize(entry));
         },
 
-        getBootstrapTodayEntry() {
-          return this.normalize({
-            date: "2026-04-22",
-            sleepScore: 89,
-            bedtime: "22:00",
-            wakeTime: "06:00",
-            wakeups: 2,
-            energy: 10,
-            weight: CONFIG.currentWeightDefault,
-            exercised: true,
-            cooked: true,
-            healthyFood: true,
-            ateOut: false,
-            deepWorkTasks: 0,
-            adminTasks: 0,
-            morningEnergy: null,
-            afternoonEnergy: null,
-            eveningEnergy: null,
-            mood: "神清气爽",
-            dailyStory: "今天刚刚石头过来了，然后聊了一下最近的动态，经过他提醒，我最近打算把我们的客服也变成 AI，然后把开关房也交由 AI 掌管。很开心，又找到了新的扩大我们影响力的着力点。然后聊起来我女儿，关于昨天我女儿被英语老师放学留堂的事情。现在他走了，我自己突然心酸起来，自己一个年近 40 岁的大男人默默一个人哭起来了，想到我女儿一个人来上海。身边除了我这个爸爸，没有可依靠的人了！她才 12 岁的年纪里，在她面前全是陌生和未知，昨天晚上她跑到我房间里睡觉，可想而知孩子受了多么大的委屈和恐惧。刚刚我跟前妻说了这个事，大致就是说昨天女儿受了委屈，英语被放学的时候留堂了，孩子路上就哭了，然后半夜跑到我房间要跟我一起睡，我说我今天才意识到，孩子是多么坚强，昨天受了多么大的委屈。我把这个事情想简单了。希望前妻多给点鼓励，多跟她视频，多给予安慰。Jarvis 不瞒你说，反而哭出来之后我好受多了，原来我也有脆弱的一面。怪不得今天不停地想去按摩，自己独身一人去医院，看眼结石，公司还一堆事，孩子过来又受了委屈，没有压力是假的，原来我自己也有脆弱的一面。",
-            workoutItems: [
-              { name: "合桥", volume: "43 个 x 1 组", rating: 10, note: "" },
-              { name: "单腿深蹲", volume: "20 个 x 1 组", rating: 10, note: "" },
-              { name: "宽距引体向上", volume: "11 个 x 1 组", rating: 10, note: "" },
-              { name: "靠墙倒立", volume: "12 个 x 1 组", rating: 5, note: "今天下雨，手有点滑" },
-              { name: "窄距俯卧撑", volume: "23 个 x 1 组", rating: 10, note: "" },
-              { name: "悬垂举腿", volume: "15 个 x 1 组", rating: 8, note: "肚子太大了，脂肪太多，每次抬腿还是有点吃力" },
-              { name: "拉伸", volume: "10 分钟", rating: 8, note: "" }
-            ]
-          });
-        },
-
         dedupe(entries) {
           const map = new Map();
           entries.forEach((entry) => {
@@ -3147,6 +2880,580 @@
           return [...map.values()].sort((a, b) => a.date.localeCompare(b.date));
         }
       };
+
+      const SyncQueue = {
+        load() {
+          const raw = localStorage.getItem(CONFIG.pendingSyncKey);
+          if (!raw) return [];
+          try {
+            const parsed = JSON.parse(raw);
+            return Array.isArray(parsed) ? parsed : [];
+          } catch (error) {
+            console.error("读取待同步队列失败:", error);
+            return [];
+          }
+        },
+
+        save(queue) {
+          localStorage.setItem(CONFIG.pendingSyncKey, JSON.stringify(queue));
+        },
+
+        add(event) {
+          // 去重：同 id 的事件就地更新，不重复入队
+          const queue = this.load();
+          const existingIndex = queue.findIndex((item) => item.id === event.id);
+          if (existingIndex >= 0) {
+            queue[existingIndex] = event;
+          } else {
+            queue.push(event);
+          }
+          this.save(queue);
+          return queue;
+        },
+
+        removeById(id) {
+          const queue = this.load().filter((item) => item.id !== id);
+          this.save(queue);
+          return queue;
+        },
+
+        filterByDate(date) {
+          return this.load().filter((item) => item.date === date);
+        },
+
+        clearByDate(date) {
+          const queue = this.load().filter((item) => item.date !== date);
+          this.save(queue);
+          return queue;
+        },
+
+        countByDate(date) {
+          return this.filterByDate(date).length;
+        }
+      };
+
+      const PanelManager = {
+        activeType: null,
+
+        open(eventType, options = {}) {
+          this.activeType = eventType;
+          this.render(options);
+        },
+
+        close() {
+          this.activeType = null;
+          this.render();
+        },
+
+        toggle(eventType) {
+          if (this.activeType === eventType) {
+            this.close();
+          } else {
+            this.open(eventType);
+          }
+        },
+
+        render(options = {}) {
+          // 胶囊按钮 active 状态
+          document.querySelectorAll(".capture-pill").forEach((btn) => {
+            btn.classList.toggle("active", btn.dataset.eventType === this.activeType);
+          });
+
+          const container = document.getElementById("capturePanelContainer");
+          if (!container) return;
+
+          if (!this.activeType) {
+            container.innerHTML = "";
+            return;
+          }
+
+          // 调用面板专属的渲染函数（下面 Phase C 各任务里定义）
+          const renderer = PanelRenderers[this.activeType];
+          if (!renderer) {
+            container.innerHTML = `<div class="capture-panel"><p>面板 ${this.activeType} 待实现</p></div>`;
+            return;
+          }
+          container.innerHTML = renderer(options.prefill || null);
+
+          // 调用绑定函数（每个面板自己处理 input/save）
+          const binder = PanelBinders[this.activeType];
+          if (binder) binder(options.prefill || null);
+        }
+      };
+
+      // 每个事件类型的面板渲染器：输入 prefill（可空）→ 返回 HTML 字符串
+      const PanelRenderers = {
+  sleep(prefill) {
+    const p = prefill || {};
+    const today = state.entries.find((e) => e.date === DateUtils.getTodayISO()) || {};
+    return `
+      <div class="capture-panel" data-panel-type="sleep">
+        <h3>😴 记睡眠</h3>
+        <div class="field-row">
+          <div class="field" style="flex:1;min-width:200px">
+            <label>睡眠分 <strong id="sleepPanelScoreValue">${p.sleepScore ?? today.sleepScore ?? 80}</strong></label>
+            <input type="range" id="sleepPanelScore" min="0" max="100" step="1" value="${p.sleepScore ?? today.sleepScore ?? 80}">
+          </div>
+          <div class="field">
+            <label>起夜次数</label>
+            <input type="number" id="sleepPanelWakeups" min="0" max="10" value="${p.wakeups ?? today.wakeups ?? 0}">
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field" style="flex:1">
+            <label>入睡时间</label>
+            <input type="time" id="sleepPanelBedtime" value="${p.bedtime || today.bedtime || '22:00'}">
+          </div>
+          <div class="field" style="flex:1">
+            <label>起床时间</label>
+            <input type="time" id="sleepPanelWakeTime" value="${p.wakeTime || today.wakeTime || '06:00'}">
+          </div>
+        </div>
+        <div class="panel-actions">
+          <button class="btn-primary" id="sleepPanelSave" type="button">💾 保存</button>
+          <label class="immediate-push-check">
+            <input type="checkbox" id="sleepPanelImmediate"> 立刻推到 Obsidian
+          </label>
+        </div>
+        <div class="panel-error" id="sleepPanelError" style="color:#c62828;font-size:12px;margin-top:8px"></div>
+      </div>
+    `;
+  },
+  weight(prefill) {
+  const p = prefill || {};
+  const today = state.entries.find((e) => e.date === DateUtils.getTodayISO()) || {};
+  const defaultWeight = p.weight ?? today.weight ?? CONFIG.currentWeightDefault;
+  return `
+    <div class="capture-panel" data-panel-type="weight">
+      <h3>⚖️ 记体重</h3>
+      <div class="field-row">
+        <div class="field" style="flex:1">
+          <label>今日体重（kg）<strong id="weightPanelValue">${defaultWeight}</strong></label>
+          <input type="range" id="weightPanelSlider" min="70" max="85" step="0.1" value="${defaultWeight}">
+        </div>
+      </div>
+      <div class="panel-actions">
+        <button class="btn-primary" id="weightPanelSave" type="button">💾 保存</button>
+        <label class="immediate-push-check">
+          <input type="checkbox" id="weightPanelImmediate"> 立刻推到 Obsidian
+        </label>
+      </div>
+      <div class="panel-error" id="weightPanelError" style="color:#c62828;font-size:12px;margin-top:8px"></div>
+    </div>
+  `;
+},
+  meal(prefill) {
+  const p = prefill?.data || {};
+  const time = prefill?.time || DateUtils.getCurrentTimeString();
+  return `
+    <div class="capture-panel" data-panel-type="meal">
+      <h3>🍱 记一餐</h3>
+      <div class="field-row">
+        <div class="field">
+          <label>时间</label>
+          <input type="time" id="mealPanelTime" value="${time}">
+        </div>
+        <div class="field" style="flex:1">
+          <label>餐次</label>
+          <select id="mealPanelType">
+            <option value="早餐" ${p.type === "早餐" ? "selected" : ""}>早餐</option>
+            <option value="上午餐" ${p.type === "上午餐" ? "selected" : ""}>上午餐</option>
+            <option value="午餐" ${!p.type || p.type === "午餐" ? "selected" : ""}>午餐</option>
+            <option value="加餐" ${p.type === "加餐" ? "selected" : ""}>加餐</option>
+            <option value="晚餐" ${p.type === "晚餐" ? "selected" : ""}>晚餐</option>
+            <option value="其他" ${p.type === "其他" ? "selected" : ""}>其他</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label>吃了什么</label>
+        <textarea id="mealPanelFood" placeholder="例如：牛肉 青菜 米饭" rows="2">${p.food || ""}</textarea>
+      </div>
+      <div class="field-row">
+        <label class="meal-tag-check"><input type="checkbox" id="mealPanelCooked" ${p.cooked !== false ? "checked" : ""}> 自己做</label>
+        <label class="meal-tag-check"><input type="checkbox" id="mealPanelHealthy" ${p.healthy !== false ? "checked" : ""}> 健康营养</label>
+        <label class="meal-tag-check"><input type="checkbox" id="mealPanelAteOut" ${p.ateOut ? "checked" : ""}> 外食</label>
+      </div>
+      <div class="panel-actions">
+        <button class="btn-primary" id="mealPanelSave" type="button">💾 保存</button>
+        <label class="immediate-push-check">
+          <input type="checkbox" id="mealPanelImmediate"> 立刻推到 Obsidian
+        </label>
+      </div>
+      <div class="panel-error" id="mealPanelError" style="color:#c62828;font-size:12px;margin-top:8px"></div>
+    </div>
+  `;
+},
+  recovery(prefill) {
+  const p = prefill?.data || {};
+  const time = prefill?.time || DateUtils.getCurrentTimeString();
+  return `
+    <div class="capture-panel" data-panel-type="recovery">
+      <h3>🛋 记补能</h3>
+      <div class="field-row">
+        <div class="field">
+          <label>时间</label>
+          <input type="time" id="recoveryPanelTime" value="${time}">
+        </div>
+        <div class="field" style="flex:1">
+          <label>类型</label>
+          <select id="recoveryPanelType">
+            <option value="午睡" ${!p.type || p.type === "午睡" ? "selected" : ""}>午睡</option>
+            <option value="按摩" ${p.type === "按摩" ? "selected" : ""}>按摩</option>
+            <option value="冥想" ${p.type === "冥想" ? "selected" : ""}>冥想</option>
+            <option value="散步" ${p.type === "散步" ? "selected" : ""}>散步</option>
+            <option value="其他补能" ${p.type === "其他补能" ? "selected" : ""}>其他补能</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>补能加分（%）</label>
+          <input type="number" id="recoveryPanelBoost" min="1" max="40" step="1" value="${p.boost ?? 10}">
+        </div>
+      </div>
+      <div class="field">
+        <label>备注</label>
+        <input type="text" id="recoveryPanelNote" placeholder="例如：睡了 25 分钟，醒来舒服很多" value="${p.note || ""}">
+      </div>
+      <div class="panel-actions">
+        <button class="btn-primary" id="recoveryPanelSave" type="button">💾 保存</button>
+        <label class="immediate-push-check">
+          <input type="checkbox" id="recoveryPanelImmediate"> 立刻推到 Obsidian
+        </label>
+      </div>
+      <div class="panel-error" id="recoveryPanelError" style="color:#c62828;font-size:12px;margin-top:8px"></div>
+    </div>
+  `;
+},
+  training(prefill) {
+  const p = prefill?.data || {};
+  const today = state.entries.find((e) => e.date === DateUtils.getTodayISO()) || {};
+  const existingItems = p.workoutItems || today.workoutItems || [];
+  return `
+    <div class="capture-panel" data-panel-type="training">
+      <h3>💪 记训练</h3>
+      <div class="panel-actions" style="margin-bottom:12px">
+        <button class="btn-secondary btn-slim" id="trainingLoadTemplatesBtn" type="button">一键导入常用七项</button>
+        <button class="btn-secondary btn-slim" id="trainingClearBtn" type="button">清空</button>
+      </div>
+      <div id="trainingItemsList" style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px">
+        ${existingItems.map((it, idx) => `
+          <div class="training-item-row" data-idx="${idx}" style="display:flex;gap:6px;align-items:center">
+            <input type="text" class="tr-name" value="${it.name || ""}" placeholder="动作" style="flex:1">
+            <input type="text" class="tr-volume" value="${it.volume || ""}" placeholder="组数" style="flex:1">
+            <input type="number" class="tr-rating" value="${it.rating || 8}" min="0" max="10" style="width:60px">
+            <button class="btn-warning btn-slim" type="button" data-action="remove-tr-item">×</button>
+          </div>
+        `).join("")}
+      </div>
+      <button class="btn-secondary btn-slim" id="trainingAddItemBtn" type="button" style="margin-bottom:12px">+ 添加动作</button>
+      <div class="panel-actions">
+        <button class="btn-primary" id="trainingPanelSave" type="button">💾 保存</button>
+        <label class="immediate-push-check">
+          <input type="checkbox" id="trainingPanelImmediate"> 立刻推到 Obsidian
+        </label>
+      </div>
+      <div class="panel-error" id="trainingPanelError" style="color:#c62828;font-size:12px;margin-top:8px"></div>
+    </div>
+  `;
+},
+  reflection(prefill) {
+  const p = prefill?.data || {};
+  const today = state.entries.find((e) => e.date === DateUtils.getTodayISO()) || {};
+  return `
+    <div class="capture-panel" data-panel-type="reflection">
+      <h3>🌙 睡前复盘</h3>
+      <div class="field-row">
+        <div class="field" style="flex:1">
+          <label>睡前状态</label>
+          <select id="reflectionPanelMood">
+            <option value="平静" ${(!p.mood && !today.mood) || p.mood === "平静" || today.mood === "平静" ? "selected" : ""}>平静</option>
+            <option value="满足" ${p.mood === "满足" || today.mood === "满足" ? "selected" : ""}>满足</option>
+            <option value="疲惫" ${p.mood === "疲惫" || today.mood === "疲惫" ? "selected" : ""}>疲惫</option>
+            <option value="焦虑" ${p.mood === "焦虑" || today.mood === "焦虑" ? "selected" : ""}>焦虑</option>
+            <option value="感恩" ${p.mood === "感恩" || today.mood === "感恩" ? "selected" : ""}>感恩</option>
+            <option value="其他" ${p.mood === "其他" || today.mood === "其他" ? "selected" : ""}>其他</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>今日整体能量（1-10）</label>
+          <input type="number" id="reflectionPanelEnergy" min="1" max="10" value="${p.energy ?? today.energy ?? 7}">
+        </div>
+      </div>
+      <div class="field">
+        <label>想复盘什么</label>
+        <textarea id="reflectionPanelStory" rows="5" placeholder="例如：今天哪里做得不错，哪里消耗了能量，明天醒来最重要的一件事。">${p.dailyStory ?? today.dailyStory ?? ""}</textarea>
+      </div>
+      <div class="panel-actions">
+        <button class="btn-primary" id="reflectionPanelSave" type="button">💾 保存</button>
+        <label class="immediate-push-check">
+          <input type="checkbox" id="reflectionPanelImmediate"> 立刻推到 Obsidian
+        </label>
+      </div>
+      <div class="panel-error" id="reflectionPanelError" style="color:#c62828;font-size:12px;margin-top:8px"></div>
+    </div>
+  `;
+},
+  mood(prefill) {
+  const p = prefill?.data || {};
+  const time = prefill?.time || DateUtils.getCurrentTimeString();
+  const selectedTag = p.tag || "🙂";
+  const tags = ["😫", "😕", "😐", "🙂", "😄", "🤔", "😡", "🥺"];
+  return `
+    <div class="capture-panel" data-panel-type="mood">
+      <h3>💭 记心情</h3>
+      <div class="field-row">
+        <div class="field">
+          <label>时间</label>
+          <input type="time" id="moodPanelTime" value="${time}">
+        </div>
+      </div>
+      <div class="field">
+        <label>此刻心情</label>
+        <div id="moodPanelTagGroup" style="display:flex;gap:6px;flex-wrap:wrap">
+          ${tags.map((tag) => `
+            <button type="button" class="mood-tag-btn${tag === selectedTag ? ' active' : ''}" data-tag="${tag}"
+                    style="font-size:22px;padding:8px 14px;border:1px solid ${tag === selectedTag ? 'var(--accent)' : 'var(--line)'};background:${tag === selectedTag ? 'var(--accent-soft)' : 'var(--bg)'};border-radius:12px;cursor:pointer">${tag}</button>
+          `).join("")}
+        </div>
+      </div>
+      <div class="field">
+        <label>想说什么（可选）</label>
+        <input type="text" id="moodPanelNote" placeholder="例如：会议太多，没时间深度工作" value="${p.note || ""}">
+      </div>
+      <div class="panel-actions">
+        <button class="btn-primary" id="moodPanelSave" type="button">💾 保存</button>
+        <label class="immediate-push-check">
+          <input type="checkbox" id="moodPanelImmediate"> 立刻推到 Obsidian
+        </label>
+      </div>
+      <div class="panel-error" id="moodPanelError" style="color:#c62828;font-size:12px;margin-top:8px"></div>
+    </div>
+  `;
+}
+};
+
+      // 每个事件类型的面板事件绑定器：prefill 同上 → 给面板里的元素绑事件
+      const PanelBinders = {
+  sleep(prefill) {
+    document.getElementById("sleepPanelScore").addEventListener("input", (e) => {
+      document.getElementById("sleepPanelScoreValue").textContent = e.target.value;
+    });
+    document.getElementById("sleepPanelSave").addEventListener("click", () => {
+      const data = {
+        sleepScore: Number(document.getElementById("sleepPanelScore").value),
+        bedtime: document.getElementById("sleepPanelBedtime").value,
+        wakeTime: document.getElementById("sleepPanelWakeTime").value,
+        wakeups: Number(document.getElementById("sleepPanelWakeups").value)
+      };
+      const err = EventModel.types.sleep.validate(data);
+      if (err) {
+        document.getElementById("sleepPanelError").textContent = err;
+        return;
+      }
+      const event = prefill
+        ? { ...prefill, data, capturedAt: Date.now() }
+        : EventModel.buildQueueItem("sleep", DateUtils.getTodayISO(), DateUtils.getCurrentTimeString(), data);
+      App.applyEvent(event);
+      if (document.getElementById("sleepPanelImmediate").checked) {
+        App.pushEventsToObsidian([event]);
+      }
+      UI.showStatus(`已保存：😴 睡眠`);
+      PanelManager.close();
+    });
+  },
+  weight(prefill) {
+  document.getElementById("weightPanelSlider").addEventListener("input", (e) => {
+    document.getElementById("weightPanelValue").textContent = Number(e.target.value).toFixed(1);
+  });
+  document.getElementById("weightPanelSave").addEventListener("click", () => {
+    const data = { weight: Number(document.getElementById("weightPanelSlider").value) };
+    const err = EventModel.types.weight.validate(data);
+    if (err) {
+      document.getElementById("weightPanelError").textContent = err;
+      return;
+    }
+    const event = prefill
+      ? { ...prefill, data, capturedAt: Date.now() }
+      : EventModel.buildQueueItem("weight", DateUtils.getTodayISO(), DateUtils.getCurrentTimeString(), data);
+    App.applyEvent(event);
+    if (document.getElementById("weightPanelImmediate").checked) {
+      App.pushEventsToObsidian([event]);
+    }
+    UI.showStatus(`已保存：⚖️ 体重`);
+    PanelManager.close();
+  });
+},
+  meal(prefill) {
+  document.getElementById("mealPanelSave").addEventListener("click", () => {
+    const data = {
+      time: document.getElementById("mealPanelTime").value,
+      type: document.getElementById("mealPanelType").value,
+      food: document.getElementById("mealPanelFood").value.trim(),
+      cooked: document.getElementById("mealPanelCooked").checked,
+      healthy: document.getElementById("mealPanelHealthy").checked,
+      ateOut: document.getElementById("mealPanelAteOut").checked
+    };
+    const err = EventModel.types.meal.validate(data);
+    if (err) {
+      document.getElementById("mealPanelError").textContent = err;
+      return;
+    }
+    const event = prefill
+      ? { ...prefill, time: data.time, data, capturedAt: Date.now() }
+      : EventModel.buildQueueItem("meal", DateUtils.getTodayISO(), data.time, data);
+    App.applyEvent(event);
+    if (document.getElementById("mealPanelImmediate").checked) {
+      App.pushEventsToObsidian([event]);
+    }
+    UI.showStatus(`已保存：🍱 ${data.type}`);
+    PanelManager.close();
+  });
+},
+  recovery(prefill) {
+  document.getElementById("recoveryPanelSave").addEventListener("click", () => {
+    const data = {
+      time: document.getElementById("recoveryPanelTime").value,
+      type: document.getElementById("recoveryPanelType").value,
+      boost: Number(document.getElementById("recoveryPanelBoost").value),
+      note: document.getElementById("recoveryPanelNote").value.trim()
+    };
+    const err = EventModel.types.recovery.validate(data);
+    if (err) {
+      document.getElementById("recoveryPanelError").textContent = err;
+      return;
+    }
+    const event = prefill
+      ? { ...prefill, time: data.time, data, capturedAt: Date.now() }
+      : EventModel.buildQueueItem("recovery", DateUtils.getTodayISO(), data.time, data);
+    App.applyEvent(event);
+    if (document.getElementById("recoveryPanelImmediate").checked) {
+      App.pushEventsToObsidian([event]);
+    }
+    UI.showStatus(`已保存：🛋 ${data.type}`);
+    PanelManager.close();
+  });
+},
+  training(prefill) {
+  const list = document.getElementById("trainingItemsList");
+
+  function renderRow(item) {
+    const row = document.createElement("div");
+    row.className = "training-item-row";
+    row.style.cssText = "display:flex;gap:6px;align-items:center";
+    row.innerHTML = `
+      <input type="text" class="tr-name" value="${item.name || ""}" placeholder="动作" style="flex:1">
+      <input type="text" class="tr-volume" value="${item.volume || ""}" placeholder="组数" style="flex:1">
+      <input type="number" class="tr-rating" value="${item.rating || 8}" min="0" max="10" style="width:60px">
+      <button class="btn-warning btn-slim" type="button" data-action="remove-tr-item">×</button>
+    `;
+    list.appendChild(row);
+  }
+
+  document.getElementById("trainingLoadTemplatesBtn").addEventListener("click", () => {
+    list.innerHTML = "";
+    CONFIG.workoutTemplates.forEach((tpl) => renderRow({ name: tpl.name, volume: tpl.volume, rating: tpl.rating, note: tpl.note }));
+  });
+
+  document.getElementById("trainingClearBtn").addEventListener("click", () => {
+    list.innerHTML = "";
+  });
+
+  document.getElementById("trainingAddItemBtn").addEventListener("click", () => {
+    renderRow({ name: "", volume: "", rating: 8, note: "" });
+  });
+
+  list.addEventListener("click", (event) => {
+    const btn = event.target.closest("[data-action='remove-tr-item']");
+    if (!btn) return;
+    btn.parentElement.remove();
+  });
+
+  document.getElementById("trainingPanelSave").addEventListener("click", () => {
+    const rows = list.querySelectorAll(".training-item-row");
+    const workoutItems = Array.from(rows).map((row) => ({
+      name: row.querySelector(".tr-name").value.trim(),
+      volume: row.querySelector(".tr-volume").value.trim(),
+      rating: Number(row.querySelector(".tr-rating").value) || 0,
+      note: ""
+    })).filter((it) => it.name);
+
+    const data = { workoutItems };
+    const err = EventModel.types.training.validate(data);
+    if (err) {
+      document.getElementById("trainingPanelError").textContent = err;
+      return;
+    }
+    const event = prefill
+      ? { ...prefill, data, capturedAt: Date.now() }
+      : EventModel.buildQueueItem("training", DateUtils.getTodayISO(), DateUtils.getCurrentTimeString(), data);
+    App.applyEvent(event);
+    if (document.getElementById("trainingPanelImmediate").checked) {
+      App.pushEventsToObsidian([event]);
+    }
+    UI.showStatus(`已保存：💪 训练 (${workoutItems.length} 个动作)`);
+    PanelManager.close();
+  });
+},
+  reflection(prefill) {
+  document.getElementById("reflectionPanelSave").addEventListener("click", () => {
+    const data = {
+      mood: document.getElementById("reflectionPanelMood").value,
+      energy: Number(document.getElementById("reflectionPanelEnergy").value),
+      dailyStory: document.getElementById("reflectionPanelStory").value.trim()
+    };
+    const err = EventModel.types.reflection.validate(data);
+    if (err) {
+      document.getElementById("reflectionPanelError").textContent = err;
+      return;
+    }
+    const event = prefill
+      ? { ...prefill, data, capturedAt: Date.now() }
+      : EventModel.buildQueueItem("reflection", DateUtils.getTodayISO(), DateUtils.getCurrentTimeString(), data);
+    App.applyEvent(event);
+    if (document.getElementById("reflectionPanelImmediate").checked) {
+      App.pushEventsToObsidian([event]);
+    }
+    UI.showStatus(`已保存：🌙 复盘`);
+    PanelManager.close();
+  });
+},
+  mood(prefill) {
+  let selectedTag = prefill?.data?.tag || "🙂";
+  document.getElementById("moodPanelTagGroup").addEventListener("click", (event) => {
+    const btn = event.target.closest(".mood-tag-btn");
+    if (!btn) return;
+    selectedTag = btn.dataset.tag;
+    document.querySelectorAll(".mood-tag-btn").forEach((b) => {
+      const active = b.dataset.tag === selectedTag;
+      b.classList.toggle("active", active);
+      b.style.border = `1px solid ${active ? "var(--accent)" : "var(--line)"}`;
+      b.style.background = active ? "var(--accent-soft)" : "var(--bg)";
+    });
+  });
+
+  document.getElementById("moodPanelSave").addEventListener("click", () => {
+    const data = {
+      time: document.getElementById("moodPanelTime").value,
+      tag: selectedTag,
+      note: document.getElementById("moodPanelNote").value.trim()
+    };
+    const err = EventModel.types.mood.validate(data);
+    if (err) {
+      document.getElementById("moodPanelError").textContent = err;
+      return;
+    }
+    const event = prefill
+      ? { ...prefill, time: data.time, data, capturedAt: Date.now() }
+      : EventModel.buildQueueItem("mood", DateUtils.getTodayISO(), data.time, data);
+    App.applyEvent(event);
+    if (document.getElementById("moodPanelImmediate").checked) {
+      App.pushEventsToObsidian([event]);
+    }
+    UI.showStatus(`已保存：💭 ${data.tag}`);
+    PanelManager.close();
+  });
+}
+};
 
       const StorageService = {
         loadEntries() {
@@ -3191,15 +3498,6 @@
           const hasSeeded = localStorage.getItem(CONFIG.seededKey) === "true";
           if (existingEntries.length > 0 || hasSeeded) return existingEntries;
           return this.saveEntries(EntryModel.getDefaultSeedEntries());
-        },
-
-        ensureBootstrapTodayEntry() {
-          const existingEntries = this.loadEntries();
-          const hasTodayEntry = existingEntries.some((entry) => entry.date === "2026-04-22");
-          if (hasTodayEntry) return existingEntries;
-
-          const nextEntries = [...existingEntries, EntryModel.getBootstrapTodayEntry()];
-          return this.saveEntries(nextEntries);
         },
 
         clearAll() {
@@ -3755,331 +4053,11 @@
             .replaceAll("'", "&#39;");
         },
 
-        setFormMode(text) {
-          elements.formModeLabel.textContent = text;
-        },
-
         formatWeight(weight) {
           if (weight === null || weight === undefined || weight === "") return "未记录";
           const numericWeight = Number(weight);
           if (!Number.isFinite(numericWeight)) return "未记录";
           return `${Number.isInteger(numericWeight) ? numericWeight.toFixed(0) : numericWeight.toFixed(1)} kg`;
-        },
-
-        syncSleepScoreSlider() {
-          elements.sleepScoreValue.textContent = `${elements.form.sleepScore.value} 分`;
-        },
-
-        syncWeightSlider() {
-          elements.weightValue.textContent = `${Number(elements.weightSlider.value).toFixed(1)} kg`;
-        },
-
-        syncEnergyBoostSlider() {
-          elements.energyBoostValue.textContent = `+${Number(elements.energyBoostSlider.value).toFixed(0)}%`;
-        },
-
-        syncBedtimeSlider() {
-          const timeString = DateUtils.bedtimeSliderToTimeString(elements.bedtimeSlider.value);
-          elements.form.bedtime.value = timeString;
-          elements.bedtimeValue.textContent = timeString;
-        },
-
-        syncWakeTimeSlider() {
-          const timeString = DateUtils.minutesToTimeString(elements.wakeTimeSlider.value);
-          elements.form.wakeTime.value = timeString;
-          elements.wakeTimeValue.textContent = timeString;
-        },
-
-        syncAllSliders() {
-          this.syncSleepScoreSlider();
-          this.syncWeightSlider();
-          this.syncEnergyBoostSlider();
-          this.syncBedtimeSlider();
-          this.syncWakeTimeSlider();
-        },
-
-        createWorkoutItemElement(item = {}) {
-          const workoutItem = WorkoutModel.normalize(item);
-          const wrapper = document.createElement("div");
-          wrapper.className = "workout-item";
-          wrapper.innerHTML = `
-            <div class="field">
-              <label>训练项目</label>
-              <input type="text" data-field="name" placeholder="例如：宽距引体向上" value="${this.escapeHtml(workoutItem.name)}" />
-            </div>
-            <div class="field">
-              <label>组数 / 数量</label>
-              <input type="text" data-field="volume" placeholder="例如：15 个 x 1 组" value="${this.escapeHtml(workoutItem.volume)}" />
-            </div>
-            <div class="field">
-              <label>状态自评</label>
-              <input type="number" data-field="rating" min="1" max="10" placeholder="1-10" value="${workoutItem.rating ?? ""}" />
-            </div>
-            <div class="workout-item-actions">
-              <button class="btn-warning btn-slim" type="button" data-action="remove-workout-item">移除</button>
-            </div>
-            <div class="field full workout-note-field">
-              <label>训练备注</label>
-              <input type="text" data-field="note" placeholder="身体感受、痛点、突破都可以记这里" value="${this.escapeHtml(workoutItem.note)}" />
-            </div>
-          `;
-          return wrapper;
-        },
-
-        renderWorkoutTemplates() {
-          elements.workoutTemplateGrid.innerHTML = WorkoutModel.getTemplates()
-            .map((item) => `
-              <div class="template-card">
-                <div class="template-card-title">${this.escapeHtml(item.name)}</div>
-                ${item.templateEditable ? `
-                  <div class="template-adjuster">
-                    <button class="template-stepper" type="button" data-action="step-template-quantity" data-template-name="${this.escapeHtml(item.name)}" data-step="-1" aria-label="减少 ${this.escapeHtml(item.name)} 数量">-</button>
-                    <input
-                      class="template-count-input"
-                      type="number"
-                      min="${item.templateMin}"
-                      step="${item.templateStep}"
-                      value="${item.templateQuantity}"
-                      data-action="template-count-input"
-                      data-template-name="${this.escapeHtml(item.name)}"
-                      aria-label="${this.escapeHtml(item.name)} 数量"
-                    />
-                    <span class="template-unit">${this.escapeHtml(item.templateSuffix || "次")}</span>
-                    <button class="template-stepper" type="button" data-action="step-template-quantity" data-template-name="${this.escapeHtml(item.name)}" data-step="1" aria-label="增加 ${this.escapeHtml(item.name)} 数量">+</button>
-                  </div>
-                ` : `
-                  <div class="template-card-subtitle">${this.escapeHtml(item.volume)}</div>
-                `}
-                <button class="btn-secondary btn-slim template-add-btn" type="button" data-action="add-workout-template" data-template-name="${this.escapeHtml(item.name)}">加入今天</button>
-              </div>
-            `)
-            .join("");
-        },
-
-        updateTemplateQuantity(templateName, nextValue) {
-          const template = WorkoutModel.getTemplateByName(templateName);
-          if (!template || !template.templateEditable) return null;
-
-          const parsedValue = Number(nextValue);
-          const fallbackValue = template.templateQuantity || template.templateMin || 1;
-          const safeValue = Number.isFinite(parsedValue) && parsedValue > 0 ? parsedValue : fallbackValue;
-          const roundedValue = template.templateStep >= 1
-            ? Math.round(safeValue)
-            : Math.round(safeValue / template.templateStep) * template.templateStep;
-          const nextQuantity = Math.max(template.templateMin || template.templateStep || 1, roundedValue);
-
-          state.templateSettings = StorageService.saveTemplateSettings({
-            ...state.templateSettings,
-            [templateName]: nextQuantity
-          });
-          this.renderWorkoutTemplates();
-          return nextQuantity;
-        },
-
-        nudgeTemplateQuantity(templateName, delta) {
-          const template = WorkoutModel.getTemplateByName(templateName);
-          if (!template || !template.templateEditable) return null;
-          const nextValue = (template.templateQuantity || template.templateMin || 1) + Number(delta || 0) * template.templateStep;
-          return this.updateTemplateQuantity(templateName, nextValue);
-        },
-
-        getWorkoutItemsFromEditor() {
-          return [...elements.workoutItemsEditor.querySelectorAll(".workout-item")]
-            .map((item) => WorkoutModel.normalize({
-              name: item.querySelector('[data-field="name"]').value,
-              volume: item.querySelector('[data-field="volume"]').value,
-              rating: item.querySelector('[data-field="rating"]').value,
-              note: item.querySelector('[data-field="note"]').value
-            }))
-            .filter((item) => WorkoutModel.isMeaningful(item));
-        },
-
-        renderWorkoutEditor(items = []) {
-          elements.workoutItemsEditor.innerHTML = "";
-          WorkoutModel.normalizeItems(items).forEach((item) => {
-            elements.workoutItemsEditor.appendChild(this.createWorkoutItemElement(item));
-          });
-          this.refreshWorkoutMeta();
-        },
-
-        addWorkoutItem(item = {}) {
-          elements.workoutItemsEditor.appendChild(this.createWorkoutItemElement(item));
-          document.getElementById("exerciseYes").checked = true;
-          this.refreshWorkoutMeta();
-        },
-
-        addWorkoutTemplateByName(templateName) {
-          const template = WorkoutModel.getTemplateWorkoutItem(templateName);
-          if (!template) return;
-          this.addWorkoutItem(template);
-        },
-
-        addWorkoutRoutine() {
-          const currentItems = this.getWorkoutItemsFromEditor();
-          const nextItems = WorkoutModel.getTemplates()
-            .filter((template) => !WorkoutModel.hasSameTemplate(currentItems, template.name))
-            .map((template) => WorkoutModel.getTemplateWorkoutItem(template.name))
-            .filter(Boolean);
-          nextItems.forEach((item) => {
-            elements.workoutItemsEditor.appendChild(this.createWorkoutItemElement(item));
-          });
-          if (nextItems.length) {
-            document.getElementById("exerciseYes").checked = true;
-          }
-          this.refreshWorkoutMeta();
-          return nextItems.length;
-        },
-
-        clearWorkoutEditor() {
-          elements.workoutItemsEditor.innerHTML = "";
-          this.refreshWorkoutMeta();
-        },
-
-        refreshWorkoutMeta() {
-          const workoutItems = this.getWorkoutItemsFromEditor();
-          const isExerciseChecked = document.getElementById("exerciseYes").checked;
-          const wasHidden = elements.workoutDetailField.hidden;
-          elements.workoutDetailField.hidden = !isExerciseChecked;
-          if (isExerciseChecked && wasHidden) {
-            elements.workoutDetailsPanel.open = true;
-          }
-          elements.workoutEmptyState.style.display = workoutItems.length ? "none" : "block";
-
-          if (workoutItems.length) {
-            const averageRating = WorkoutModel.getAverageRating(workoutItems);
-            elements.workoutMetaLabel.textContent = averageRating === null
-              ? `已记录 ${workoutItems.length} 个训练项目`
-              : `已记录 ${workoutItems.length} 个训练项目，平均状态 ${averageRating.toFixed(1)}`;
-            return;
-          }
-
-          elements.workoutMetaLabel.textContent = isExerciseChecked
-            ? "已展开今日训练模板"
-            : "选择训练后再记录动作";
-        },
-
-        refreshMealDetails() {
-          const isCookedChecked = document.getElementById("cookedYes").checked;
-          elements.mealDetailField.hidden = !isCookedChecked;
-        },
-
-        resetAppendInputs() {
-          const currentTime = DateUtils.getCurrentTimeString();
-          elements.mealLogTime.value = currentTime;
-          elements.recoveryLogTime.value = currentTime;
-          elements.mealLogFood.value = "";
-          elements.mealLogCooked.checked = true;
-          elements.mealLogHealthy.checked = true;
-          elements.mealLogAteOut.checked = false;
-          elements.recoveryLogType.value = "午睡";
-          elements.recoveryLogBoost.value = 10;
-          elements.recoveryLogNote.value = "";
-          elements.nightReviewTime.value = currentTime;
-          elements.nightReviewMood.value = "平静";
-          elements.nightReviewText.value = "";
-          this.refreshMealLogPreview();
-        },
-
-        refreshMealLogPreview() {
-          const typeText = elements.mealLogType.value || "这一餐";
-          const foodText = elements.mealLogFood.value.trim() || "还没填写食物";
-          const tags = [
-            elements.mealLogCooked.checked ? "自己做" : "非自己做",
-            elements.mealLogHealthy.checked ? "健康营养" : "营养未确认",
-            elements.mealLogAteOut.checked ? "外食" : "非外食"
-          ];
-          elements.mealLogPreview.textContent = `${typeText}：${foodText}｜${tags.join(" / ")}`;
-        },
-
-        renderDailyAppendList(entries = state.entries) {
-          const todayEntry = entries.find((entry) => entry.date === DateUtils.getTodayISO());
-          const mealItems = EntryModel.normalizeMealItems(todayEntry?.mealItems || []);
-          const recoveryItems = EntryModel.normalizeRecoveryItems(todayEntry?.recoveryItems || []);
-          const rows = [];
-
-          mealItems.forEach((item) => {
-            rows.push(`
-              <div class="daily-log-item">
-                <strong>${this.escapeHtml(item.time || "未记时间")} ${this.escapeHtml(item.type)}</strong>
-                ${this.escapeHtml(item.food)}
-                ${item.cooked ? " / 自己做" : ""}
-                ${item.healthy ? " / 健康" : ""}
-                ${item.ateOut ? " / 外食" : ""}
-                ${item.note ? `<br />${this.escapeHtml(item.note)}` : ""}
-              </div>
-            `);
-          });
-
-          recoveryItems.forEach((item) => {
-            rows.push(`
-              <div class="daily-log-item">
-                <strong>${this.escapeHtml(item.time || "未记时间")} ${this.escapeHtml(item.type)}</strong>
-                补能 +${Number(item.boost || 0).toFixed(0)}%
-                ${item.note ? `<br />${this.escapeHtml(item.note)}` : ""}
-              </div>
-            `);
-          });
-
-          elements.dailyAppendList.innerHTML = rows.length
-            ? rows.join("")
-            : '<div class="daily-log-item">今天还没有追加餐食或补能。先保存早上的主记录，后面就可以只追加小事件。</div>';
-        },
-
-        resetForm() {
-          elements.form.reset();
-          elements.form.entryDate.value = DateUtils.getTodayISO();
-          elements.form.sleepScore.value = 80;
-          elements.weightSlider.value = CONFIG.currentWeightDefault;
-          elements.energyBoostSlider.value = 0;
-          elements.bedtimeSlider.value = 22 * 60;
-          elements.wakeTimeSlider.value = 6 * 60;
-          elements.form.deepWorkTasks.value = "";
-          elements.form.adminTasks.value = "";
-          elements.form.morningEnergy.value = "";
-          elements.form.afternoonEnergy.value = "";
-          elements.form.eveningEnergy.value = "";
-          elements.form.mealDetails.value = "";
-          elements.form.dailyStory.value = "";
-          document.getElementById("exerciseNo").checked = true;
-          document.getElementById("cookedNo").checked = true;
-          document.getElementById("healthyFoodNo").checked = true;
-          document.getElementById("ateOutNo").checked = true;
-          this.clearWorkoutEditor();
-          this.refreshMealDetails();
-          this.resetAppendInputs();
-          this.renderDailyAppendList();
-          this.syncAllSliders();
-          this.setFormMode("保存或更新当天记录");
-        },
-
-        fillForm(entry, options = {}) {
-          elements.form.entryDate.value = entry.date;
-          elements.form.sleepScore.value = entry.sleepScore;
-          elements.bedtimeSlider.value = DateUtils.bedtimeTimeStringToSliderValue(entry.bedtime);
-          elements.wakeTimeSlider.value = DateUtils.timeToMinutes(entry.wakeTime) ?? 6 * 60;
-          elements.form.wakeups.value = entry.wakeups;
-          elements.form.energy.value = entry.energy;
-          elements.weightSlider.value = entry.weight ?? CONFIG.currentWeightDefault;
-          elements.energyBoostSlider.value = entry.energyBoost ?? 0;
-          elements.form.deepWorkTasks.value = entry.deepWorkTasks ?? 0;
-          elements.form.adminTasks.value = entry.adminTasks ?? 0;
-          elements.form.morningEnergy.value = entry.morningEnergy ?? "";
-          elements.form.afternoonEnergy.value = entry.afternoonEnergy ?? "";
-          elements.form.eveningEnergy.value = entry.eveningEnergy ?? "";
-          elements.form.mealDetails.value = entry.mealDetails || "";
-          elements.form.mood.value = entry.mood || "";
-          elements.form.dailyStory.value = entry.dailyStory || "";
-          document.getElementById(EntryModel.isExerciseDay(entry) ? "exerciseYes" : "exerciseNo").checked = true;
-          document.getElementById(entry.cooked ? "cookedYes" : "cookedNo").checked = true;
-          document.getElementById(entry.healthyFood ? "healthyFoodYes" : "healthyFoodNo").checked = true;
-          document.getElementById(entry.ateOut ? "ateOutYes" : "ateOutNo").checked = true;
-          this.renderWorkoutEditor(entry.workoutItems || []);
-          this.refreshMealDetails();
-          this.syncAllSliders();
-          this.setFormMode(`正在编辑：${DateUtils.formatShortDate(entry.date)}`);
-          if (options.scroll !== false) {
-            window.scrollTo({ top: 0, behavior: "smooth" });
-          }
         },
 
         renderGrowthDashboard(entries, latestEntry) {
@@ -4191,70 +4169,6 @@
           elements.heroBatteryDrain.textContent = `基于 ${battery.sourceLabel}，6:00 后已过 ${battery.elapsedHours.toFixed(1)}h`;
           elements.heroBatteryRule.textContent = `睡眠${battery.sleepBase} + 补能${battery.recoveryBonus} + 营养${battery.nutritionBonus} - 熵增${battery.entropyDrain.toFixed(1)}`;
           elements.heroBatteryZone.textContent = battery.zoneText;
-        },
-
-        getTodayMainRecordStatus(entries) {
-          const todayEntry = entries.find((entry) => entry.date === DateUtils.getTodayISO()) || null;
-          if (!todayEntry) {
-            return {
-              todayEntry: null,
-              chips: [
-                { label: "主记录未保存", done: false },
-                { label: "餐食待追加", done: false },
-                { label: "补能待追加", done: false },
-                { label: "睡前复盘待追加", done: false }
-              ],
-              missing: ["主记录", "餐食", "午睡/补能", "睡前复盘"]
-            };
-          }
-
-          const hasMeals = EntryModel.normalizeMealItems(todayEntry.mealItems || []).length > 0;
-          const hasRecovery = EntryModel.normalizeRecoveryItems(todayEntry.recoveryItems || []).length > 0;
-          const hasNightReview = /睡前复盘/.test(todayEntry.dailyStory || "");
-          const chips = [
-            { label: "主记录已保存", done: true },
-            { label: hasMeals ? "餐食已追加" : "餐食待追加", done: hasMeals },
-            { label: hasRecovery ? "补能已追加" : "补能待追加", done: hasRecovery },
-            { label: hasNightReview ? "睡前复盘已追加" : "睡前复盘待追加", done: hasNightReview }
-          ];
-          const missing = chips.filter((item) => !item.done).map((item) => item.label.replace("待追加", "").replace("未保存", ""));
-          return { todayEntry, chips, missing };
-        },
-
-        renderMainRecordStatus(entries) {
-          const status = this.getTodayMainRecordStatus(entries);
-          const shouldCollapseMain = Boolean(status.todayEntry) && !state.mainRecordExpanded;
-
-          elements.form.classList.toggle("main-record-collapsed", shouldCollapseMain);
-          elements.mainRecordProgress.innerHTML = status.chips
-            .map((item) => `<span class="progress-chip ${item.done ? "done" : "todo"}">${this.escapeHtml(item.label)}</span>`)
-            .join("");
-
-          if (!status.todayEntry) {
-            elements.mainRecordStatusTitle.textContent = "今日主记录还没保存";
-            elements.mainRecordStatusText.textContent = "先把睡眠、体重、训练等基础信息保存一次，后面就只追加餐食、补能和睡前复盘。";
-            elements.toggleMainRecordBtn.textContent = "开始填写主记录";
-            state.mainRecordExpanded = true;
-            elements.form.classList.remove("main-record-collapsed");
-            return;
-          }
-
-          elements.mainRecordStatusTitle.textContent = shouldCollapseMain
-            ? "今日主记录已保存，基础表单已收起"
-            : "正在查看/修改今日主记录";
-          elements.mainRecordStatusText.textContent = status.missing.length
-            ? `今天还可以补：${status.missing.join("、")}。`
-            : "今天关键记录都已经补齐，剩下就是按需追加新的能量事件。";
-          elements.toggleMainRecordBtn.textContent = shouldCollapseMain ? "展开修改主记录" : "收起已保存内容";
-        },
-
-        toggleMainRecordEditor() {
-          const todayEntry = state.entries.find((entry) => entry.date === DateUtils.getTodayISO()) || null;
-          state.mainRecordExpanded = !state.mainRecordExpanded;
-          if (state.mainRecordExpanded && todayEntry) {
-            this.fillForm(todayEntry, { scroll: false });
-          }
-          this.renderMainRecordStatus(state.entries);
         },
 
         renderTodaySummary(latestEntry) {
@@ -4414,7 +4328,6 @@
                     ${workoutDetails}
                   </div>
                   <div class="record-actions">
-                    <button class="btn-secondary" type="button" data-action="edit" data-date="${entry.date}">编辑</button>
                     <button class="btn-warning" type="button" data-action="delete" data-date="${entry.date}">删除</button>
                   </div>
                 </article>
@@ -4439,18 +4352,87 @@
           elements.dataUpdatedValue.textContent = `最近更新：${DateUtils.formatShortDate(latestEntry.date)}`;
         },
 
+        renderTodayTimeline() {
+          const container = document.getElementById("todayTimeline");
+          if (!container) return;
+          const today = DateUtils.getTodayISO();
+          const pending = SyncQueue.filterByDate(today);
+
+          // 时间线只展示"待同步"事件（pending 队列）。已推事件无源可查（URL scheme 不返回成败），
+          // 所以 timeline 的心智是"今天还有几条没同步"。
+
+          if (!pending.length) {
+            container.innerHTML = `<div class="timeline-empty">今天还没有记录，点上面的胶囊开始。</div>`;
+            return;
+          }
+
+          const sorted = [...pending].sort((a, b) => (a.time || "").localeCompare(b.time || ""));
+          container.innerHTML = sorted.map((event) => {
+            const def = EventModel.types[event.eventType];
+            const summary = this.summarizeEvent(event);
+            return `
+              <div class="timeline-item pending" data-event-id="${event.id}">
+                <span class="tl-status"></span>
+                <span class="tl-time">${event.time || "--:--"}</span>
+                <span class="tl-content">${def.emoji} ${def.label} · ${summary}</span>
+              </div>
+            `;
+          }).join("");
+        },
+
+        summarizeEvent(event) {
+          const d = event.data || {};
+          switch (event.eventType) {
+            case "sleep": return `${d.sleepScore} 分 · ${d.bedtime}-${d.wakeTime}`;
+            case "meal": return `${d.type}：${d.food || "无内容"}`;
+            case "training": return `${(d.workoutItems || []).length} 个动作`;
+            case "recovery": return `${d.type} · +${d.boost}%`;
+            case "weight": return `${d.weight?.toFixed(1) ?? "--"} kg`;
+            case "reflection": return `${d.mood} · ${d.energy}/10`;
+            case "mood": return `${d.tag}${d.note ? " · " + d.note : ""}`;
+            default: return "";
+          }
+        },
+
+        renderPendingCapsule() {
+          const capsule = document.getElementById("pendingSyncCapsule");
+          const countEl = document.getElementById("pendingSyncCount");
+          if (!capsule || !countEl) return;
+          const count = SyncQueue.countByDate(DateUtils.getTodayISO());
+          countEl.textContent = count;
+          capsule.hidden = count === 0;
+        },
+
+        flashPushSuccess(count) {
+          const capsule = document.getElementById("pendingSyncCapsule");
+          const textEl = capsule?.querySelector(".pending-sync-text");
+          if (!capsule || !textEl) {
+            this.renderPendingCapsule();
+            return;
+          }
+          const originalText = textEl.innerHTML;
+          capsule.hidden = false;
+          capsule.classList.add("push-success");
+          textEl.innerHTML = `✓ 已推送 <strong>${count}</strong> 条到 Obsidian`;
+          window.setTimeout(() => {
+            capsule.classList.remove("push-success");
+            textEl.innerHTML = originalText;
+            this.renderPendingCapsule();
+          }, 2500);
+        },
+
         render(entries) {
           const latestEntry = Analytics.getLatestEntry(entries);
           this.renderHeroBattery(entries, latestEntry);
           this.renderTodaySummary(latestEntry);
           this.renderGrowthDashboard(entries, latestEntry);
-          this.renderMainRecordStatus(entries);
           this.renderMetrics(entries, latestEntry);
           this.renderReminders(entries, latestEntry);
           this.renderRecordList(entries);
           this.renderDataOverview(entries, latestEntry);
-          this.renderDailyAppendList(entries);
           ChartRenderer.render(entries, latestEntry);
+          this.renderTodayTimeline();
+          this.renderPendingCapsule();
         }
       };
 
@@ -4462,6 +4444,34 @@
 
         render() {
           UI.render(this.syncEntries());
+        },
+
+        applyEvent(event) {
+          const entries = state.entries;
+          const existingEntry = entries.find((e) => e.date === event.date) || EntryModel.normalize({ date: event.date });
+          const nextEntry = EventModel.types[event.eventType].applyToEntry(existingEntry, event.data);
+          const nextEntries = entries.filter((e) => e.date !== event.date).concat(nextEntry);
+          state.entries = StorageService.saveEntries(nextEntries);
+          SyncQueue.add(event);
+          UI.render(state.entries);
+          UI.renderTodayTimeline();
+          UI.renderPendingCapsule();
+          return true;
+        },
+
+        pushEventsToObsidian(events) {
+          if (!events.length) return;
+          const date = events[0].date;
+          const count = events.length;
+          const content = "\n\n" + EventModel.renderBatchMarkdown(events);
+          const file = `${CONFIG.obsidianFolder}/训练日志 ${DateUtils.formatShortYearDate(date)}`;
+          const url = `obsidian://new?vault=${encodeURIComponent(CONFIG.obsidianVault)}&file=${encodeURIComponent(file)}&append=true&content=${encodeURIComponent(content)}`;
+          // 同步调用，自定义协议必须这样
+          window.location.href = url;
+          // 乐观清队列（无法从 URL scheme 得知成败）
+          events.forEach((e) => SyncQueue.removeById(e.id));
+          UI.renderTodayTimeline();
+          UI.flashPushSuccess(count);
         },
 
         buildEntryFromForm() {
@@ -4705,11 +4715,7 @@
         },
 
         saveEntry(entry) {
-          if (entry.date === DateUtils.getTodayISO()) {
-            state.mainRecordExpanded = false;
-          }
           this.upsertEntry(entry);
-          UI.setFormMode(`已保存：${DateUtils.formatShortDate(entry.date)}`);
           return this.confirmSavedEntry(entry);
         },
 
@@ -4756,95 +4762,6 @@
       };
 
       const Handlers = {
-        submit(event) {
-          event.preventDefault();
-          this.saveToObsidian();
-        },
-
-        saveToObsidian() {
-          const { entry, validationMessage } = App.validateAndBuildEntry();
-          if (validationMessage) {
-            UI.showStatus(validationMessage);
-            return;
-          }
-
-          const isSaved = App.saveEntry(entry);
-          if (!isSaved) {
-            UI.showStatus("保存失败：本地记录未写入，暂不打开 Obsidian");
-            return;
-          }
-          App.sendToObsidian(entry);
-          UI.showStatus(`本地已保存，正在打开 Obsidian：${DateUtils.formatShortDate(entry.date)}`);
-        },
-
-        addMealLog() {
-          const food = elements.mealLogFood.value.trim();
-          if (!food) {
-            UI.showStatus("请先填写这一餐具体吃了什么");
-            return;
-          }
-
-          const log = {
-            time: elements.mealLogTime.value || DateUtils.getCurrentTimeString(),
-            type: elements.mealLogType.value,
-            food,
-            cooked: elements.mealLogCooked.checked,
-            healthy: elements.mealLogHealthy.checked,
-            ateOut: elements.mealLogAteOut.checked,
-            note: ""
-          };
-
-          if (App.appendMealLog(log)) {
-            elements.mealLogFood.value = "";
-            elements.mealLogAteOut.checked = false;
-            UI.resetAppendInputs();
-            UI.showStatus(`已追加餐食：${log.type}`);
-          }
-        },
-
-        addRecoveryLog() {
-          const boost = Number(elements.recoveryLogBoost.value);
-          if (!Number.isFinite(boost) || boost <= 0) {
-            UI.showStatus("补能加分需要大于 0");
-            return;
-          }
-
-          const log = {
-            time: elements.recoveryLogTime.value || DateUtils.getCurrentTimeString(),
-            type: elements.recoveryLogType.value,
-            boost: Math.min(40, Math.round(boost)),
-            note: elements.recoveryLogNote.value.trim()
-          };
-
-          if (App.appendRecoveryLog(log)) {
-            UI.resetAppendInputs();
-            UI.showStatus(`已追加补能：${log.type} +${log.boost}%`);
-          }
-        },
-
-        addNightReview() {
-          const text = elements.nightReviewText.value.trim();
-          if (!text) {
-            UI.showStatus("请先填写今晚的睡前复盘");
-            return;
-          }
-
-          const log = {
-            time: elements.nightReviewTime.value || DateUtils.getCurrentTimeString(),
-            mood: elements.nightReviewMood.value,
-            text
-          };
-
-          if (App.appendNightReview(log)) {
-            UI.resetAppendInputs();
-            UI.showStatus("已追加睡前复盘");
-          }
-        },
-
-        mealLogInputChange() {
-          UI.refreshMealLogPreview();
-        },
-
         recordActions(event) {
           const target = event.target.closest("button[data-action]");
           if (!target) return;
@@ -4853,21 +4770,14 @@
           const targetEntry = state.entries.find((entry) => entry.date === date);
           if (!targetEntry) return;
 
-          if (action === "edit") {
-            UI.fillForm(targetEntry);
-            UI.showStatus(`已载入 ${DateUtils.formatShortDate(date)} 的数据`);
-            return;
-          }
-
           if (action === "delete") {
             const shouldDelete = window.confirm(`确定删除 ${DateUtils.formatShortDate(date)} 的记录吗？`);
             if (!shouldDelete) return;
             App.deleteEntry(date);
-            if (elements.form.entryDate.value === date) {
-              UI.resetForm();
-            }
             UI.showStatus(`已删除 ${DateUtils.formatShortDate(date)} 的记录`);
           }
+          // 注：edit action 已删除。新架构下，编辑历史 entry 请通过新的事件面板
+          //    （Task 16 实现点时间线 → 打开面板；但只对当天的 pending 事件有效）
         },
 
         exportJson() {
@@ -4888,7 +4798,6 @@
             try {
               const parsed = JSON.parse(String(reader.result));
               App.importEntries(parsed);
-              UI.resetForm();
               UI.showStatus("JSON 数据已导入");
             } catch (error) {
               console.error("导入失败:", error);
@@ -4900,105 +4809,6 @@
           reader.readAsText(file);
         },
 
-        resetForm() {
-          state.mainRecordExpanded = true;
-          UI.resetForm();
-          UI.renderMainRecordStatus(state.entries);
-        },
-
-        sleepSliderInput() {
-          UI.syncSleepScoreSlider();
-        },
-
-        weightSliderInput() {
-          UI.syncWeightSlider();
-        },
-
-        energyBoostSliderInput() {
-          UI.syncEnergyBoostSlider();
-        },
-
-        bedtimeSliderInput() {
-          UI.syncBedtimeSlider();
-        },
-
-        wakeTimeSliderInput() {
-          UI.syncWakeTimeSlider();
-        },
-
-        addWorkoutItem() {
-          UI.addWorkoutItem();
-        },
-
-        addWorkoutRoutine() {
-          const addedCount = UI.addWorkoutRoutine();
-          UI.showStatus(addedCount ? `已加入 ${addedCount} 个常用动作模板` : "常用七项已经都在今天的训练明细里了");
-        },
-
-        workoutTemplateClick(event) {
-          const actionButton = event.target.closest('button[data-action]');
-          if (!actionButton) return;
-
-          if (actionButton.dataset.action === "add-workout-template") {
-            UI.addWorkoutTemplateByName(actionButton.dataset.templateName);
-            UI.showStatus(`已加入动作模板：${actionButton.dataset.templateName}`);
-            return;
-          }
-
-          if (actionButton.dataset.action === "step-template-quantity") {
-            const nextQuantity = UI.nudgeTemplateQuantity(actionButton.dataset.templateName, Number(actionButton.dataset.step));
-            if (nextQuantity !== null) {
-              UI.showStatus(`${actionButton.dataset.templateName} 已调整为 ${nextQuantity}`);
-            }
-          }
-        },
-
-        workoutTemplateChange(event) {
-          const quantityInput = event.target.closest('input[data-action="template-count-input"]');
-          if (!quantityInput) return;
-          const nextQuantity = UI.updateTemplateQuantity(quantityInput.dataset.templateName, quantityInput.value);
-          if (nextQuantity !== null) {
-            UI.showStatus(`${quantityInput.dataset.templateName} 已调整为 ${nextQuantity}`);
-          }
-        },
-
-        clearWorkoutItems() {
-          UI.clearWorkoutEditor();
-          UI.refreshWorkoutMeta();
-        },
-
-        workoutEditorClick(event) {
-          const removeButton = event.target.closest('[data-action="remove-workout-item"]');
-          if (!removeButton) return;
-          const workoutItem = removeButton.closest(".workout-item");
-          if (workoutItem) {
-            workoutItem.remove();
-            UI.refreshWorkoutMeta();
-          }
-        },
-
-        workoutEditorInput(event) {
-          const workoutItem = event.target.closest(".workout-item");
-          if (workoutItem && UI.getWorkoutItemsFromEditor().length) {
-            document.getElementById("exerciseYes").checked = true;
-          }
-          UI.refreshWorkoutMeta();
-        },
-
-        workoutToggleChange() {
-          if (document.getElementById("exerciseNo").checked) {
-            UI.clearWorkoutEditor();
-          }
-          UI.refreshWorkoutMeta();
-        },
-
-        cookedToggleChange() {
-          if (document.getElementById("cookedNo").checked) {
-            elements.form.mealDetails.value = "";
-          }
-          UI.refreshMealDetails();
-        },
-
         resize() {
           if (!window.Chart) {
             UI.render(state.entries);
@@ -5007,47 +4817,39 @@
       };
 
       function bindEvents() {
-        elements.form.addEventListener("submit", Handlers.submit);
-        elements.toggleMainRecordBtn.addEventListener("click", () => UI.toggleMainRecordEditor());
         elements.recordList.addEventListener("click", Handlers.recordActions);
-        elements.form.sleepScore.addEventListener("input", Handlers.sleepSliderInput);
-        elements.weightSlider.addEventListener("input", Handlers.weightSliderInput);
-        elements.energyBoostSlider.addEventListener("input", Handlers.energyBoostSliderInput);
-        elements.bedtimeSlider.addEventListener("input", Handlers.bedtimeSliderInput);
-        elements.wakeTimeSlider.addEventListener("input", Handlers.wakeTimeSliderInput);
-        document.getElementById("resetFormBtn").addEventListener("click", Handlers.resetForm);
-        elements.workoutTemplateGrid.addEventListener("click", Handlers.workoutTemplateClick);
-        elements.workoutTemplateGrid.addEventListener("change", Handlers.workoutTemplateChange);
-        elements.addWorkoutRoutineBtn.addEventListener("click", Handlers.addWorkoutRoutine);
-        elements.addWorkoutItemBtn.addEventListener("click", Handlers.addWorkoutItem);
-        elements.clearWorkoutItemsBtn.addEventListener("click", Handlers.clearWorkoutItems);
-        elements.addMealLogBtn.addEventListener("click", Handlers.addMealLog);
-        elements.addRecoveryLogBtn.addEventListener("click", Handlers.addRecoveryLog);
-        elements.addNightReviewBtn.addEventListener("click", Handlers.addNightReview);
-        elements.mealLogType.addEventListener("change", Handlers.mealLogInputChange);
-        elements.mealLogFood.addEventListener("input", Handlers.mealLogInputChange);
-        elements.mealLogCooked.addEventListener("change", Handlers.mealLogInputChange);
-        elements.mealLogHealthy.addEventListener("change", Handlers.mealLogInputChange);
-        elements.mealLogAteOut.addEventListener("change", Handlers.mealLogInputChange);
-        elements.workoutItemsEditor.addEventListener("click", Handlers.workoutEditorClick);
-        elements.workoutItemsEditor.addEventListener("input", Handlers.workoutEditorInput);
-        document.getElementById("exerciseNo").addEventListener("change", Handlers.workoutToggleChange);
-        document.getElementById("exerciseYes").addEventListener("change", Handlers.workoutToggleChange);
-        document.getElementById("cookedNo").addEventListener("change", Handlers.cookedToggleChange);
-        document.getElementById("cookedYes").addEventListener("change", Handlers.cookedToggleChange);
         document.getElementById("exportBtn").addEventListener("click", Handlers.exportJson);
         document.getElementById("importBtn").addEventListener("click", Handlers.importTrigger);
         elements.importFileInput.addEventListener("change", Handlers.importFile);
         window.addEventListener("resize", Handlers.resize);
+        document.getElementById("captureBar").addEventListener("click", (event) => {
+          const pill = event.target.closest(".capture-pill[data-event-type]");
+          if (!pill) return;
+          PanelManager.toggle(pill.dataset.eventType);
+        });
+        document.getElementById("pushAllBtn").addEventListener("click", () => {
+          const today = DateUtils.getTodayISO();
+          const pending = SyncQueue.filterByDate(today);
+          if (!pending.length) {
+            UI.showStatus("今天没有待同步事件");
+            return;
+          }
+          App.pushEventsToObsidian(pending);
+          UI.showStatus(`已推 ${pending.length} 条到 Obsidian · ${DateUtils.formatShortDate(today)}`);
+        });
+        document.getElementById("todayTimeline").addEventListener("click", (event) => {
+          const item = event.target.closest(".timeline-item[data-event-id]");
+          if (!item) return;
+          const id = item.dataset.eventId;
+          const existing = SyncQueue.load().find((e) => e.id === id);
+          if (!existing) return;
+          PanelManager.open(existing.eventType, { prefill: existing });
+        });
       }
 
       function initialize() {
         state.entries = StorageService.ensureSeedData();
-        state.entries = StorageService.ensureBootstrapTodayEntry();
-        state.templateSettings = StorageService.loadTemplateSettings();
-        UI.renderWorkoutTemplates();
         bindEvents();
-        UI.resetForm();
         UI.render(state.entries);
         // 首页电池每 15 秒刷新一次，让“每小时 -2%”在手机上持续可见。
         state.heroBatteryTimer = window.setInterval(() => {
