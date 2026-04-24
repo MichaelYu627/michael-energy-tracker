@@ -3754,6 +3754,46 @@
     </div>
   `;
 },
+  recovery(prefill) {
+  const p = prefill?.data || {};
+  const time = prefill?.time || DateUtils.getCurrentTimeString();
+  return `
+    <div class="capture-panel" data-panel-type="recovery">
+      <h3>🛋 记补能</h3>
+      <div class="field-row">
+        <div class="field">
+          <label>时间</label>
+          <input type="time" id="recoveryPanelTime" value="${time}">
+        </div>
+        <div class="field" style="flex:1">
+          <label>类型</label>
+          <select id="recoveryPanelType">
+            <option value="午睡" ${!p.type || p.type === "午睡" ? "selected" : ""}>午睡</option>
+            <option value="按摩" ${p.type === "按摩" ? "selected" : ""}>按摩</option>
+            <option value="冥想" ${p.type === "冥想" ? "selected" : ""}>冥想</option>
+            <option value="散步" ${p.type === "散步" ? "selected" : ""}>散步</option>
+            <option value="其他补能" ${p.type === "其他补能" ? "selected" : ""}>其他补能</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>补能加分（%）</label>
+          <input type="number" id="recoveryPanelBoost" min="1" max="40" step="1" value="${p.boost ?? 10}">
+        </div>
+      </div>
+      <div class="field">
+        <label>备注</label>
+        <input type="text" id="recoveryPanelNote" placeholder="例如：睡了 25 分钟，醒来舒服很多" value="${p.note || ""}">
+      </div>
+      <div class="panel-actions">
+        <button class="btn-primary" id="recoveryPanelSave" type="button">💾 保存</button>
+        <label class="immediate-push-check">
+          <input type="checkbox" id="recoveryPanelImmediate"> 立刻推到 Obsidian
+        </label>
+      </div>
+      <div class="panel-error" id="recoveryPanelError" style="color:#c62828;font-size:12px;margin-top:8px"></div>
+    </div>
+  `;
+},
 };
 
       // 每个事件类型的面板事件绑定器：prefill 同上 → 给面板里的元素绑事件
@@ -3830,6 +3870,30 @@
       App.pushEventsToObsidian([event]);
     }
     UI.showStatus(`已保存：🍱 ${data.type}`);
+    PanelManager.close();
+  });
+},
+  recovery(prefill) {
+  document.getElementById("recoveryPanelSave").addEventListener("click", () => {
+    const data = {
+      time: document.getElementById("recoveryPanelTime").value,
+      type: document.getElementById("recoveryPanelType").value,
+      boost: Number(document.getElementById("recoveryPanelBoost").value),
+      note: document.getElementById("recoveryPanelNote").value.trim()
+    };
+    const err = EventModel.types.recovery.validate(data);
+    if (err) {
+      document.getElementById("recoveryPanelError").textContent = err;
+      return;
+    }
+    const event = prefill
+      ? { ...prefill, time: data.time, data, capturedAt: Date.now() }
+      : EventModel.buildQueueItem("recovery", DateUtils.getTodayISO(), data.time, data);
+    App.applyEvent(event);
+    if (document.getElementById("recoveryPanelImmediate").checked) {
+      App.pushEventsToObsidian([event]);
+    }
+    UI.showStatus(`已保存：🛋 ${data.type}`);
     PanelManager.close();
   });
 },
