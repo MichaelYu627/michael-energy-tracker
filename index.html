@@ -1992,6 +1992,127 @@
       .jarvis-panel { padding: 18px 14px 16px; }
       .jarvis-tagline { font-size: 16px; padding: 12px 14px; }
     }
+
+/* 快速捕获重设计 */
+.capture-bar {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 12px 0 16px;
+}
+.capture-pill {
+  padding: 8px 14px;
+  border-radius: 20px;
+  border: 1px solid var(--border, #ccc);
+  background: white;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.15s;
+}
+.capture-pill:hover {
+  background: var(--bg-deep, #e8dcc6);
+}
+.capture-pill.active {
+  background: var(--accent, #1e7b64);
+  color: white;
+  border-color: var(--accent, #1e7b64);
+  font-weight: 600;
+}
+.capture-panel-container {
+  min-height: 20px;
+}
+.capture-panel {
+  background: #e8f5e9;
+  border: 2px solid var(--accent, #1e7b64);
+  border-radius: 10px;
+  padding: 16px;
+  margin-top: 4px;
+}
+.capture-panel h3 {
+  margin: 0 0 12px;
+  font-size: 15px;
+}
+.capture-panel .field-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+.capture-panel .panel-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+.capture-panel .immediate-push-check {
+  font-size: 13px;
+  color: #555;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* 待同步胶囊 */
+.pending-sync-capsule {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #fff8e1;
+  border: 1px solid #ffb300;
+  border-radius: 10px;
+  padding: 10px 14px;
+  margin: 0 auto 12px;
+  max-width: 960px;
+}
+.pending-sync-text {
+  font-size: 13px;
+  color: #5d4037;
+}
+.pending-sync-text strong {
+  color: #e65100;
+  margin: 0 2px;
+}
+
+/* 时间线 */
+.timeline-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.timeline-item {
+  display: flex;
+  gap: 10px;
+  padding: 8px 12px;
+  background: white;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: background 0.15s;
+}
+.timeline-item:hover {
+  background: #fafafa;
+}
+.timeline-item .tl-status {
+  width: 18px;
+}
+.timeline-item .tl-time {
+  color: #999;
+  width: 50px;
+  flex-shrink: 0;
+}
+.timeline-item .tl-content {
+  flex: 1;
+}
+.timeline-item.synced .tl-status::before { content: "✓"; color: #2e7d32; }
+.timeline-item.pending .tl-status::before { content: "⏳"; }
+.timeline-empty {
+  padding: 20px;
+  text-align: center;
+  color: #999;
+  font-size: 13px;
+}
   </style>
 </head>
 <body>
@@ -2084,7 +2205,7 @@
     </section>
 
     <section class="panel-grid top">
-      <article class="panel">
+      <article class="panel" hidden data-legacy="true">
         <div class="panel-content">
           <div class="section-title">
             <h2>今日录入</h2>
@@ -2415,6 +2536,45 @@
           </form>
         </div>
       </article>
+
+<!-- 重设计：快速捕获面板 -->
+<article class="panel" id="capturePanel">
+  <div class="panel-content">
+    <div class="section-title">
+      <h2>快速捕获</h2>
+      <span id="captureStatusLabel">点一个按钮展开当下要记的那件事</span>
+    </div>
+
+    <div class="capture-bar" id="captureBar">
+      <button class="capture-pill" type="button" data-event-type="sleep">😴 睡眠</button>
+      <button class="capture-pill" type="button" data-event-type="meal">🍱 餐食</button>
+      <button class="capture-pill" type="button" data-event-type="training">💪 训练</button>
+      <button class="capture-pill" type="button" data-event-type="recovery">🛋 补能</button>
+      <button class="capture-pill" type="button" data-event-type="weight">⚖️ 体重</button>
+      <button class="capture-pill" type="button" data-event-type="reflection">🌙 复盘</button>
+      <button class="capture-pill" type="button" data-event-type="mood">💭 心情</button>
+    </div>
+
+    <div class="capture-panel-container" id="capturePanelContainer"></div>
+  </div>
+</article>
+
+<!-- 待同步胶囊（仅当 pendingSync 今日非空时显示） -->
+<div class="pending-sync-capsule" id="pendingSyncCapsule" hidden>
+  <span class="pending-sync-text">⏳ 待同步到 Obsidian：<strong id="pendingSyncCount">0</strong> 条</span>
+  <button class="btn-primary btn-slim" id="pushAllBtn" type="button">📤 一键推到 Obsidian</button>
+</div>
+
+<!-- 今日时间线 -->
+<article class="panel" id="todayTimelinePanel">
+  <div class="panel-content">
+    <div class="section-title">
+      <h2>今日时间线</h2>
+      <span id="todayTimelineLabel">今天记的所有事件</span>
+    </div>
+    <div class="timeline-list" id="todayTimeline"></div>
+  </div>
+</article>
 
       <article class="panel">
         <div class="panel-content">
