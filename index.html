@@ -2095,6 +2095,26 @@
   color: #e65100;
   margin: 0 2px;
 }
+.pending-sync-capsule.push-success {
+  background: #d4edda;
+  border-color: #2e7d32;
+  animation: push-flash 0.4s ease-out;
+}
+.pending-sync-capsule.push-success .pending-sync-text {
+  color: #1b5e20;
+  font-weight: 600;
+}
+.pending-sync-capsule.push-success strong {
+  color: #1b5e20;
+}
+.pending-sync-capsule.push-success #pushAllBtn {
+  display: none;
+}
+@keyframes push-flash {
+  0% { transform: scale(1); }
+  30% { transform: scale(1.03); background: #a5d6a7; }
+  100% { transform: scale(1); }
+}
 
 /* 时间线 */
 .timeline-list {
@@ -5490,6 +5510,24 @@
           capsule.hidden = count === 0;
         },
 
+        flashPushSuccess(count) {
+          const capsule = document.getElementById("pendingSyncCapsule");
+          const textEl = capsule?.querySelector(".pending-sync-text");
+          if (!capsule || !textEl) {
+            this.renderPendingCapsule();
+            return;
+          }
+          const originalText = textEl.innerHTML;
+          capsule.hidden = false;
+          capsule.classList.add("push-success");
+          textEl.innerHTML = `✓ 已推送 <strong>${count}</strong> 条到 Obsidian`;
+          window.setTimeout(() => {
+            capsule.classList.remove("push-success");
+            textEl.innerHTML = originalText;
+            this.renderPendingCapsule();
+          }, 2500);
+        },
+
         render(entries) {
           const latestEntry = Analytics.getLatestEntry(entries);
           this.renderHeroBattery(entries, latestEntry);
@@ -5533,6 +5571,7 @@
         pushEventsToObsidian(events) {
           if (!events.length) return;
           const date = events[0].date;
+          const count = events.length;
           const content = "\n\n" + EventModel.renderBatchMarkdown(events);
           const file = `${CONFIG.obsidianFolder}/训练日志 ${DateUtils.formatShortYearDate(date)}`;
           const url = `obsidian://new?vault=${encodeURIComponent(CONFIG.obsidianVault)}&file=${encodeURIComponent(file)}&append=true&content=${encodeURIComponent(content)}`;
@@ -5541,7 +5580,7 @@
           // 乐观清队列（无法从 URL scheme 得知成败）
           events.forEach((e) => SyncQueue.removeById(e.id));
           UI.renderTodayTimeline();
-          UI.renderPendingCapsule();
+          UI.flashPushSuccess(count);
         },
 
         buildEntryFromForm() {
