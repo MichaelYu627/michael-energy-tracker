@@ -2969,6 +2969,20 @@
             .filter((item) => item.boost > 0 || item.note);
         },
 
+        normalizeMoodLogs(items) {
+          if (!Array.isArray(items)) return [];
+          return items
+            .map((item) => {
+              if (!item || typeof item !== "object") return null;
+              const time = String(item.time || "").trim();
+              const tag = String(item.tag || "").trim();
+              const note = String(item.note || "").trim();
+              if (!tag) return null;
+              return { time, tag, note };
+            })
+            .filter(Boolean);
+        },
+
         formatMealDetails(mealItems, fallback = "") {
           const items = this.normalizeMealItems(mealItems);
           if (!items.length) return String(fallback || "").trim();
@@ -2996,6 +3010,7 @@
             mealDetails,
             mealItems,
             recoveryItems,
+            moodLogs: this.normalizeMoodLogs(raw.moodLogs || []),
             healthyFood: this.normalizeBoolean(raw.healthyFood) || mealItems.some((item) => item.healthy),
             ateOut: this.normalizeBoolean(raw.ateOut) || mealItems.some((item) => item.ateOut),
             deepWorkTasks: this.normalizeNumber(raw.deepWorkTasks, 0),
