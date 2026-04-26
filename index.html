@@ -1857,6 +1857,33 @@
   color: var(--success);
   font-weight: 700;
 }
+.tl-delete {
+  flex: 0 0 auto !important;
+  width: 26px !important;
+  height: 26px !important;
+  padding: 0 !important;
+  border-radius: 50% !important;
+  background: transparent !important;
+  border: 1px solid transparent !important;
+  color: var(--muted);
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0.4;
+  transition: opacity 0.15s, background 0.15s, color 0.15s, transform 0.12s;
+}
+.timeline-item:hover .tl-delete {
+  opacity: 1;
+}
+.tl-delete:hover {
+  background: rgba(196, 69, 54, 0.12) !important;
+  color: var(--accent-hot) !important;
+  transform: scale(1.08);
+}
 .timeline-empty {
   padding: 32px 20px;
   text-align: center;
@@ -4493,11 +4520,16 @@
           container.innerHTML = sorted.map((event) => {
             const def = EventModel.types[event.eventType];
             const summary = this.summarizeEvent(event);
+            // 追加型事件（餐食/补能/心情）显示 × 按钮，可单条删除；覆盖型只能编辑覆盖
+            const deleteBtn = def.mode === "append"
+              ? `<button class="tl-delete" type="button" data-action="delete-event" aria-label="删除">×</button>`
+              : "";
             return `
               <div class="timeline-item pending" data-event-id="${event.id}">
                 <span class="tl-status"></span>
                 <span class="tl-time">${event.time || "--:--"}</span>
                 <span class="tl-content">${def.emoji} ${def.label} · ${summary}</span>
+                ${deleteBtn}
               </div>
             `;
           }).join("");
@@ -4583,6 +4615,63 @@
           UI.render(state.entries);
           UI.renderTodayTimeline();
           UI.renderPendingCapsule();
+          return true;
+        },
+
+        // 删除追加型事件（meal/recovery/mood）—— 从 entry 数组里摘出 + 从队列移除
+        // 覆盖型事件没有"删除"语义（要改就编辑），不在这里处理
+        deleteEvent(eventId) {
+          const queueEvent = SyncQueue.load().find((e) => e.id === eventId);
+          if (!queueEvent) return false;
+          const def = EventModel.types[queueEvent.eventType];
+          if (!def || def.mode !== "append") return false;
+
+          const arrayKey = {
+            meal: "mealItems",
+            recovery: "recoveryItems",
+            mood: "moodLogs"
+          }[queueEvent.eventType];
+          if (!arrayKey) return false;
+
+          if (!window.confirm(`确定删除这条 ${def.emoji} ${def.label} 记录吗？`)) return false;
+
+          const entry = state.entries.find((e) => e.date === queueEvent.date);
+          if (entry && Array.isArray(entry[arrayKey])) {
+            const data = queueEvent.data;
+            // 用关键字段定位要删除的那条
+            const matchKeys = {
+              meal: ["time", "food", "type"],
+              recovery: ["time", "type", "boost"],
+              mood: ["time", "tag"]
+            }[queueEvent.eventType];
+            let removed = false;
+            const newArray = entry[arrayKey].filter((item) => {
+              if (removed) return true;
+              const matches = matchKeys.every((k) => item[k] === data[k]);
+              if (matches) { removed = true; return false; }
+              return true;
+            });
+
+            // 重建 entry，重算 meal/recovery 的派生字段
+            const draft = { ...entry, [arrayKey]: newArray };
+            if (queueEvent.eventType === "meal") {
+              draft.cooked = newArray.some((m) => m.cooked);
+              draft.healthyFood = newArray.some((m) => m.healthy);
+              draft.ateOut = newArray.some((m) => m.ateOut);
+              draft.mealDetails = EntryModel.formatMealDetails(newArray, "");
+            } else if (queueEvent.eventType === "recovery") {
+              draft.energyBoost = Math.min(40, newArray.reduce((sum, r) => sum + (r.boost || 0), 0));
+            }
+            const nextEntry = EntryModel.normalize(draft);
+            const nextEntries = state.entries.filter((e) => e.date !== entry.date).concat(nextEntry);
+            state.entries = StorageService.saveEntries(nextEntries);
+          }
+
+          SyncQueue.removeById(eventId);
+          UI.render(state.entries);
+          UI.renderTodayTimeline();
+          UI.renderPendingCapsule();
+          UI.showStatus(`已删除：${def.emoji} ${def.label}`);
           return true;
         },
 
@@ -4965,6 +5054,16 @@
           UI.showStatus(`已推 ${pending.length} 条到 Obsidian · ${DateUtils.formatShortDate(today)}`);
         });
         document.getElementById("todayTimeline").addEventListener("click", (event) => {
+          // 优先处理 × 删除（追加型才有）
+          const deleteBtn = event.target.closest("[data-action='delete-event']");
+          if (deleteBtn) {
+            event.stopPropagation();
+            const item = deleteBtn.closest(".timeline-item[data-event-id]");
+            if (!item) return;
+            App.deleteEvent(item.dataset.eventId);
+            return;
+          }
+          // 否则视为编辑
           const item = event.target.closest(".timeline-item[data-event-id]");
           if (!item) return;
           const id = item.dataset.eventId;
