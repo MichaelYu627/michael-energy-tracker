@@ -1700,6 +1700,39 @@
   font-weight: 700;
 }
 
+/* 数字选择 chip 组（睡眠起夜次数等） */
+.number-chip-group {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.number-chip {
+  flex: 0 0 auto !important;
+  min-width: 0 !important;
+  width: auto !important;
+  padding: 6px 14px !important;
+  background: var(--bg) !important;
+  border: 1px solid var(--line) !important;
+  border-radius: 999px !important;
+  color: var(--muted) !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  font-family: var(--font-number) !important;
+  cursor: pointer;
+  transition: transform 0.12s, background 0.15s, color 0.15s, border-color 0.15s, box-shadow 0.15s !important;
+}
+.number-chip:hover {
+  border-color: var(--accent-soft) !important;
+  color: var(--text) !important;
+  transform: translateY(-1px);
+}
+.number-chip.active {
+  background: var(--accent) !important;
+  color: #fff !important;
+  border-color: var(--accent) !important;
+  box-shadow: 0 3px 10px rgba(31, 122, 92, 0.22);
+}
+
 /* Mood tag emoji buttons · 美化 */
 .mood-tag-btn {
   /* 防止被 flex 容器拉伸成整行 —— 同 .training-item-row 的踩坑修复 */
@@ -3081,15 +3114,19 @@
           </div>
         </div>
         <div class="field-row">
-          <div class="field">
-            <label>起夜次数</label>
-            <input type="number" id="sleepPanelWakeups" min="0" max="10" value="${p.wakeups ?? today.wakeups ?? 0}">
-          </div>
           <div class="field" style="flex:1">
+            <label>起夜次数</label>
+            <div class="number-chip-group" id="sleepPanelWakeups" data-value="${p.wakeups ?? today.wakeups ?? 0}">
+              ${[0, 1, 2, 3, 4, 5].map((n) => `<button type="button" class="number-chip${n === (p.wakeups ?? today.wakeups ?? 0) ? ' active' : ''}" data-value="${n}">${n}</button>`).join("")}
+            </div>
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field" style="flex:1;min-width:140px">
             <label>入睡时间</label>
             <input type="time" id="sleepPanelBedtime" value="${p.bedtime || today.bedtime || '22:00'}">
           </div>
-          <div class="field" style="flex:1">
+          <div class="field" style="flex:1;min-width:140px">
             <label>起床时间</label>
             <input type="time" id="sleepPanelWakeTime" value="${p.wakeTime || today.wakeTime || '06:00'}">
           </div>
@@ -3360,12 +3397,20 @@
     document.getElementById("sleepPanelWakingEnergy").addEventListener("input", (e) => {
       document.getElementById("sleepPanelWakingEnergyValue").textContent = e.target.value;
     });
+    // 起夜次数 chip group：点击切换 active + 更新 data-value
+    document.getElementById("sleepPanelWakeups").addEventListener("click", (e) => {
+      const btn = e.target.closest(".number-chip");
+      if (!btn) return;
+      const wrapper = document.getElementById("sleepPanelWakeups");
+      wrapper.dataset.value = btn.dataset.value;
+      wrapper.querySelectorAll(".number-chip").forEach((b) => b.classList.toggle("active", b === btn));
+    });
     document.getElementById("sleepPanelSave").addEventListener("click", () => {
       const data = {
         sleepScore: Number(document.getElementById("sleepPanelScore").value),
         bedtime: document.getElementById("sleepPanelBedtime").value,
         wakeTime: document.getElementById("sleepPanelWakeTime").value,
-        wakeups: Number(document.getElementById("sleepPanelWakeups").value),
+        wakeups: Number(document.getElementById("sleepPanelWakeups").dataset.value),
         wakingEnergy: Number(document.getElementById("sleepPanelWakingEnergy").value)
       };
       const err = EventModel.types.sleep.validate(data);
