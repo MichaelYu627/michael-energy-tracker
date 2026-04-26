@@ -4565,16 +4565,12 @@
           container.innerHTML = sorted.map((event) => {
             const def = EventModel.types[event.eventType];
             const summary = this.summarizeEvent(event);
-            // 追加型事件（餐食/补能/心情）显示 × 按钮，可单条删除；覆盖型只能编辑覆盖
-            const deleteBtn = def.mode === "append"
-              ? `<button class="tl-delete" type="button" data-action="delete-event" aria-label="删除">×</button>`
-              : "";
             return `
               <div class="timeline-item pending" data-event-id="${event.id}">
                 <span class="tl-status"></span>
                 <span class="tl-time">${event.time || "--:--"}</span>
                 <span class="tl-content">${def.emoji} ${def.label} · ${summary}</span>
-                ${deleteBtn}
+                <button class="tl-delete" type="button" data-action="delete-event" aria-label="删除">×</button>
               </div>
             `;
           }).join("");
@@ -4663,49 +4659,71 @@
           return true;
         },
 
-        // 删除追加型事件（meal/recovery/mood）—— 从 entry 数组里摘出 + 从队列移除
-        // 覆盖型事件没有"删除"语义（要改就编辑），不在这里处理
+        // 删除事件 —— 追加型从数组里摘出，覆盖型清空对应字段；都从同步队列移除
         deleteEvent(eventId) {
           const queueEvent = SyncQueue.load().find((e) => e.id === eventId);
           if (!queueEvent) return false;
           const def = EventModel.types[queueEvent.eventType];
-          if (!def || def.mode !== "append") return false;
+          if (!def) return false;
 
-          const arrayKey = {
-            meal: "mealItems",
-            recovery: "recoveryItems",
-            mood: "moodLogs"
-          }[queueEvent.eventType];
-          if (!arrayKey) return false;
-
-          if (!window.confirm(`确定删除这条 ${def.emoji} ${def.label} 记录吗？`)) return false;
+          // 构造确认提示：覆盖型多说明"会清空什么"
+          const overwriteFieldsLabel = {
+            sleep: "睡眠分、入睡/起床时间、起夜次数、起床能量",
+            weight: "体重",
+            training: "训练动作清单",
+            reflection: "睡前状态、今日整体能量、复盘文本",
+            morningNote: "起床想法、今日安排"
+          };
+          const confirmMsg = def.mode === "append"
+            ? `确定删除这条 ${def.emoji} ${def.label} 记录吗？`
+            : `确定删除这条 ${def.emoji} ${def.label} 记录吗？将清空今日的${overwriteFieldsLabel[queueEvent.eventType] || "对应字段"}。`;
+          if (!window.confirm(confirmMsg)) return false;
 
           const entry = state.entries.find((e) => e.date === queueEvent.date);
-          if (entry && Array.isArray(entry[arrayKey])) {
-            const data = queueEvent.data;
-            // 用关键字段定位要删除的那条
-            const matchKeys = {
-              meal: ["time", "food", "type"],
-              recovery: ["time", "type", "boost"],
-              mood: ["time", "tag"]
-            }[queueEvent.eventType];
-            let removed = false;
-            const newArray = entry[arrayKey].filter((item) => {
-              if (removed) return true;
-              const matches = matchKeys.every((k) => item[k] === data[k]);
-              if (matches) { removed = true; return false; }
-              return true;
-            });
-
-            // 重建 entry，重算 meal/recovery 的派生字段
-            const draft = { ...entry, [arrayKey]: newArray };
-            if (queueEvent.eventType === "meal") {
-              draft.cooked = newArray.some((m) => m.cooked);
-              draft.healthyFood = newArray.some((m) => m.healthy);
-              draft.ateOut = newArray.some((m) => m.ateOut);
-              draft.mealDetails = EntryModel.formatMealDetails(newArray, "");
-            } else if (queueEvent.eventType === "recovery") {
-              draft.energyBoost = Math.min(40, newArray.reduce((sum, r) => sum + (r.boost || 0), 0));
+          if (entry) {
+            let draft;
+            if (def.mode === "append") {
+              const arrayKey = {
+                meal: "mealItems",
+                recovery: "recoveryItems",
+                mood: "moodLogs"
+              }[queueEvent.eventType];
+              if (!arrayKey || !Array.isArray(entry[arrayKey])) {
+                SyncQueue.removeById(eventId);
+                return true;
+              }
+              const data = queueEvent.data;
+              const matchKeys = {
+                meal: ["time", "food", "type"],
+                recovery: ["time", "type", "boost"],
+                mood: ["time", "tag"]
+              }[queueEvent.eventType];
+              let removed = false;
+              const newArray = entry[arrayKey].filter((item) => {
+                if (removed) return true;
+                const matches = matchKeys.every((k) => item[k] === data[k]);
+                if (matches) { removed = true; return false; }
+                return true;
+              });
+              draft = { ...entry, [arrayKey]: newArray };
+              if (queueEvent.eventType === "meal") {
+                draft.cooked = newArray.some((m) => m.cooked);
+                draft.healthyFood = newArray.some((m) => m.healthy);
+                draft.ateOut = newArray.some((m) => m.ateOut);
+                draft.mealDetails = EntryModel.formatMealDetails(newArray, "");
+              } else if (queueEvent.eventType === "recovery") {
+                draft.energyBoost = Math.min(40, newArray.reduce((sum, r) => sum + (r.boost || 0), 0));
+              }
+            } else {
+              // 覆盖型：清空该事件触及的字段（保留 entry 里的其他字段）
+              const resetFields = {
+                sleep: { sleepScore: 0, bedtime: "", wakeTime: "", wakeups: 0, wakingEnergy: null },
+                weight: { weight: null },
+                training: { workoutItems: [], exercised: false },
+                reflection: { mood: "", energy: 0, dailyStory: "" },
+                morningNote: { morningThoughts: "", morningPlan: "" }
+              }[queueEvent.eventType] || {};
+              draft = { ...entry, ...resetFields };
             }
             const nextEntry = EntryModel.normalize(draft);
             const nextEntries = state.entries.filter((e) => e.date !== entry.date).concat(nextEntry);
