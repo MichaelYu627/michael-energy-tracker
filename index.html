@@ -1702,6 +1702,10 @@
 
 /* Mood tag emoji buttons · 美化 */
 .mood-tag-btn {
+  /* 防止被 flex 容器拉伸成整行 —— 同 .training-item-row 的踩坑修复 */
+  flex: 0 0 auto !important;
+  width: auto !important;
+  min-width: 0 !important;
   transition: transform 0.15s, box-shadow 0.15s, background 0.15s, border-color 0.15s !important;
 }
 .mood-tag-btn:hover {
@@ -1964,10 +1968,11 @@
 
     <div class="capture-bar" id="captureBar">
       <button class="capture-pill" type="button" data-event-type="sleep">😴 睡眠</button>
-      <button class="capture-pill" type="button" data-event-type="meal">🍱 餐食</button>
-      <button class="capture-pill" type="button" data-event-type="training">💪 训练</button>
-      <button class="capture-pill" type="button" data-event-type="recovery">🛋 补能</button>
+      <button class="capture-pill" type="button" data-event-type="morningNote">☕ 晨间笔记</button>
       <button class="capture-pill" type="button" data-event-type="weight">⚖️ 体重</button>
+      <button class="capture-pill" type="button" data-event-type="meal">🍱 餐食</button>
+      <button class="capture-pill" type="button" data-event-type="recovery">🛋 补能</button>
+      <button class="capture-pill" type="button" data-event-type="training">💪 训练</button>
       <button class="capture-pill" type="button" data-event-type="reflection">🌙 复盘</button>
       <button class="capture-pill" type="button" data-event-type="mood">💭 心情</button>
     </div>
@@ -2473,6 +2478,9 @@
               if (typeof data.wakeups !== "number" || data.wakeups < 0 || data.wakeups > 10) {
                 return "起夜次数需要在 0-10 之间";
               }
+              if (typeof data.wakingEnergy !== "number" || data.wakingEnergy < 1 || data.wakingEnergy > 10) {
+                return "起床能量需要在 1-10 之间";
+              }
               return "";
             },
             applyToEntry(entry, data) {
@@ -2481,7 +2489,8 @@
                 sleepScore: data.sleepScore,
                 bedtime: data.bedtime,
                 wakeTime: data.wakeTime,
-                wakeups: data.wakeups
+                wakeups: data.wakeups,
+                wakingEnergy: data.wakingEnergy
               });
             },
             toMarkdown(event) {
@@ -2490,8 +2499,33 @@
                 `### 😴 睡眠 ${event.time}`,
                 `- 睡眠分：${d.sleepScore}`,
                 `- 入睡：${d.bedtime} / 起床：${d.wakeTime}`,
-                `- 起夜：${d.wakeups} 次`
+                `- 起夜：${d.wakeups} 次`,
+                `- 起床能量：${d.wakingEnergy}/10`
               ].join("\n");
+            }
+          },
+
+          morningNote: {
+            emoji: "☕",
+            label: "晨间笔记",
+            mode: "overwrite",
+            validate(data) {
+              if (!data.thoughts && !data.plan) return "想法和安排至少填一项";
+              return "";
+            },
+            applyToEntry(entry, data) {
+              return EntryModel.normalize({
+                ...entry,
+                morningThoughts: data.thoughts || "",
+                morningPlan: data.plan || ""
+              });
+            },
+            toMarkdown(event) {
+              const d = event.data;
+              const lines = [`### ☕ 晨间笔记 ${event.time}`];
+              if (d.thoughts) lines.push("", "**想法**", d.thoughts);
+              if (d.plan) lines.push("", "**今日安排**", d.plan);
+              return lines.join("\n");
             }
           },
 
@@ -2787,6 +2821,9 @@
             eveningEnergy: this.normalizeNullableNumber(raw.eveningEnergy),
             mood: String(raw.mood || "").trim(),
             dailyStory: String(raw.dailyStory || raw.story || "").trim(),
+            wakingEnergy: this.normalizeNullableNumber(raw.wakingEnergy),
+            morningThoughts: String(raw.morningThoughts || "").trim(),
+            morningPlan: String(raw.morningPlan || "").trim(),
             workoutItems
           };
         },
@@ -3011,12 +3048,16 @@
             <label>睡眠分 <strong id="sleepPanelScoreValue">${p.sleepScore ?? today.sleepScore ?? 80}</strong></label>
             <input type="range" id="sleepPanelScore" min="0" max="100" step="1" value="${p.sleepScore ?? today.sleepScore ?? 80}">
           </div>
+          <div class="field" style="flex:1;min-width:200px">
+            <label>起床能量感受 <strong id="sleepPanelWakingEnergyValue">${p.wakingEnergy ?? today.wakingEnergy ?? 7}</strong>/10</label>
+            <input type="range" id="sleepPanelWakingEnergy" min="1" max="10" step="1" value="${p.wakingEnergy ?? today.wakingEnergy ?? 7}">
+          </div>
+        </div>
+        <div class="field-row">
           <div class="field">
             <label>起夜次数</label>
             <input type="number" id="sleepPanelWakeups" min="0" max="10" value="${p.wakeups ?? today.wakeups ?? 0}">
           </div>
-        </div>
-        <div class="field-row">
           <div class="field" style="flex:1">
             <label>入睡时间</label>
             <input type="time" id="sleepPanelBedtime" value="${p.bedtime || today.bedtime || '22:00'}">
@@ -3033,6 +3074,40 @@
           </label>
         </div>
         <div class="panel-error" id="sleepPanelError" style="color:#c62828;font-size:12px;margin-top:8px"></div>
+      </div>
+    `;
+  },
+
+  morningNote(prefill) {
+    const p = prefill?.data || {};
+    const today = state.entries.find((e) => e.date === DateUtils.getTodayISO()) || {};
+    const time = prefill?.time || DateUtils.getCurrentTimeString();
+    const thoughts = p.thoughts ?? today.morningThoughts ?? "";
+    const plan = p.plan ?? today.morningPlan ?? "";
+    return `
+      <div class="capture-panel" data-panel-type="morningNote">
+        <h3>☕ 晨间笔记</h3>
+        <div class="field-row">
+          <div class="field">
+            <label>时间</label>
+            <input type="time" id="morningPanelTime" value="${time}">
+          </div>
+        </div>
+        <div class="field">
+          <label>起床后的想法 / 状态</label>
+          <textarea id="morningPanelThoughts" rows="3" placeholder="例如：今天醒来胸口有点闷，可能昨晚吃太晚了；又或者晒到阳光感觉很满足。">${thoughts}</textarea>
+        </div>
+        <div class="field">
+          <label>今日重点安排</label>
+          <textarea id="morningPanelPlan" rows="4" placeholder="例如：上午写完 PRP 文档；下午跟石头视频；晚上去练拳。">${plan}</textarea>
+        </div>
+        <div class="panel-actions">
+          <button class="btn-primary" id="morningPanelSave" type="button">💾 保存</button>
+          <label class="immediate-push-check">
+            <input type="checkbox" id="morningPanelImmediate"> 立刻推到 Obsidian
+          </label>
+        </div>
+        <div class="panel-error" id="morningPanelError" style="color:#c62828;font-size:12px;margin-top:8px"></div>
       </div>
     `;
   },
@@ -3191,9 +3266,9 @@
             <option value="其他" ${p.mood === "其他" || today.mood === "其他" ? "selected" : ""}>其他</option>
           </select>
         </div>
-        <div class="field">
-          <label>今日整体能量（1-10）</label>
-          <input type="number" id="reflectionPanelEnergy" min="1" max="10" value="${p.energy ?? today.energy ?? 7}">
+        <div class="field" style="flex:1;min-width:180px">
+          <label>今日整体能量 <strong id="reflectionPanelEnergyValue">${p.energy ?? today.energy ?? 7}</strong>/10</label>
+          <input type="range" id="reflectionPanelEnergy" min="1" max="10" step="1" value="${p.energy ?? today.energy ?? 7}">
         </div>
       </div>
       <div class="field">
@@ -3213,8 +3288,8 @@
   mood(prefill) {
   const p = prefill?.data || {};
   const time = prefill?.time || DateUtils.getCurrentTimeString();
-  const selectedTag = p.tag || "🙂";
-  const tags = ["😫", "😕", "😐", "🙂", "😄", "🤔", "😡", "🥺"];
+  const selectedTag = p.tag || "☀️";
+  const tags = ["☀️", "🥰", "😌", "🌟", "🌱", "🤔", "☕", "💪"];
   return `
     <div class="capture-panel" data-panel-type="mood">
       <h3>💭 记心情</h3>
@@ -3255,12 +3330,16 @@
     document.getElementById("sleepPanelScore").addEventListener("input", (e) => {
       document.getElementById("sleepPanelScoreValue").textContent = e.target.value;
     });
+    document.getElementById("sleepPanelWakingEnergy").addEventListener("input", (e) => {
+      document.getElementById("sleepPanelWakingEnergyValue").textContent = e.target.value;
+    });
     document.getElementById("sleepPanelSave").addEventListener("click", () => {
       const data = {
         sleepScore: Number(document.getElementById("sleepPanelScore").value),
         bedtime: document.getElementById("sleepPanelBedtime").value,
         wakeTime: document.getElementById("sleepPanelWakeTime").value,
-        wakeups: Number(document.getElementById("sleepPanelWakeups").value)
+        wakeups: Number(document.getElementById("sleepPanelWakeups").value),
+        wakingEnergy: Number(document.getElementById("sleepPanelWakingEnergy").value)
       };
       const err = EventModel.types.sleep.validate(data);
       if (err) {
@@ -3275,6 +3354,30 @@
         App.pushEventsToObsidian([event]);
       }
       UI.showStatus(`已保存：😴 睡眠`);
+      PanelManager.close();
+    });
+  },
+
+  morningNote(prefill) {
+    document.getElementById("morningPanelSave").addEventListener("click", () => {
+      const data = {
+        time: document.getElementById("morningPanelTime").value,
+        thoughts: document.getElementById("morningPanelThoughts").value.trim(),
+        plan: document.getElementById("morningPanelPlan").value.trim()
+      };
+      const err = EventModel.types.morningNote.validate(data);
+      if (err) {
+        document.getElementById("morningPanelError").textContent = err;
+        return;
+      }
+      const event = prefill
+        ? { ...prefill, time: data.time, data, capturedAt: Date.now() }
+        : EventModel.buildQueueItem("morningNote", DateUtils.getTodayISO(), data.time, data);
+      App.applyEvent(event);
+      if (document.getElementById("morningPanelImmediate").checked) {
+        App.pushEventsToObsidian([event]);
+      }
+      UI.showStatus(`已保存：☕ 晨间笔记`);
       PanelManager.close();
     });
   },
@@ -3412,6 +3515,9 @@
   });
 },
   reflection(prefill) {
+  document.getElementById("reflectionPanelEnergy").addEventListener("input", (e) => {
+    document.getElementById("reflectionPanelEnergyValue").textContent = e.target.value;
+  });
   document.getElementById("reflectionPanelSave").addEventListener("click", () => {
     const data = {
       mood: document.getElementById("reflectionPanelMood").value,
@@ -3435,7 +3541,7 @@
   });
 },
   mood(prefill) {
-  let selectedTag = prefill?.data?.tag || "🙂";
+  let selectedTag = prefill?.data?.tag || "☀️";
   document.getElementById("moodPanelTagGroup").addEventListener("click", (event) => {
     const btn = event.target.closest(".mood-tag-btn");
     if (!btn) return;
@@ -4400,7 +4506,11 @@
         summarizeEvent(event) {
           const d = event.data || {};
           switch (event.eventType) {
-            case "sleep": return `${d.sleepScore} 分 · ${d.bedtime}-${d.wakeTime}`;
+            case "sleep": return `${d.sleepScore} 分 · 起床能量 ${d.wakingEnergy ?? "--"}/10`;
+            case "morningNote": {
+              const snippet = (d.thoughts || d.plan || "").slice(0, 30);
+              return snippet ? `${snippet}${snippet.length === 30 ? "…" : ""}` : "已记";
+            }
             case "meal": return `${d.type}：${d.food || "无内容"}`;
             case "training": return `${(d.workoutItems || []).length} 个动作`;
             case "recovery": return `${d.type} · +${d.boost}%`;
