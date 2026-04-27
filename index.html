@@ -1885,10 +1885,20 @@
   content: "⏳";
   filter: saturate(0.85);
 }
+.timeline-item.synced {
+  background: var(--bg);
+  opacity: 0.78;
+}
+.timeline-item.synced:hover {
+  opacity: 1;
+}
 .timeline-item.synced .tl-status::before {
   content: "✓";
   color: var(--success);
   font-weight: 700;
+}
+.timeline-item.synced .tl-content {
+  color: var(--muted);
 }
 .tl-delete {
   flex: 0 0 auto !important;
@@ -3043,6 +3053,28 @@
 
         countByDate(date) {
           return this.filterByDate(date).length;
+        },
+
+        // 把事件标记为"已推"——保留在队列中作为历史，时间线展示 ✓
+        markPushed(id, pushedAt) {
+          const queue = this.load();
+          const idx = queue.findIndex((e) => e.id === id);
+          if (idx < 0) return;
+          queue[idx] = { ...queue[idx], pushedAt };
+          this.save(queue);
+        },
+
+        // 仅统计今日待推事件数（已推不计）—— 给胶囊用
+        countPendingByDate(date) {
+          return this.filterByDate(date).filter((e) => !e.pushedAt).length;
+        },
+
+        // 清理：已推 + 非今日的事件丢弃，避免队列无限增长
+        // 今日的已推事件保留供时间线展示，明天清理
+        cleanOldPushed(todayDate) {
+          const queue = this.load();
+          const filtered = queue.filter((e) => !e.pushedAt || e.date === todayDate);
+          if (filtered.length !== queue.length) this.save(filtered);
         }
       };
 
@@ -4551,22 +4583,21 @@
           const container = document.getElementById("todayTimeline");
           if (!container) return;
           const today = DateUtils.getTodayISO();
-          const pending = SyncQueue.filterByDate(today);
+          // 显示今日所有事件：未推（⏳）+ 已推（✓）
+          const allEvents = SyncQueue.filterByDate(today);
 
-          // 时间线只展示"待同步"事件（pending 队列）。已推事件无源可查（URL scheme 不返回成败），
-          // 所以 timeline 的心智是"今天还有几条没同步"。
-
-          if (!pending.length) {
+          if (!allEvents.length) {
             container.innerHTML = `<div class="timeline-empty">今天还没有记录，点上面的胶囊开始。</div>`;
             return;
           }
 
-          const sorted = [...pending].sort((a, b) => (a.time || "").localeCompare(b.time || ""));
+          const sorted = [...allEvents].sort((a, b) => (a.time || "").localeCompare(b.time || ""));
           container.innerHTML = sorted.map((event) => {
             const def = EventModel.types[event.eventType];
             const summary = this.summarizeEvent(event);
+            const statusClass = event.pushedAt ? "synced" : "pending";
             return `
-              <div class="timeline-item pending" data-event-id="${event.id}">
+              <div class="timeline-item ${statusClass}" data-event-id="${event.id}">
                 <span class="tl-status"></span>
                 <span class="tl-time">${event.time || "--:--"}</span>
                 <span class="tl-content">${def.emoji} ${def.label} · ${summary}</span>
@@ -4598,7 +4629,7 @@
           const capsule = document.getElementById("pendingSyncCapsule");
           const countEl = document.getElementById("pendingSyncCount");
           if (!capsule || !countEl) return;
-          const count = SyncQueue.countByDate(DateUtils.getTodayISO());
+          const count = SyncQueue.countPendingByDate(DateUtils.getTodayISO());
           countEl.textContent = count;
           capsule.hidden = count === 0;
         },
@@ -4652,7 +4683,10 @@
           const nextEntry = EventModel.types[event.eventType].applyToEntry(existingEntry, event.data);
           const nextEntries = entries.filter((e) => e.date !== event.date).concat(nextEntry);
           state.entries = StorageService.saveEntries(nextEntries);
-          SyncQueue.add(event);
+          // 编辑已推过的事件 → 清掉 pushedAt 让它重新进入待推队列
+          const eventForQueue = { ...event };
+          delete eventForQueue.pushedAt;
+          SyncQueue.add(eventForQueue);
           UI.render(state.entries);
           UI.renderTodayTimeline();
           UI.renderPendingCapsule();
@@ -4747,8 +4781,9 @@
           const url = `obsidian://new?vault=${encodeURIComponent(CONFIG.obsidianVault)}&file=${encodeURIComponent(file)}&append=true&content=${encodeURIComponent(content)}`;
           // 同步调用，自定义协议必须这样
           window.location.href = url;
-          // 乐观清队列（无法从 URL scheme 得知成败）
-          events.forEach((e) => SyncQueue.removeById(e.id));
+          // 不再删除事件，而是标记为已推；时间线据此显示 ✓
+          const pushedAt = Date.now();
+          events.forEach((e) => SyncQueue.markPushed(e.id, pushedAt));
           UI.renderTodayTimeline();
           UI.flashPushSuccess(count);
         },
@@ -5108,7 +5143,8 @@
         });
         document.getElementById("pushAllBtn").addEventListener("click", () => {
           const today = DateUtils.getTodayISO();
-          const pending = SyncQueue.filterByDate(today);
+          // 仅推未推事件，已推的在时间线上保留作为历史
+          const pending = SyncQueue.filterByDate(today).filter((e) => !e.pushedAt);
           if (!pending.length) {
             UI.showStatus("今天没有待同步事件");
             return;
@@ -5138,6 +5174,8 @@
 
       function initialize() {
         state.entries = StorageService.ensureSeedData();
+        // 清理"非今日且已推"的事件：今日已推的保留供时间线展示，跨日后丢弃
+        SyncQueue.cleanOldPushed(DateUtils.getTodayISO());
         bindEvents();
         UI.render(state.entries);
         // 首页电池每 15 秒刷新一次，让“每小时 -2%”在手机上持续可见。
