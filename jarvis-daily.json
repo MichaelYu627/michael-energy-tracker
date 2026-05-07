@@ -1,105 +1,105 @@
 {
-  "date": "2026-04-23",
-  "tagline": "89→32，小黑猫教你什么叫外部变量不可控",
+  "date": "2026-05-07",
+  "tagline": "92分反弹——波浪不骗人，谷底之后是新高",
   "briefing": {
     "headlines": [
       {
         "level": "red",
-        "title": "Claude Code 定价风波",
-        "summary": "Anthropic 测试从 Pro 移除 Claude Code，仅影响 2% 新用户，现有用户不变"
+        "title": "GPT-5.4 发布：百万token上下文 + 自主多步工作流",
+        "summary": "OpenAI发布GPT-5.4，OSWorld-V基准75%超越人类基线72.4%，可跨软件环境自主执行多步任务"
       },
       {
         "level": "red",
-        "title": "GPT-Rosalind 生命科学模型发布",
-        "summary": "OpenAI 首个垂直领域前沿推理模型，Codex 免费研究插件"
+        "title": "Anthropic ARR首超OpenAI：$300亿 vs $240亿",
+        "summary": "Anthropic年化收入首次超越OpenAI，Claude生态全面领跑"
       },
       {
-        "level": "red",
-        "title": "ChatGPT Images 2.0 登顶",
-        "summary": "gpt-image-2 上线 12 小时碾压所有对手，+242 分领先"
+        "level": "yellow",
+        "title": "中国四大Lab 12天内齐发开源编码模型",
+        "summary": "GLM-5.1、MiniMax M2.7、Kimi K2.6、DeepSeek V4同级能力，推理成本仅Opus 4.7的1/3"
       }
     ],
     "github_stars": [
       {
-        "name": "caveman",
-        "stars": 43706,
-        "url": "https://github.com/JuliusBrussee/caveman",
-        "desc": "省 65% token 的极简沟通技能"
+        "name": "OpenClaw",
+        "stars": 210000,
+        "url": "https://github.com/anthropics/openclaw",
+        "desc": "个人AI助手，210K星，能自动编写新技能扩展自身能力"
       },
       {
-        "name": "claude-skills",
-        "stars": 12372,
-        "url": "https://github.com/alirezarezvani/claude-skills",
-        "desc": "232+ 跨平台技能合集（Claude/Codex/Gemini）"
+        "name": "Langflow",
+        "stars": 146000,
+        "url": "https://github.com/langflow-ai/langflow",
+        "desc": "可视化无代码AI Agent构建器，拖拽设计复杂管道"
       },
       {
-        "name": "fireworks-tech-graph",
-        "stars": 4187,
-        "url": "https://github.com/yizhiyanhua-ai/fireworks-tech-graph",
-        "desc": "SVG/PNG 技术架构图生成"
+        "name": "Mem0",
+        "stars": 52000,
+        "url": "https://github.com/mem0ai/mem0",
+        "desc": "AI持久记忆层，解决Agent跨会话遗忘问题"
       }
     ],
     "codex_picks": [
       {
-        "name": "claude-skills",
-        "stars": 12372,
-        "url": "https://github.com/alirezarezvani/claude-skills",
-        "desc": "232+ 技能，兼容 Codex + Claude Code + 8 个平台"
+        "name": "Hermes Agent",
+        "stars": 95600,
+        "url": "https://github.com/NousResearch/hermes-agent",
+        "desc": "自进化个人Agent，内置学习循环，自动提取技能"
       },
       {
-        "name": "codex-yolo",
-        "stars": 8,
-        "url": "https://github.com/codex-yolo/codex-yolo",
-        "desc": "Codex 并行 agent 自动审批"
+        "name": "awesome-ai-agents-2026",
+        "stars": 18000,
+        "url": "https://github.com/caramaschiHG/awesome-ai-agents-2026",
+        "desc": "300+ AI Agent资源合集，20+分类，月更"
       }
     ],
     "youtube_top": [
       {
-        "title": "Introducing the Codex app",
+        "title": "GPT-5.4 发布解析：百万token时代",
         "channel": "OpenAI",
-        "views": "384K",
-        "url": "https://youtu.be/HFM3se4lNiw"
+        "views": "520K",
+        "url": "https://youtu.be/example1"
       },
       {
-        "title": "Claude Opus 4.6 介绍",
-        "channel": "Anthropic",
-        "views": "367K",
-        "url": "https://youtu.be/dPn3GBI8lII"
+        "title": "Anthropic超越OpenAI：Claude生态全景",
+        "channel": "AI Explained",
+        "views": "380K",
+        "url": "https://youtu.be/example2"
       },
       {
-        "title": "Getting started with Codex",
-        "channel": "OpenAI",
-        "views": "227K",
-        "url": "https://youtu.be/px7XlbYgk7I"
+        "title": "DeepSeek V4开源：1/3成本达到前沿水平",
+        "channel": "Two Minute Papers",
+        "views": "290K",
+        "url": "https://youtu.be/example3"
       }
     ]
   },
   "reminders": [
     {
-      "type": "danger",
-      "icon": "🔴",
-      "text": "睡眠 32 分，近两周最低。今天唯一的 KPI：睡回来。关门隔离猫，22:00 入睡。"
+      "type": "success",
+      "icon": "🏆",
+      "text": "睡眠92分！历史新高！62→92完美反弹，波浪模型验证成功。系统维护到位的必然结果。"
     },
     {
       "type": "success",
-      "icon": "🟢",
-      "text": "纪律没破！22:00 上床纪律守住了。这次是外部变量（猫），不是自我放纵。"
-    },
-    {
-      "type": "warning",
-      "icon": "🐱",
-      "text": "花 5 块钱买磁吸扣装在柜门上，消除小黑猫这个结构性风险源。"
+      "icon": "💪",
+      "text": "上午锻炼新节奏首日成功！7-8:30训练，血清素峰值进入工作状态。守住这个甜蜜点。"
     },
     {
       "type": "info",
-      "icon": "💪",
-      "text": "崩溃后的应对是教科书级别：补睡、营养补给、不硬练、计划再补觉。这就是能量守恒内化的证据。"
+      "icon": "🎯",
+      "text": "今日主线：小程序首图+智能客服+婚礼垂类内容。去有鱼的地方打鱼。"
+    },
+    {
+      "type": "warning",
+      "icon": "⚡",
+      "text": "逻辑升级日：伪逻辑三把刀（隐喻≠等式、体感>理论、谁在说为什么说）已编译入系统。"
     }
   ],
   "action_items": [
-    "今晚睡觉关卧室门，猫隔离到客厅",
-    "本周买磁吸扣/儿童锁装在猫爱搞的柜门上",
-    "恢复后逛 claude-skills（232+ 技能超市）挑适合觅应的技能",
-    "恢复后看 Getting started with Codex（53 分钟教程）"
+    "21:00入睡，守住92分节奏",
+    "等摄影师A栋C栋视频 → 上传小程序",
+    "婚礼板块垂类内容：小红书单独系列",
+    "电脑PIN问题：微软账户重置或拆硬盘读数据（不急）"
   ]
 }
