@@ -1700,6 +1700,21 @@
   font-weight: 700;
 }
 
+/* 恢复 checkbox 的原生样式 —— 全局 input 规则把它们误伤成空白胶囊了 */
+input[type="checkbox"] {
+  width: auto !important;
+  padding: 0 !important;
+  appearance: auto !important;
+  -webkit-appearance: checkbox !important;
+  border: none !important;
+  background: transparent !important;
+  margin: 0 6px 0 0;
+  vertical-align: middle;
+  accent-color: var(--accent);
+  cursor: pointer;
+  box-shadow: none !important;
+}
+
 /* 数字选择 chip 组（睡眠起夜次数等） */
 .number-chip-group {
   display: flex;
@@ -2707,13 +2722,28 @@
               if (typeof data.weight !== "number" || data.weight < 20 || data.weight > 300) {
                 return "体重需要在 20-300 kg 之间";
               }
+              // 腰围可选；若填了，校验在合理范围
+              if (data.waistCircumference !== null && data.waistCircumference !== undefined) {
+                if (typeof data.waistCircumference !== "number" || data.waistCircumference < 50 || data.waistCircumference > 150) {
+                  return "腰围需要在 50-150 cm 之间";
+                }
+              }
               return "";
             },
             applyToEntry(entry, data) {
-              return EntryModel.normalize({ ...entry, weight: data.weight });
+              return EntryModel.normalize({
+                ...entry,
+                weight: data.weight,
+                waistCircumference: data.waistCircumference ?? null
+              });
             },
             toMarkdown(event) {
-              return `### ⚖️ 体重 ${event.time}\n- ${event.data.weight.toFixed(1)} kg`;
+              const d = event.data;
+              const lines = [`### ⚖️ 体重 ${event.time}`, `- ${d.weight.toFixed(1)} kg`];
+              if (typeof d.waistCircumference === "number") {
+                lines.push(`- 腰围：${d.waistCircumference} cm`);
+              }
+              return lines.join("\n");
             }
           },
 
@@ -2894,6 +2924,7 @@
             wakingEnergy: this.normalizeNullableNumber(raw.wakingEnergy),
             morningThoughts: String(raw.morningThoughts || "").trim(),
             morningPlan: String(raw.morningPlan || "").trim(),
+            waistCircumference: this.normalizeNullableNumber(raw.waistCircumference),
             workoutItems
           };
         },
@@ -3211,6 +3242,10 @@
   const p = prefill || {};
   const today = state.entries.find((e) => e.date === DateUtils.getTodayISO()) || {};
   const defaultWeight = p.weight ?? today.weight ?? CONFIG.currentWeightDefault;
+  // 腰围：prefill > 今日已有 > 默认 80（中间值）
+  const previousWaist = (prefill?.data?.waistCircumference) ?? today.waistCircumference;
+  const hasWaist = typeof previousWaist === "number";
+  const defaultWaist = hasWaist ? previousWaist : 80;
   return `
     <div class="capture-panel" data-panel-type="weight">
       <h3>⚖️ 记体重</h3>
@@ -3218,6 +3253,15 @@
         <div class="field" style="flex:1">
           <label>今日体重（kg）<strong id="weightPanelValue">${defaultWeight}</strong></label>
           <input type="range" id="weightPanelSlider" min="70" max="85" step="0.1" value="${defaultWeight}">
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field" style="flex:1">
+          <label>
+            <input type="checkbox" id="weightPanelHasWaist" ${hasWaist ? "checked" : ""}> 顺便记腰围
+            <strong id="weightPanelWaistValue" style="margin-left:8px">${defaultWaist}</strong> cm
+          </label>
+          <input type="range" id="weightPanelWaistSlider" min="70" max="90" step="0.5" value="${defaultWaist}" ${hasWaist ? "" : "disabled"}>
         </div>
       </div>
       <div class="panel-actions">
@@ -3489,8 +3533,20 @@
   document.getElementById("weightPanelSlider").addEventListener("input", (e) => {
     document.getElementById("weightPanelValue").textContent = Number(e.target.value).toFixed(1);
   });
+  // 腰围滑块实时显示
+  document.getElementById("weightPanelWaistSlider").addEventListener("input", (e) => {
+    document.getElementById("weightPanelWaistValue").textContent = Number(e.target.value);
+  });
+  // 勾选"顺便记腰围"才启用滑块
+  document.getElementById("weightPanelHasWaist").addEventListener("change", (e) => {
+    document.getElementById("weightPanelWaistSlider").disabled = !e.target.checked;
+  });
   document.getElementById("weightPanelSave").addEventListener("click", () => {
-    const data = { weight: Number(document.getElementById("weightPanelSlider").value) };
+    const hasWaist = document.getElementById("weightPanelHasWaist").checked;
+    const data = {
+      weight: Number(document.getElementById("weightPanelSlider").value),
+      waistCircumference: hasWaist ? Number(document.getElementById("weightPanelWaistSlider").value) : null
+    };
     const err = EventModel.types.weight.validate(data);
     if (err) {
       document.getElementById("weightPanelError").textContent = err;
@@ -4618,7 +4674,10 @@
             case "meal": return `${d.type}：${d.food || "无内容"}`;
             case "training": return `${(d.workoutItems || []).length} 个动作`;
             case "recovery": return `${d.type} · +${d.boost}%`;
-            case "weight": return `${d.weight?.toFixed(1) ?? "--"} kg`;
+            case "weight": {
+              const w = `${d.weight?.toFixed(1) ?? "--"} kg`;
+              return typeof d.waistCircumference === "number" ? `${w} · 腰围 ${d.waistCircumference} cm` : w;
+            }
             case "reflection": return `${d.mood} · ${d.energy}/10`;
             case "mood": return `${d.tag}${d.note ? " · " + d.note : ""}`;
             default: return "";
@@ -4703,7 +4762,7 @@
           // 构造确认提示：覆盖型多说明"会清空什么"
           const overwriteFieldsLabel = {
             sleep: "睡眠分、入睡/起床时间、起夜次数、起床能量",
-            weight: "体重",
+            weight: "体重和腰围",
             training: "训练动作清单",
             reflection: "睡前状态、今日整体能量、复盘文本",
             morningNote: "起床想法、今日安排"
@@ -4752,7 +4811,7 @@
               // 覆盖型：清空该事件触及的字段（保留 entry 里的其他字段）
               const resetFields = {
                 sleep: { sleepScore: 0, bedtime: "", wakeTime: "", wakeups: 0, wakingEnergy: null },
-                weight: { weight: null },
+                weight: { weight: null, waistCircumference: null },
                 training: { workoutItems: [], exercised: false },
                 reflection: { mood: "", energy: 0, dailyStory: "" },
                 morningNote: { morningThoughts: "", morningPlan: "" }
