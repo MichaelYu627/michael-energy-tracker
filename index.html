@@ -1952,6 +1952,293 @@ input[type="checkbox"] {
   border-radius: var(--radius-sm);
   letter-spacing: 0.02em;
 }
+
+/* ===== 觅应运营看板 · 深色主题，配 Jarvis 同款 ===== */
+.miying-panel {
+  margin-top: 16px;
+  border-radius: var(--radius-xl);
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 60%, #0f3460 100%);
+  color: #e8e8e8;
+  padding: 22px 20px 18px;
+  box-shadow: 0 20px 50px rgba(15, 20, 40, 0.35);
+  position: relative;
+  overflow: hidden;
+}
+.miying-panel::before {
+  content: "";
+  position: absolute;
+  top: -60px; left: -60px;
+  width: 220px; height: 220px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 184, 0, 0.10), transparent 70%);
+  pointer-events: none;
+}
+.miying-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+  position: relative;
+}
+.miying-logo {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ffb347, #d17b1f);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+.miying-header h2 {
+  margin: 0;
+  font-size: 17px;
+  color: #fff;
+  font-weight: 700;
+}
+.miying-toggle {
+  margin-left: auto;
+  background: rgba(255,255,255,0.08) !important;
+  color: #e8e8e8 !important;
+  border: 1px solid rgba(255,255,255,0.15) !important;
+  border-radius: 999px !important;
+  padding: 6px 14px !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  cursor: pointer;
+}
+.miying-toggle:hover { background: rgba(255,255,255,0.14) !important; }
+.miying-body.collapsed { display: none; }
+
+/* KPI cards */
+.miying-kpis {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-bottom: 18px;
+}
+.kpi-card {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 14px;
+  padding: 12px 14px;
+  position: relative;
+}
+.kpi-card-wide { grid-column: 1 / -1; }
+.kpi-label {
+  font-size: 11px;
+  color: rgba(255,255,255,0.55);
+  letter-spacing: 0.05em;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+}
+.kpi-target-label {
+  text-transform: none;
+  color: rgba(255,255,255,0.4);
+  font-size: 11px;
+  margin-left: 6px;
+}
+.kpi-value {
+  font-size: 22px;
+  font-weight: 700;
+  color: #ffd57a;
+  font-family: var(--font-number);
+  line-height: 1.2;
+  outline: none;
+  display: inline-block;
+  min-width: 30px;
+  cursor: text;
+}
+.kpi-value:focus { color: #fff; background: rgba(255,213,122,0.12); border-radius: 4px; padding: 0 4px; }
+.kpi-value-suffix { display: inline-block; }
+.kpi-suffix {
+  display: inline-block;
+  margin-left: 4px;
+  color: rgba(255,255,255,0.6);
+  font-size: 13px;
+}
+.kpi-progress {
+  margin-top: 8px;
+  height: 6px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.kpi-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #ffb347, #d17b1f);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+/* Sub sections (deals / distrib / todos) */
+.miying-sub {
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+}
+.miying-sub-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.miying-sub h3 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  letter-spacing: 0.02em;
+}
+.miying-sub-meta {
+  font-size: 11px;
+  color: rgba(255,255,255,0.45);
+  font-family: var(--font-number);
+}
+.miying-action-btn {
+  margin-left: auto;
+  background: rgba(255,179,71,0.18) !important;
+  color: #ffd57a !important;
+  border: 1px solid rgba(255,179,71,0.4) !important;
+  border-radius: 999px !important;
+  padding: 5px 12px !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  cursor: pointer;
+}
+.miying-action-btn:hover { background: rgba(255,179,71,0.28) !important; }
+
+/* Tables */
+.miying-table-wrap { overflow-x: auto; }
+.miying-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  color: #e8e8e8;
+}
+.miying-table th {
+  text-align: left;
+  font-weight: 500;
+  color: rgba(255,255,255,0.5);
+  font-size: 11px;
+  padding: 6px 8px;
+  letter-spacing: 0.04em;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+.miying-table th.num, .miying-table td.num { text-align: right; }
+.miying-table td {
+  padding: 8px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  font-family: var(--font-main);
+}
+.miying-table td.amount, .miying-table td.cumulative {
+  font-family: var(--font-number);
+  color: #ffd57a;
+}
+.miying-table td.cumulative { color: rgba(255,213,122,0.7); }
+.miying-table tr:last-child td { border-bottom: none; }
+.miying-deal-del {
+  background: transparent !important;
+  border: none !important;
+  color: rgba(255,255,255,0.3) !important;
+  cursor: pointer;
+  font-size: 16px !important;
+  padding: 0 !important;
+  width: 22px;
+}
+.miying-deal-del:hover { color: #ff8a80 !important; }
+.miying-table .empty-row td {
+  text-align: center;
+  color: rgba(255,255,255,0.4);
+  font-size: 12px;
+  padding: 14px 8px;
+}
+
+/* Distribution grid */
+.miying-distrib-table th, .miying-distrib-table td {
+  text-align: center;
+  padding: 6px 4px;
+}
+.miying-distrib-table .day-label {
+  text-align: left;
+  color: rgba(255,255,255,0.7);
+  font-size: 12px;
+  white-space: nowrap;
+  padding-right: 8px;
+}
+.miying-distrib-table .day-label.today {
+  color: #ffd57a;
+  font-weight: 600;
+}
+.miying-distrib-cell {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  background: rgba(255,255,255,0.06);
+  cursor: pointer;
+  font-size: 14px;
+  transition: background 0.15s;
+  user-select: none;
+}
+.miying-distrib-cell:hover { background: rgba(255,255,255,0.12); }
+.miying-distrib-cell.checked {
+  background: linear-gradient(135deg, #2d8f4e, #5cba73);
+  color: #fff;
+}
+
+/* Todos */
+.miying-todos {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.miying-todo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 4px;
+  border-bottom: 1px dashed rgba(255,255,255,0.07);
+  font-size: 13.5px;
+}
+.miying-todo:last-child { border-bottom: none; }
+.miying-todo input[type="checkbox"] {
+  flex-shrink: 0;
+  margin: 0 !important;
+  accent-color: #ffd57a !important;
+}
+.miying-todo .todo-text {
+  flex: 1;
+  color: #e8e8e8;
+  outline: none;
+  word-break: break-word;
+}
+.miying-todo.done .todo-text {
+  text-decoration: line-through;
+  color: rgba(255,255,255,0.35);
+}
+.miying-todo .todo-del {
+  background: transparent !important;
+  border: none !important;
+  color: rgba(255,255,255,0.3) !important;
+  cursor: pointer;
+  font-size: 16px !important;
+  padding: 0 !important;
+  width: 22px;
+}
+.miying-todo .todo-del:hover { color: #ff8a80 !important; }
+
+/* Mobile tweaks */
+@media (max-width: 480px) {
+  .miying-panel { padding: 18px 14px 14px; }
+  .miying-kpis { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .kpi-card { padding: 10px 12px; }
+  .kpi-value { font-size: 19px; }
+  .miying-distrib-cell { width: 24px; height: 24px; font-size: 13px; }
+  .miying-distrib-table th, .miying-distrib-table td { padding: 4px 2px; font-size: 11px; }
+}
   </style>
 </head>
 <body>
@@ -2041,6 +2328,78 @@ input[type="checkbox"] {
       <div class="jarvis-tab-content" id="jarvisTabYoutube"></div>
       <div class="jarvis-tab-content" id="jarvisTabReminders"></div>
       <div class="jarvis-actions" id="jarvisActions"></div>
+    </section>
+
+    <!-- 觅应运营看板 -->
+    <section class="miying-panel" id="miyingPanel">
+      <header class="miying-header">
+        <span class="miying-logo">📈</span>
+        <h2>觅应运营看板</h2>
+        <button class="miying-toggle" id="miyingToggleBtn" type="button">收起</button>
+      </header>
+
+      <div class="miying-body" id="miyingBody">
+        <!-- Module 1: KPI cards -->
+        <div class="miying-kpis">
+          <div class="kpi-card">
+            <div class="kpi-label">总成交额</div>
+            <div class="kpi-value" data-metric="totalRevenue" contenteditable="true" inputmode="numeric"></div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">净利润</div>
+            <div class="kpi-value" data-metric="netProfit" contenteditable="true" inputmode="numeric"></div>
+          </div>
+          <div class="kpi-card kpi-card-wide">
+            <div class="kpi-label">系统收入月化 <span class="kpi-target-label">目标 <span data-metric="monthlyIncomeTarget" contenteditable="true">50000</span></span></div>
+            <div class="kpi-value" data-metric="monthlyIncome" contenteditable="true" inputmode="numeric"></div>
+            <div class="kpi-progress">
+              <div class="kpi-progress-fill" id="kpiProgressFill"></div>
+            </div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">房源总数</div>
+            <div class="kpi-value kpi-value-suffix" data-metric="propertyCount" contenteditable="true" inputmode="numeric"></div>
+            <div class="kpi-suffix">套</div>
+          </div>
+        </div>
+
+        <!-- Module 2: Deals -->
+        <div class="miying-sub">
+          <div class="miying-sub-header">
+            <h3>近期成交记录</h3>
+            <button class="miying-action-btn" id="miyingAddDealBtn" type="button">+ 新增成交</button>
+          </div>
+          <div class="miying-table-wrap">
+            <table class="miying-table">
+              <thead><tr><th>日期</th><th>来源</th><th class="num">金额</th><th class="num">累计</th><th></th></tr></thead>
+              <tbody id="miyingDealsBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Module 3: Distribution grid -->
+        <div class="miying-sub">
+          <div class="miying-sub-header">
+            <h3>本周内容分发</h3>
+            <span class="miying-sub-meta" id="miyingWeekLabel"></span>
+          </div>
+          <div class="miying-table-wrap">
+            <table class="miying-table miying-distrib-table">
+              <thead><tr id="distribHeader"></tr></thead>
+              <tbody id="miyingDistribBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Module 4: Weekly focus todos -->
+        <div class="miying-sub">
+          <div class="miying-sub-header">
+            <h3>本周重点</h3>
+            <button class="miying-action-btn" id="miyingAddTodoBtn" type="button">+ 新增</button>
+          </div>
+          <ul class="miying-todos" id="miyingTodosList"></ul>
+        </div>
+      </div>
     </section>
 
 <!-- 重设计：快速捕获面板 -->
@@ -5415,6 +5774,340 @@ input[type="checkbox"] {
       }
 
       initJarvis();
+    })();
+
+    // ── 觅应运营看板 ──
+    (() => {
+      const STORAGE_KEY = "michael-miying-dashboard-v1";
+
+      const PLATFORMS = ["小红书", "TikTok", "X", "Facebook", "朋友圈", "公众号"];
+      const DAY_LABELS = ["周一", "周二", "周三", "周四", "周五", "周六", "周日"];
+
+      function defaultState() {
+        return {
+          metrics: {
+            totalRevenue: 118000,
+            netProfit: 40000,
+            monthlyIncome: 30000,
+            monthlyIncomeTarget: 50000,
+            propertyCount: 18
+          },
+          deals: [
+            { id: "deal-seed-1", date: "2026-05-01", source: "40天MVP汇总", amount: 110000 },
+            { id: "deal-seed-2", date: "2026-05-12", source: "网站", amount: 8000 }
+          ],
+          distribution: {},  // { 'YYYY-MM-DD': { '小红书': true, ... } }
+          todos: [
+            { id: "todo-seed-1", text: "5/14 九院南院正畸复诊", done: false },
+            { id: "todo-seed-2", text: "5/20 零界魔方路演", done: false },
+            { id: "todo-seed-3", text: "系统收入追踪：本周新增成交？", done: false },
+            { id: "todo-seed-4", text: "慢食协议继续执行", done: false },
+            { id: "todo-seed-5", text: "睡前SOP继续运转", done: false }
+          ],
+          collapsed: false
+        };
+      }
+
+      function load() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (!raw) return defaultState();
+          const parsed = JSON.parse(raw);
+          // 补齐缺失字段
+          const def = defaultState();
+          return {
+            metrics: { ...def.metrics, ...(parsed.metrics || {}) },
+            deals: Array.isArray(parsed.deals) ? parsed.deals : def.deals,
+            distribution: parsed.distribution && typeof parsed.distribution === "object" ? parsed.distribution : {},
+            todos: Array.isArray(parsed.todos) ? parsed.todos : def.todos,
+            collapsed: !!parsed.collapsed
+          };
+        } catch (err) {
+          console.error("觅应看板读取失败:", err);
+          return defaultState();
+        }
+      }
+
+      function save(state) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      }
+
+      let state = load();
+
+      // ── 工具函数 ──
+      function fmtCurrency(n) {
+        if (typeof n !== "number" || !Number.isFinite(n)) return "¥0";
+        return "¥" + n.toLocaleString();
+      }
+      function parseNumber(str) {
+        if (typeof str !== "string") return NaN;
+        const cleaned = str.replace(/[¥,，\s+套]/g, "");
+        return Number(cleaned);
+      }
+      function makeId(prefix) {
+        return `${prefix}-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+      }
+      function getMondayISO(date) {
+        const d = new Date(date);
+        const day = d.getDay() || 7;
+        d.setDate(d.getDate() - (day - 1));
+        d.setHours(0, 0, 0, 0);
+        return d.toISOString().slice(0, 10);
+      }
+      function getWeekDates() {
+        const today = new Date();
+        const monday = new Date(getMondayISO(today) + "T00:00:00");
+        return Array.from({ length: 7 }, (_, i) => {
+          const d = new Date(monday);
+          d.setDate(monday.getDate() + i);
+          return d.toISOString().slice(0, 10);
+        });
+      }
+      function todayISO() {
+        return new Date().toISOString().slice(0, 10);
+      }
+      function fmtShortDate(iso) {
+        const [, mm, dd] = iso.split("-");
+        return `${Number(mm)}/${Number(dd)}`;
+      }
+
+      // ── 渲染 ──
+      function renderKPIs() {
+        const m = state.metrics;
+        document.querySelectorAll(".kpi-value[data-metric]").forEach((el) => {
+          const key = el.dataset.metric;
+          if (key === "propertyCount") {
+            el.textContent = String(m.propertyCount ?? 0);
+          } else {
+            el.textContent = fmtCurrency(m[key]);
+          }
+        });
+        const targetEl = document.querySelector('[data-metric="monthlyIncomeTarget"]');
+        if (targetEl) targetEl.textContent = fmtCurrency(m.monthlyIncomeTarget);
+        const fill = document.getElementById("kpiProgressFill");
+        if (fill) {
+          const pct = m.monthlyIncomeTarget > 0
+            ? Math.min(100, Math.max(0, (m.monthlyIncome / m.monthlyIncomeTarget) * 100))
+            : 0;
+          fill.style.width = pct.toFixed(1) + "%";
+        }
+      }
+
+      function renderDeals() {
+        const tbody = document.getElementById("miyingDealsBody");
+        if (!tbody) return;
+        const sorted = [...state.deals].sort((a, b) => a.date.localeCompare(b.date));
+        if (!sorted.length) {
+          tbody.innerHTML = `<tr class="empty-row"><td colspan="5">还没有成交记录，点右上"+ 新增成交"添加。</td></tr>`;
+          return;
+        }
+        let running = 0;
+        tbody.innerHTML = sorted.map((d) => {
+          running += d.amount || 0;
+          return `
+            <tr data-deal-id="${d.id}">
+              <td>${fmtShortDate(d.date)}</td>
+              <td>${escapeHtml(d.source || "")}</td>
+              <td class="num amount">${fmtCurrency(d.amount || 0)}</td>
+              <td class="num cumulative">${fmtCurrency(running)}</td>
+              <td><button class="miying-deal-del" type="button" data-action="delete-deal" aria-label="删除">×</button></td>
+            </tr>
+          `;
+        }).join("");
+      }
+
+      function renderDistribution() {
+        const head = document.getElementById("distribHeader");
+        const body = document.getElementById("miyingDistribBody");
+        const weekLabel = document.getElementById("miyingWeekLabel");
+        if (!head || !body) return;
+
+        // 表头：空 + 6 平台
+        head.innerHTML = `<th></th>` + PLATFORMS.map((p) => `<th>${p}</th>`).join("");
+
+        const dates = getWeekDates();
+        if (weekLabel) weekLabel.textContent = `${fmtShortDate(dates[0])} - ${fmtShortDate(dates[6])}`;
+        const tIso = todayISO();
+        body.innerHTML = dates.map((iso, i) => {
+          const dayClass = iso === tIso ? "day-label today" : "day-label";
+          const cells = PLATFORMS.map((p) => {
+            const checked = !!(state.distribution[iso] && state.distribution[iso][p]);
+            return `<td><span class="miying-distrib-cell${checked ? " checked" : ""}" data-action="toggle-distrib" data-date="${iso}" data-platform="${p}">${checked ? "✓" : ""}</span></td>`;
+          }).join("");
+          return `<tr><td class="${dayClass}">${DAY_LABELS[i]}<br><span style="font-size:10px;opacity:0.5">${fmtShortDate(iso)}</span></td>${cells}</tr>`;
+        }).join("");
+      }
+
+      function renderTodos() {
+        const list = document.getElementById("miyingTodosList");
+        if (!list) return;
+        if (!state.todos.length) {
+          list.innerHTML = `<li class="miying-todo" style="color:rgba(255,255,255,0.4);font-size:12px">点"+ 新增"加一条本周重点</li>`;
+          return;
+        }
+        list.innerHTML = state.todos.map((t) => `
+          <li class="miying-todo${t.done ? " done" : ""}" data-todo-id="${t.id}">
+            <input type="checkbox" data-action="toggle-todo" ${t.done ? "checked" : ""}>
+            <span class="todo-text" contenteditable="true" data-action="edit-todo">${escapeHtml(t.text)}</span>
+            <button class="todo-del" type="button" data-action="delete-todo" aria-label="删除">×</button>
+          </li>
+        `).join("");
+      }
+
+      function escapeHtml(s) {
+        return String(s).replace(/[&<>"']/g, (c) => ({
+          "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+        }[c]));
+      }
+
+      function renderAll() {
+        renderKPIs();
+        renderDeals();
+        renderDistribution();
+        renderTodos();
+      }
+
+      // ── 事件绑定 ──
+      function bindEvents() {
+        // KPI inline edit
+        document.querySelectorAll(".kpi-value[data-metric], [data-metric='monthlyIncomeTarget']").forEach((el) => {
+          el.addEventListener("blur", () => {
+            const key = el.dataset.metric;
+            if (!key) return;
+            const num = parseNumber(el.textContent);
+            if (Number.isFinite(num) && num >= 0) {
+              state.metrics[key] = num;
+              save(state);
+              renderKPIs();
+            } else {
+              renderKPIs(); // 还原
+            }
+          });
+          el.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              el.blur();
+            }
+          });
+        });
+
+        // Toggle 收起/展开
+        const toggleBtn = document.getElementById("miyingToggleBtn");
+        const body = document.getElementById("miyingBody");
+        function applyCollapsed() {
+          body.classList.toggle("collapsed", state.collapsed);
+          toggleBtn.textContent = state.collapsed ? "展开" : "收起";
+        }
+        applyCollapsed();
+        toggleBtn.addEventListener("click", () => {
+          state.collapsed = !state.collapsed;
+          save(state);
+          applyCollapsed();
+        });
+
+        // 新增成交
+        document.getElementById("miyingAddDealBtn").addEventListener("click", () => {
+          const date = window.prompt("日期 (YYYY-MM-DD)", todayISO());
+          if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) return;
+          const source = window.prompt("来源（例如：网站、抖音、推荐）");
+          if (!source) return;
+          const amountStr = window.prompt("金额（数字，不含 ¥）");
+          if (!amountStr) return;
+          const amount = parseNumber(amountStr);
+          if (!Number.isFinite(amount) || amount <= 0) {
+            window.alert("金额需要是正数");
+            return;
+          }
+          state.deals.push({ id: makeId("deal"), date, source: source.trim(), amount });
+          // 自动累加到总成交额
+          state.metrics.totalRevenue = state.deals.reduce((sum, d) => sum + (d.amount || 0), 0);
+          save(state);
+          renderDeals();
+          renderKPIs();
+        });
+
+        // 删除成交
+        document.getElementById("miyingDealsBody").addEventListener("click", (e) => {
+          const btn = e.target.closest("[data-action='delete-deal']");
+          if (!btn) return;
+          const row = btn.closest("tr[data-deal-id]");
+          if (!row) return;
+          const id = row.dataset.dealId;
+          const deal = state.deals.find((d) => d.id === id);
+          if (!deal) return;
+          if (!window.confirm(`确定删除 ${fmtShortDate(deal.date)} ${deal.source} ${fmtCurrency(deal.amount)} 这条记录吗？`)) return;
+          state.deals = state.deals.filter((d) => d.id !== id);
+          state.metrics.totalRevenue = state.deals.reduce((sum, d) => sum + (d.amount || 0), 0);
+          save(state);
+          renderDeals();
+          renderKPIs();
+        });
+
+        // 分发格子点击
+        document.getElementById("miyingDistribBody").addEventListener("click", (e) => {
+          const cell = e.target.closest("[data-action='toggle-distrib']");
+          if (!cell) return;
+          const date = cell.dataset.date;
+          const platform = cell.dataset.platform;
+          if (!state.distribution[date]) state.distribution[date] = {};
+          state.distribution[date][platform] = !state.distribution[date][platform];
+          save(state);
+          // 局部更新避免重绘整个表
+          cell.classList.toggle("checked", state.distribution[date][platform]);
+          cell.textContent = state.distribution[date][platform] ? "✓" : "";
+        });
+
+        // Todo 新增
+        document.getElementById("miyingAddTodoBtn").addEventListener("click", () => {
+          const text = window.prompt("新本周重点");
+          if (!text || !text.trim()) return;
+          state.todos.push({ id: makeId("todo"), text: text.trim(), done: false });
+          save(state);
+          renderTodos();
+        });
+
+        // Todo 勾选 / 删除 / 编辑
+        const todosList = document.getElementById("miyingTodosList");
+        todosList.addEventListener("click", (e) => {
+          const li = e.target.closest("li[data-todo-id]");
+          if (!li) return;
+          const id = li.dataset.todoId;
+          const todo = state.todos.find((t) => t.id === id);
+          if (!todo) return;
+          if (e.target.matches("[data-action='toggle-todo']")) {
+            todo.done = e.target.checked;
+            li.classList.toggle("done", todo.done);
+            save(state);
+          } else if (e.target.matches("[data-action='delete-todo']")) {
+            if (!window.confirm(`删除 "${todo.text}" 吗？`)) return;
+            state.todos = state.todos.filter((t) => t.id !== id);
+            save(state);
+            renderTodos();
+          }
+        });
+        // Todo 行内编辑
+        todosList.addEventListener("blur", (e) => {
+          if (!e.target.matches("[data-action='edit-todo']")) return;
+          const li = e.target.closest("li[data-todo-id]");
+          if (!li) return;
+          const id = li.dataset.todoId;
+          const todo = state.todos.find((t) => t.id === id);
+          if (!todo) return;
+          const newText = e.target.textContent.trim();
+          if (!newText) { renderTodos(); return; }
+          if (newText !== todo.text) {
+            todo.text = newText;
+            save(state);
+          }
+        }, true);
+      }
+
+      function init() {
+        renderAll();
+        bindEvents();
+      }
+
+      init();
     })();
   </script>
 </body>
