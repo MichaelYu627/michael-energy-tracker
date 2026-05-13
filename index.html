@@ -2756,6 +2756,12 @@ input[type="checkbox"] {
                 return "今日整体能量需要在 1-10 之间";
               }
               if (!data.mood) return "请选择睡前状态";
+              // 步数可选；若填，需在合理范围
+              if (data.dailySteps !== null && data.dailySteps !== undefined) {
+                if (typeof data.dailySteps !== "number" || data.dailySteps < 0 || data.dailySteps > 60000) {
+                  return "今日步数需要在 0-60000 之间";
+                }
+              }
               return "";
             },
             applyToEntry(entry, data) {
@@ -2763,7 +2769,8 @@ input[type="checkbox"] {
                 ...entry,
                 mood: data.mood,
                 energy: data.energy,
-                dailyStory: data.dailyStory || ""
+                dailyStory: data.dailyStory || "",
+                dailySteps: data.dailySteps ?? null
               });
             },
             toMarkdown(event) {
@@ -2773,6 +2780,9 @@ input[type="checkbox"] {
                 `- 睡前状态：${d.mood}`,
                 `- 今日整体能量：${d.energy}/10`
               ];
+              if (typeof d.dailySteps === "number") {
+                lines.push(`- 今日步数：${d.dailySteps.toLocaleString()}`);
+              }
               if (d.dailyStory) lines.push("", d.dailyStory);
               return lines.join("\n");
             }
@@ -2925,6 +2935,7 @@ input[type="checkbox"] {
             morningThoughts: String(raw.morningThoughts || "").trim(),
             morningPlan: String(raw.morningPlan || "").trim(),
             waistCircumference: this.normalizeNullableNumber(raw.waistCircumference),
+            dailySteps: this.normalizeNullableNumber(raw.dailySteps),
             workoutItems
           };
         },
@@ -3411,6 +3422,12 @@ input[type="checkbox"] {
           <input type="range" id="reflectionPanelEnergy" min="1" max="10" step="1" value="${p.energy ?? today.energy ?? 7}">
         </div>
       </div>
+      <div class="field-row">
+        <div class="field" style="flex:1">
+          <label>今日步数（可选）</label>
+          <input type="number" id="reflectionPanelSteps" min="0" max="60000" step="1" placeholder="从手机/手环复制总数" value="${(p.dailySteps ?? today.dailySteps) ?? ""}">
+        </div>
+      </div>
       <div class="field">
         <label>想复盘什么</label>
         <textarea id="reflectionPanelStory" rows="5" placeholder="例如：今天哪里做得不错，哪里消耗了能量，明天醒来最重要的一件事。">${p.dailyStory ?? today.dailyStory ?? ""}</textarea>
@@ -3679,9 +3696,11 @@ input[type="checkbox"] {
     document.getElementById("reflectionPanelEnergyValue").textContent = e.target.value;
   });
   document.getElementById("reflectionPanelSave").addEventListener("click", () => {
+    const stepsRaw = document.getElementById("reflectionPanelSteps").value.trim();
     const data = {
       mood: document.getElementById("reflectionPanelMood").value,
       energy: Number(document.getElementById("reflectionPanelEnergy").value),
+      dailySteps: stepsRaw === "" ? null : Number(stepsRaw),
       dailyStory: document.getElementById("reflectionPanelStory").value.trim()
     };
     const err = EventModel.types.reflection.validate(data);
@@ -4678,7 +4697,10 @@ input[type="checkbox"] {
               const w = `${d.weight?.toFixed(1) ?? "--"} kg`;
               return typeof d.waistCircumference === "number" ? `${w} · 腰围 ${d.waistCircumference} cm` : w;
             }
-            case "reflection": return `${d.mood} · ${d.energy}/10`;
+            case "reflection": {
+              const base = `${d.mood} · ${d.energy}/10`;
+              return typeof d.dailySteps === "number" ? `${base} · ${d.dailySteps.toLocaleString()} 步` : base;
+            }
             case "mood": return `${d.tag}${d.note ? " · " + d.note : ""}`;
             default: return "";
           }
@@ -4764,7 +4786,7 @@ input[type="checkbox"] {
             sleep: "睡眠分、入睡/起床时间、起夜次数、起床能量",
             weight: "体重和腰围",
             training: "训练动作清单",
-            reflection: "睡前状态、今日整体能量、复盘文本",
+            reflection: "睡前状态、今日整体能量、今日步数、复盘文本",
             morningNote: "起床想法、今日安排"
           };
           const confirmMsg = def.mode === "append"
@@ -4813,7 +4835,7 @@ input[type="checkbox"] {
                 sleep: { sleepScore: 0, bedtime: "", wakeTime: "", wakeups: 0, wakingEnergy: null },
                 weight: { weight: null, waistCircumference: null },
                 training: { workoutItems: [], exercised: false },
-                reflection: { mood: "", energy: 0, dailyStory: "" },
+                reflection: { mood: "", energy: 0, dailyStory: "", dailySteps: null },
                 morningNote: { morningThoughts: "", morningPlan: "" }
               }[queueEvent.eventType] || {};
               draft = { ...entry, ...resetFields };
