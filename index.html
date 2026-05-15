@@ -1953,6 +1953,249 @@ input[type="checkbox"] {
   letter-spacing: 0.02em;
 }
 
+/* ===== 尿酸管理指南（替换原 Jarvis 简报） ===== */
+.uric-panel { margin-top: 16px; }
+.uric-panel .section-title h2 { font-size: 18px; }
+.uric-panel .section-title span { color: var(--accent-warm); font-weight: 600; }
+
+.uric-card {
+  background: var(--panel-strong);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  margin: 10px 0;
+  overflow: hidden;
+}
+.uric-card summary {
+  list-style: none;
+  cursor: pointer;
+  padding: 14px 16px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  user-select: none;
+  position: relative;
+  transition: background 0.15s;
+}
+.uric-card summary::-webkit-details-marker { display: none; }
+.uric-card summary::after {
+  content: "▾";
+  margin-left: auto;
+  color: var(--muted);
+  font-size: 12px;
+  transition: transform 0.2s;
+}
+.uric-card[open] summary::after { transform: rotate(180deg); }
+.uric-card summary:hover { background: var(--bg-deep); }
+.uric-card-icon { font-size: 18px; }
+.uric-card-meta {
+  margin-left: 8px;
+  font-size: 11px;
+  color: var(--muted);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+}
+
+.uric-section {
+  padding: 0 16px 14px;
+}
+.uric-section-label {
+  margin: 6px 0 8px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+.uric-section-label.red { color: #c44536; }
+.uric-section-label.yellow { color: #d17b1f; }
+.uric-section-label.green { color: #1f7a5c; }
+
+.uric-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.uric-pill {
+  padding: 4px 11px;
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+.uric-pill.red {
+  background: rgba(196, 69, 54, 0.12);
+  color: #a03328;
+  border-color: rgba(196, 69, 54, 0.3);
+}
+.uric-pill.yellow {
+  background: rgba(209, 123, 31, 0.14);
+  color: #a05908;
+  border-color: rgba(209, 123, 31, 0.32);
+}
+.uric-pill.green {
+  background: rgba(31, 122, 92, 0.12);
+  color: #135642;
+  border-color: rgba(31, 122, 92, 0.3);
+}
+
+/* 饮品列表 */
+.uric-drinks {
+  list-style: none;
+  margin: 0;
+  padding: 0 16px 14px;
+}
+.uric-drinks li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px dashed var(--line);
+  font-size: 13.5px;
+  color: var(--text);
+}
+.uric-drinks li:last-child { border-bottom: none; }
+.uric-drinks .stars {
+  flex-shrink: 0;
+  font-size: 13px;
+  letter-spacing: -1px;
+  min-width: 56px;
+}
+.uric-drinks .stars.no { color: #c44536; }
+.uric-drinks strong {
+  color: var(--text);
+  margin-right: 4px;
+}
+
+/* 每日执行清单 */
+.uric-checklist {
+  list-style: none;
+  margin: 0;
+  padding: 0 16px 14px;
+}
+.uric-checklist li {
+  padding: 8px 0;
+  border-bottom: 1px dashed var(--line);
+}
+.uric-checklist li:last-child { border-bottom: none; }
+.uric-checklist label {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  cursor: pointer;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--text);
+}
+.uric-checklist input[type="checkbox"] {
+  margin: 2px 0 0 !important;
+  flex-shrink: 0;
+  accent-color: var(--accent);
+}
+.uric-checklist-sub {
+  font-size: 11.5px;
+  color: var(--muted);
+  margin-top: 4px;
+  margin-left: 24px;
+  letter-spacing: 0.01em;
+}
+.uric-checklist label.done span,
+.uric-checklist label:has(input:checked) span {
+  text-decoration: line-through;
+  color: var(--muted);
+}
+
+/* 复查记录追踪 */
+.uric-tracking {
+  margin-top: 16px;
+  padding: 14px 16px;
+  background: var(--panel-strong);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+}
+.uric-tracking-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.uric-tracking-header h3 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+.uric-tracking-header button {
+  margin-left: auto;
+}
+.uric-tracking-wrap { overflow-x: auto; }
+.uric-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  color: var(--text);
+}
+.uric-table th {
+  text-align: left;
+  font-weight: 500;
+  color: var(--muted);
+  font-size: 11px;
+  padding: 6px 6px;
+  letter-spacing: 0.03em;
+  border-bottom: 1px solid var(--line);
+}
+.uric-table th.num, .uric-table td.num { text-align: right; }
+.uric-table td {
+  padding: 8px 6px;
+  border-bottom: 1px solid var(--line);
+}
+.uric-table td.num {
+  font-family: var(--font-number);
+}
+.uric-table tr:last-child td { border-bottom: none; }
+.uric-table .empty-row td {
+  text-align: center;
+  color: var(--muted);
+  font-size: 12px;
+  padding: 14px 6px;
+}
+.uric-table .uric-record-del {
+  background: transparent !important;
+  border: none !important;
+  color: var(--muted) !important;
+  cursor: pointer;
+  font-size: 16px !important;
+  padding: 0 !important;
+  width: 24px;
+}
+.uric-table .uric-record-del:hover { color: #c44536 !important; }
+.uric-table .uric-value-high { color: #c44536; font-weight: 700; }
+.uric-table .uric-value-mid { color: #d17b1f; font-weight: 700; }
+.uric-table .uric-value-ok { color: #1f7a5c; font-weight: 700; }
+.uric-chart-wrap {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--line);
+}
+.uric-chart-meta {
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+/* 移动端 */
+@media (max-width: 480px) {
+  .uric-card summary { padding: 12px 14px; font-size: 14px; }
+  .uric-section { padding: 0 14px 12px; }
+  .uric-pill { font-size: 11.5px; padding: 3px 9px; }
+  .uric-drinks { padding: 0 14px 12px; }
+  .uric-drinks li { font-size: 13px; }
+  .uric-tracking { padding: 12px 14px; }
+  .uric-table th, .uric-table td { padding: 6px 4px; font-size: 12px; }
+}
+
 /* ===== 觅应运营看板 · 深色主题，配 Jarvis 同款 ===== */
 .miying-panel {
   margin-top: 16px;
@@ -2307,27 +2550,119 @@ input[type="checkbox"] {
     </header>
 
     <!-- Jarvis 每日面板 -->
-    <section class="jarvis-panel" id="jarvisPanel">
-      <div class="jarvis-header">
-        <div class="jarvis-logo">J</div>
-        <h2>Jarvis 每日简报</h2>
-        <span class="jarvis-date" id="jarvisDate"></span>
+    <!-- 尿酸管理指南（替换原 Jarvis 简报） -->
+    <section class="panel uric-panel" id="uricPanel">
+      <div class="panel-content">
+        <div class="section-title">
+          <h2>🩺 尿酸管理指南</h2>
+          <span id="uricSubtitle">566 → 420 目标追踪</span>
+        </div>
+
+        <!-- 卡片 1：饮食红绿灯（默认展开） -->
+        <details class="uric-card" open>
+          <summary><span class="uric-card-icon">🚦</span>饮食红绿灯</summary>
+          <div class="uric-section">
+            <h4 class="uric-section-label red">🚫 红色 · 禁止</h4>
+            <div class="uric-pills">
+              <span class="uric-pill red">动物内脏（肝/肾/脑）</span>
+              <span class="uric-pill red">浓肉汤 / 骨头汤</span>
+              <span class="uric-pill red">火锅汤底</span>
+              <span class="uric-pill red">海鲜（虾/蟹/贝类/沙丁鱼）</span>
+              <span class="uric-pill red">啤酒</span>
+              <span class="uric-pill red">含糖饮料 / 果汁 / 西瓜汁</span>
+            </div>
+          </div>
+          <div class="uric-section">
+            <h4 class="uric-section-label yellow">⚠️ 黄色 · 控量（周 2-3 次）</h4>
+            <div class="uric-pills">
+              <span class="uric-pill yellow">牛肉 ≤150g/次</span>
+              <span class="uric-pill yellow">猪肉 / 羊肉</span>
+              <span class="uric-pill yellow">白肉鱼</span>
+              <span class="uric-pill yellow">菌菇类</span>
+              <span class="uric-pill yellow">西瓜 ≤300g</span>
+              <span class="uric-pill yellow">芒果 / 荔枝 / 葡萄</span>
+            </div>
+          </div>
+          <div class="uric-section">
+            <h4 class="uric-section-label green">✅ 绿色 · 放心吃</h4>
+            <div class="uric-pills">
+              <span class="uric-pill green">鸡蛋（每天 2-3 个）</span>
+              <span class="uric-pill green">纯牛奶（每天 1-2 杯）</span>
+              <span class="uric-pill green">鸡胸肉</span>
+              <span class="uric-pill green">蔬菜</span>
+              <span class="uric-pill green">米饭 / 面条 / 土豆</span>
+              <span class="uric-pill green">樱桃 🍒</span>
+              <span class="uric-pill green">蓝莓 / 苹果</span>
+              <span class="uric-pill green">豆腐</span>
+              <span class="uric-pill green">番茄炒蛋 / 黄瓜炒蛋（外食默认）</span>
+            </div>
+          </div>
+        </details>
+
+        <!-- 卡片 2：饮品指南 -->
+        <details class="uric-card">
+          <summary><span class="uric-card-icon">🥤</span>饮品指南</summary>
+          <ul class="uric-drinks">
+            <li><span class="stars">⭐⭐⭐</span><strong>柠檬水</strong>　碱化尿液，促排泄</li>
+            <li><span class="stars">⭐⭐⭐</span><strong>纯牛奶</strong>　促排泄 + 补蛋白</li>
+            <li><span class="stars">⭐⭐⭐</span><strong>白水</strong>　基础保障</li>
+            <li><span class="stars">⭐⭐</span><strong>无糖苏打水</strong>　碱性</li>
+            <li><span class="stars">⭐⭐</span><strong>黑咖啡（午前）</strong>　可能降尿酸</li>
+            <li><span class="stars">⭐</span><strong>淡茶</strong>　午后选无咖啡因</li>
+            <li><span class="stars no">❌</span><strong>啤酒 / 含糖饮料 / 果汁</strong>　禁止</li>
+          </ul>
+        </details>
+
+        <!-- 卡片 3：每日执行清单 -->
+        <details class="uric-card">
+          <summary><span class="uric-card-icon">📋</span>每日执行清单<span class="uric-card-meta" id="uricChecklistMeta"></span></summary>
+          <ul class="uric-checklist" id="uricChecklist">
+            <li>
+              <label>
+                <input type="checkbox" data-task="water">
+                <span>白天喝水 ≥ 2500ml（19:00 前完成）</span>
+              </label>
+              <div class="uric-checklist-sub">06-12 → 1200ml　12-17 → 1000ml　17-19 → 300ml</div>
+            </li>
+            <li>
+              <label>
+                <input type="checkbox" data-task="medication">
+                <span>苯溴马隆 饭后服（25mg/天，后续可加到 50mg）</span>
+              </label>
+            </li>
+            <li>
+              <label>
+                <input type="checkbox" data-task="beef-quota">
+                <span>牛肉今天在配额内（周 2-3 次 ≤150g）</span>
+              </label>
+            </li>
+            <li>
+              <label>
+                <input type="checkbox" data-task="avoid-red">
+                <span>避开红色标签食物</span>
+              </label>
+            </li>
+          </ul>
+        </details>
+
+        <!-- 追踪表：尿酸复查记录 -->
+        <div class="uric-tracking">
+          <div class="uric-tracking-header">
+            <h3>📊 尿酸复查记录</h3>
+            <button class="btn-secondary btn-slim" id="uricAddRecordBtn" type="button">+ 添加记录</button>
+          </div>
+          <div class="uric-tracking-wrap">
+            <table class="uric-table">
+              <thead><tr><th>日期</th><th class="num">尿酸 μmol/L</th><th class="num">体重 kg</th><th>用药</th><th>备注</th><th></th></tr></thead>
+              <tbody id="uricRecordsBody"></tbody>
+            </table>
+          </div>
+          <div class="uric-chart-wrap" id="uricChartWrap" hidden>
+            <div class="uric-chart-meta">目标：<strong>420 μmol/L</strong>（绿色虚线）</div>
+            <canvas id="uricChart"></canvas>
+          </div>
+        </div>
       </div>
-      <div class="jarvis-tagline" id="jarvisTagline">
-        <span class="tagline-label">今日定语</span>
-        <span id="jarvisTaglineText">加载中...</span>
-      </div>
-      <div class="jarvis-tabs" id="jarvisTabs">
-        <button class="jarvis-tab active" data-tab="briefing">📰 AI简报</button>
-        <button class="jarvis-tab" data-tab="github">⭐ GitHub热门</button>
-        <button class="jarvis-tab" data-tab="youtube">🎬 YouTube</button>
-        <button class="jarvis-tab" data-tab="reminders">💡 Jarvis提醒</button>
-      </div>
-      <div class="jarvis-tab-content active" id="jarvisTabBriefing"></div>
-      <div class="jarvis-tab-content" id="jarvisTabGithub"></div>
-      <div class="jarvis-tab-content" id="jarvisTabYoutube"></div>
-      <div class="jarvis-tab-content" id="jarvisTabReminders"></div>
-      <div class="jarvis-actions" id="jarvisActions"></div>
     </section>
 
     <!-- 觅应运营看板 -->
@@ -5627,154 +5962,256 @@ input[type="checkbox"] {
       initialize();
     })();
 
-    // ── Jarvis 每日面板逻辑 ──
+    // ── 尿酸管理指南 ──
     (() => {
-      const JARVIS_JSON_URL = "jarvis-daily.json";
-      const JARVIS_STORAGE_KEY = "jarvis-daily-cache";
+      const STORAGE_KEY = "uric_acid_records";
+      const CHECKLIST_KEY = "uric_acid_checklist";
+      const TARGET = 420;
 
-      function formatStars(n) {
-        if (n >= 1000) return (n / 1000).toFixed(1).replace(/\.0$/, "") + "K";
-        return String(n);
+      function todayISO() {
+        return new Date().toISOString().slice(0, 10);
+      }
+      function fmtDateShort(iso) {
+        if (!iso) return "";
+        const [, m, d] = iso.split("-");
+        return `${Number(m)}/${Number(d)}`;
+      }
+      function makeId() {
+        return `uric-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
       }
 
-      function renderBriefing(headlines) {
-        return headlines.map(h => `
-          <div class="jarvis-news-item">
-            <div class="jarvis-news-dot ${h.level}"></div>
-            <div>
-              <div class="jarvis-news-title">${h.title}</div>
-              <div class="jarvis-news-summary">${h.summary}</div>
-            </div>
-          </div>
-        `).join("");
+      // ── 数据：复查记录 ──
+      function loadRecords() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (!raw) return seedRecords();
+          const parsed = JSON.parse(raw);
+          return Array.isArray(parsed) ? parsed : seedRecords();
+        } catch (err) {
+          console.error("尿酸记录读取失败", err);
+          return seedRecords();
+        }
+      }
+      function saveRecords(records) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+      }
+      function seedRecords() {
+        const seeded = [
+          { id: makeId(), date: "2026-05-15", uricAcid: 566.57, weight: 83.5, medication: "苯溴马隆 25mg 启动", note: "基线" }
+        ];
+        saveRecords(seeded);
+        return seeded;
       }
 
-      function renderGithub(repos) {
-        return repos.map(r => `
-          <div class="jarvis-gh-item">
-            <div class="jarvis-gh-stars">⭐ ${formatStars(r.stars)}</div>
-            <div>
-              <div class="jarvis-gh-name"><a href="${r.url}" target="_blank" rel="noopener">${r.name}</a></div>
-              <div class="jarvis-gh-desc">${r.desc}</div>
-            </div>
-          </div>
-        `).join("");
+      // ── 数据：每日清单 ──
+      function loadChecklist() {
+        try {
+          const raw = localStorage.getItem(CHECKLIST_KEY);
+          return raw ? JSON.parse(raw) : {};
+        } catch (err) {
+          return {};
+        }
+      }
+      function saveChecklist(state) {
+        localStorage.setItem(CHECKLIST_KEY, JSON.stringify(state));
+      }
+      function todayChecklist() {
+        const all = loadChecklist();
+        return all[todayISO()] || {};
+      }
+      function setTodayCheck(task, checked) {
+        const all = loadChecklist();
+        if (!all[todayISO()]) all[todayISO()] = {};
+        all[todayISO()][task] = checked;
+        saveChecklist(all);
       }
 
-      function renderYoutube(videos) {
-        return videos.map(v => `
-          <div class="jarvis-yt-item">
-            <div class="jarvis-yt-views">${v.views}</div>
-            <div>
-              <div class="jarvis-yt-title"><a href="${v.url}" target="_blank" rel="noopener">${v.title}</a></div>
-              <div class="jarvis-yt-channel">${v.channel}</div>
-            </div>
-          </div>
-        `).join("");
+      // ── 渲染 ──
+      function renderRecords() {
+        const tbody = document.getElementById("uricRecordsBody");
+        if (!tbody) return;
+        const records = loadRecords().slice().sort((a, b) => a.date.localeCompare(b.date));
+        if (!records.length) {
+          tbody.innerHTML = `<tr class="empty-row"><td colspan="6">还没有复查记录，点右上"+ 添加记录"开始追踪。</td></tr>`;
+          return;
+        }
+        tbody.innerHTML = records.map((r) => {
+          let cls = "uric-value-mid";
+          if (r.uricAcid <= TARGET) cls = "uric-value-ok";
+          else if (r.uricAcid >= 500) cls = "uric-value-high";
+          return `
+            <tr data-record-id="${r.id}">
+              <td>${fmtDateShort(r.date)}</td>
+              <td class="num ${cls}">${Number(r.uricAcid).toFixed(1)}</td>
+              <td class="num">${r.weight ? Number(r.weight).toFixed(1) : "—"}</td>
+              <td>${escapeHtml(r.medication || "")}</td>
+              <td>${escapeHtml(r.note || "")}</td>
+              <td><button class="uric-record-del" type="button" data-action="delete-uric" aria-label="删除">×</button></td>
+            </tr>
+          `;
+        }).join("");
+
+        // 目标差距副标题
+        const latest = records[records.length - 1];
+        const subtitle = document.getElementById("uricSubtitle");
+        if (subtitle && latest) {
+          const diff = latest.uricAcid - TARGET;
+          if (diff <= 0) {
+            subtitle.textContent = `🎉 已达标 (${latest.uricAcid.toFixed(0)} ≤ ${TARGET})`;
+          } else {
+            subtitle.textContent = `当前 ${latest.uricAcid.toFixed(0)} → 目标 ${TARGET}（还差 ${diff.toFixed(0)}）`;
+          }
+        }
+
+        // 折线图（≥3 条数据才显示）
+        const chartWrap = document.getElementById("uricChartWrap");
+        if (records.length >= 3 && chartWrap) {
+          chartWrap.hidden = false;
+          drawChart(records);
+        } else if (chartWrap) {
+          chartWrap.hidden = true;
+        }
       }
 
-      function renderReminders(reminders) {
-        return reminders.map(r => `
-          <div class="jarvis-reminder ${r.type}">
-            <span class="reminder-icon">${r.icon}</span>
-            <span>${r.text}</span>
-          </div>
-        `).join("");
+      let chartInstance = null;
+      function drawChart(records) {
+        const canvas = document.getElementById("uricChart");
+        if (!canvas || typeof Chart === "undefined") return;
+        const labels = records.map((r) => fmtDateShort(r.date));
+        const values = records.map((r) => r.uricAcid);
+        if (chartInstance) chartInstance.destroy();
+        const yMax = Math.max(...values, TARGET) + 60;
+        const yMin = Math.min(...values, TARGET) - 60;
+        chartInstance = new Chart(canvas.getContext("2d"), {
+          type: "line",
+          data: {
+            labels,
+            datasets: [{
+              label: "尿酸 (μmol/L)",
+              data: values,
+              borderColor: "#c44536",
+              backgroundColor: "rgba(196, 69, 54, 0.08)",
+              tension: 0.25,
+              pointBackgroundColor: "#c44536",
+              pointRadius: 4,
+              fill: true
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+              tooltip: { callbacks: { label: (ctx) => `${ctx.parsed.y} μmol/L` } },
+              annotation: undefined
+            },
+            scales: {
+              y: {
+                min: Math.max(0, yMin),
+                max: yMax,
+                grid: { color: "rgba(89,73,45,0.08)" },
+                ticks: { color: "#6e6a62", font: { size: 10 } }
+              },
+              x: {
+                grid: { display: false },
+                ticks: { color: "#6e6a62", font: { size: 10 } }
+              }
+            }
+          },
+          plugins: [{
+            id: "targetLine",
+            afterDraw(chart) {
+              const { ctx, chartArea, scales } = chart;
+              if (!chartArea) return;
+              const y = scales.y.getPixelForValue(TARGET);
+              ctx.save();
+              ctx.setLineDash([4, 4]);
+              ctx.strokeStyle = "#1f7a5c";
+              ctx.lineWidth = 1.5;
+              ctx.beginPath();
+              ctx.moveTo(chartArea.left, y);
+              ctx.lineTo(chartArea.right, y);
+              ctx.stroke();
+              ctx.fillStyle = "#1f7a5c";
+              ctx.font = "11px sans-serif";
+              ctx.fillText(`目标 ${TARGET}`, chartArea.left + 4, y - 4);
+              ctx.restore();
+            }
+          }]
+        });
+        canvas.style.height = "200px";
       }
 
-      function renderActions(items) {
-        if (!items || items.length === 0) return "";
-        const inner = items.map(a =>
-          `<div class="jarvis-action-item">${a}</div>`
-        ).join("");
-        return `<div class="jarvis-actions-title">今日行动</div>${inner}`;
+      function renderChecklist() {
+        const today = todayChecklist();
+        document.querySelectorAll("#uricChecklist input[type='checkbox'][data-task]").forEach((cb) => {
+          cb.checked = !!today[cb.dataset.task];
+        });
+        const meta = document.getElementById("uricChecklistMeta");
+        if (meta) {
+          const total = 4;
+          const done = ["water", "medication", "beef-quota", "avoid-red"].filter((t) => today[t]).length;
+          meta.textContent = `· 今日 ${done}/${total}`;
+        }
       }
 
-      function renderPanel(data) {
-        const panel = document.getElementById("jarvisPanel");
-        if (!panel) return;
-
-        document.getElementById("jarvisDate").textContent = data.date;
-        document.getElementById("jarvisTaglineText").textContent = data.tagline;
-
-        const briefing = data.briefing || {};
-        document.getElementById("jarvisTabBriefing").innerHTML =
-          renderBriefing(briefing.headlines || []);
-        document.getElementById("jarvisTabGithub").innerHTML =
-          renderGithub(briefing.github_stars || []);
-        document.getElementById("jarvisTabYoutube").innerHTML =
-          renderYoutube(briefing.youtube_top || []);
-        document.getElementById("jarvisTabReminders").innerHTML =
-          renderReminders(data.reminders || []);
-        document.getElementById("jarvisActions").innerHTML =
-          renderActions(data.action_items || []);
+      function escapeHtml(s) {
+        return String(s).replace(/[&<>"']/g, (c) => ({
+          "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+        }[c]));
       }
 
-      function bindTabs() {
-        const tabContainer = document.getElementById("jarvisTabs");
-        if (!tabContainer) return;
+      // ── 交互 ──
+      function bindEvents() {
+        document.getElementById("uricAddRecordBtn").addEventListener("click", () => {
+          const date = window.prompt("复查日期 (YYYY-MM-DD)", todayISO());
+          if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) return;
+          const uricStr = window.prompt("尿酸值 μmol/L（数字）");
+          if (uricStr === null) return;
+          const uricAcid = Number(uricStr);
+          if (!Number.isFinite(uricAcid) || uricAcid <= 0) {
+            window.alert("尿酸值需要是正数");
+            return;
+          }
+          const weightStr = window.prompt("体重 kg（可选，留空跳过）", "");
+          const weight = weightStr === "" || weightStr === null ? null : Number(weightStr);
+          const medication = window.prompt("用药（例如：苯溴马隆 25mg）", "") || "";
+          const note = window.prompt("备注（可选）", "") || "";
 
-        const tabMap = {
-          briefing: "jarvisTabBriefing",
-          github: "jarvisTabGithub",
-          youtube: "jarvisTabYoutube",
-          reminders: "jarvisTabReminders"
-        };
+          const records = loadRecords();
+          records.push({ id: makeId(), date, uricAcid, weight: weight || null, medication, note });
+          saveRecords(records);
+          renderRecords();
+        });
 
-        tabContainer.addEventListener("click", (e) => {
-          const btn = e.target.closest(".jarvis-tab");
+        document.getElementById("uricRecordsBody").addEventListener("click", (e) => {
+          const btn = e.target.closest("[data-action='delete-uric']");
           if (!btn) return;
-          const tabName = btn.dataset.tab;
+          const row = btn.closest("tr[data-record-id]");
+          if (!row) return;
+          const id = row.dataset.recordId;
+          if (!window.confirm("确定删除这条尿酸复查记录吗？")) return;
+          saveRecords(loadRecords().filter((r) => r.id !== id));
+          renderRecords();
+        });
 
-          tabContainer.querySelectorAll(".jarvis-tab").forEach(t =>
-            t.classList.toggle("active", t === btn)
-          );
-          Object.entries(tabMap).forEach(([key, id]) => {
-            const el = document.getElementById(id);
-            if (el) el.classList.toggle("active", key === tabName);
-          });
+        document.getElementById("uricChecklist").addEventListener("change", (e) => {
+          const cb = e.target.closest("input[type='checkbox'][data-task]");
+          if (!cb) return;
+          setTodayCheck(cb.dataset.task, cb.checked);
+          renderChecklist();
         });
       }
 
-      async function loadJarvisData() {
-        try {
-          // 尝试从远程 JSON 加载（GitHub Pages 同域）
-          const cacheBuster = `?t=${Date.now()}`;
-          const resp = await fetch(JARVIS_JSON_URL + cacheBuster);
-          if (resp.ok) {
-            const data = await resp.json();
-            // 缓存到 localStorage
-            localStorage.setItem(JARVIS_STORAGE_KEY, JSON.stringify(data));
-            return data;
-          }
-        } catch (e) {
-          // 网络失败，尝试从缓存读取
-        }
-
-        // 回退到 localStorage 缓存
-        const cached = localStorage.getItem(JARVIS_STORAGE_KEY);
-        if (cached) {
-          try { return JSON.parse(cached); } catch (_) {}
-        }
-
-        return null;
+      function init() {
+        renderRecords();
+        renderChecklist();
+        bindEvents();
       }
 
-      async function initJarvis() {
-        bindTabs();
-        const data = await loadJarvisData();
-        if (data) {
-          renderPanel(data);
-        } else {
-          document.getElementById("jarvisTaglineText").textContent =
-            "暂无简报数据。请通过 Jarvis 生成今日简报。";
-          document.getElementById("jarvisTabBriefing").innerHTML =
-            '<div class="jarvis-empty">📡 等待 Jarvis 推送今日数据...</div>';
-        }
-      }
-
-      initJarvis();
+      init();
     })();
+
 
     // ── 觅应运营看板 ──
     (() => {
