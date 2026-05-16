@@ -2191,6 +2191,244 @@ input[type="checkbox"] {
   .health-item .item-score { width: 38px; font-size: 12px; }
 }
 
+/* ===== 健康预管理 · 体重×尿酸 联合管理 ===== */
+.health-combined {
+  margin-top: 14px;
+  background: var(--panel-strong);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+.health-combined > summary {
+  list-style: none;
+  cursor: pointer;
+  padding: 14px 16px;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.health-combined > summary::-webkit-details-marker { display: none; }
+.health-combined > summary::after {
+  content: "▾";
+  margin-left: auto;
+  color: var(--muted);
+  font-size: 12px;
+  transition: transform 0.2s;
+}
+.health-combined[open] > summary::after { transform: rotate(180deg); }
+.health-combined-target {
+  font-size: 12px;
+  color: var(--accent-warm);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  font-family: var(--font-number);
+}
+.health-combined-body {
+  padding: 0 16px 14px;
+}
+
+/* 联合追踪图 */
+.health-tracking {
+  padding-top: 6px;
+  padding-bottom: 12px;
+  border-bottom: 1px dashed var(--line);
+}
+.health-tracking-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.health-tracking-header h4 {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+.health-tracking-header button { margin-left: auto; }
+.health-chart-wrap {
+  position: relative;
+  height: 220px;
+  margin-top: 4px;
+}
+.health-chart-meta {
+  font-size: 11px;
+  color: var(--muted);
+  text-align: right;
+  margin-top: 4px;
+}
+.health-records-toggle {
+  display: block;
+  margin-top: 8px;
+}
+.health-records-toggle summary {
+  font-size: 12px;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 4px 0;
+  letter-spacing: 0.02em;
+}
+.health-records-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  margin-top: 6px;
+}
+.health-records-table th {
+  text-align: left;
+  font-weight: 500;
+  color: var(--muted);
+  font-size: 10.5px;
+  padding: 4px 6px;
+  border-bottom: 1px solid var(--line);
+}
+.health-records-table th.num, .health-records-table td.num { text-align: right; }
+.health-records-table td {
+  padding: 5px 6px;
+  border-bottom: 1px solid var(--line);
+}
+.health-records-table tr:last-child td { border-bottom: none; }
+.health-records-table .uric-value { color: var(--accent-hot); font-weight: 700; font-family: var(--font-number); }
+.health-records-table .uric-value.ok { color: var(--accent); }
+.health-records-table .weight-value { font-family: var(--font-number); font-weight: 600; }
+
+/* 慢食协议 V2.0 卡片 */
+.health-slowfood-card {
+  margin-top: 14px;
+  padding: 14px;
+  background: linear-gradient(135deg, rgba(31,122,92,0.04), rgba(209,123,31,0.04));
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+}
+.health-slowfood-card h4 {
+  margin: 0 0 12px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+}
+.slowfood-layers {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.slowfood-layer {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 8px 12px;
+  background: var(--panel-strong);
+  border-radius: var(--radius-sm);
+  border-left: 3px solid var(--accent);
+  font-size: 13px;
+}
+.slowfood-layer .layer-label {
+  font-weight: 700;
+  color: var(--accent);
+  white-space: nowrap;
+  font-size: 12.5px;
+}
+.slowfood-layer .layer-text { color: var(--text); flex: 1; }
+
+.sweet-ladder {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  margin-bottom: 12px;
+}
+.sweet-ladder h5 {
+  margin: 0 0 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+}
+.sweet-ladder ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: 12.5px;
+  line-height: 1.9;
+}
+.sweet-ladder .ladder-red { color: #a03328; }
+.sweet-ladder .ladder-yellow { color: #a05908; }
+.sweet-ladder .ladder-green { color: #135642; }
+
+.slowfood-rule {
+  font-size: 12px;
+  line-height: 1.7;
+  padding: 8px 12px;
+  background: rgba(209,123,31,0.06);
+  border-left: 3px solid var(--accent-warm);
+  border-radius: var(--radius-sm);
+  margin-bottom: 8px;
+  color: var(--text);
+}
+.slowfood-rule strong { color: var(--accent-warm); font-weight: 700; }
+
+/* 饮食红绿灯 + 饮品指南卡（沿用旧 .uric-* 类，加新外壳） */
+.health-stoplight-card,
+.health-drinks-card {
+  margin-top: 14px;
+  background: var(--panel-strong);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  padding: 14px;
+}
+.health-stoplight-card > h4,
+.health-drinks-card > h4 {
+  margin: 0 0 10px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+/* 用药提醒卡 */
+.health-medication-card {
+  margin-top: 14px;
+  padding: 12px 14px;
+  background: rgba(58,123,213,0.06);
+  border: 1px solid rgba(58,123,213,0.18);
+  border-radius: var(--radius-md);
+}
+.health-medication-card h4 {
+  margin: 0 0 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #285a9c;
+}
+.health-medication-card ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: 12.5px;
+  line-height: 1.85;
+  color: var(--text);
+}
+.health-medication-card ul li {
+  padding-left: 16px;
+  position: relative;
+}
+.health-medication-card ul li::before {
+  content: "•";
+  position: absolute;
+  left: 4px;
+  color: #3a7bd5;
+  font-weight: 700;
+}
+
+@media (max-width: 480px) {
+  .health-combined > summary { padding: 12px 14px; font-size: 14px; }
+  .health-combined-target { font-size: 11px; }
+  .health-combined-body { padding: 0 14px 12px; }
+  .health-chart-wrap { height: 200px; }
+  .slowfood-layer { padding: 6px 10px; font-size: 12.5px; }
+  .slowfood-layer .layer-label { font-size: 11.5px; }
+}
+
 /* ===== 尿酸管理指南（替换原 Jarvis 简报） ===== */
 .uric-panel { margin-top: 16px; }
 .uric-panel .section-title h2 { font-size: 18px; }
@@ -2837,6 +3075,154 @@ input[type="checkbox"] {
           ❌ 扣分项 <span class="group-sum sub" id="healthSubSum">-0</span>
         </summary>
         <div id="healthSubItems"></div>
+      </details>
+
+      <!-- ───── 体重 × 尿酸 联合管理 ───── -->
+      <details class="health-combined" open id="healthCombined">
+        <summary>
+          📊 体重 × 尿酸
+          <span class="health-combined-target" id="healthCombinedTarget">83.2 → 80 kg · 566 → 420</span>
+        </summary>
+        <div class="health-combined-body">
+
+          <!-- 联合追踪图 -->
+          <div class="health-tracking">
+            <div class="health-tracking-header">
+              <h4>📈 联合趋势</h4>
+              <button class="btn-secondary btn-slim" id="healthAddRecordBtn" type="button">+ 添加记录</button>
+            </div>
+            <div class="health-chart-wrap">
+              <canvas id="healthCombinedChart"></canvas>
+            </div>
+            <div class="health-chart-meta">
+              <span style="color:#3a7bd5;">●</span> 体重 ·
+              <span style="color:#d17b1f;">●</span> 尿酸 ·
+              <span style="color:rgba(110,110,98,0.7);">—— —— ——</span> 腰围
+            </div>
+            <details class="health-records-toggle">
+              <summary>查看完整记录</summary>
+              <div class="health-records-wrap" style="overflow-x:auto;margin-top:6px">
+                <table class="health-records-table">
+                  <thead><tr>
+                    <th>日期</th>
+                    <th class="num">体重</th>
+                    <th class="num">腰围</th>
+                    <th class="num">尿酸</th>
+                    <th>用药</th>
+                    <th>备注</th>
+                    <th></th>
+                  </tr></thead>
+                  <tbody id="healthRecordsBody"></tbody>
+                </table>
+              </div>
+            </details>
+          </div>
+
+          <!-- 慢食协议 V2.0 -->
+          <div class="health-slowfood-card">
+            <h4>🍽 慢食协议 V2.0</h4>
+            <div class="slowfood-layers">
+              <div class="slowfood-layer">
+                <span class="layer-label">第一层·速度</span>
+                <span class="layer-text">每口嚼 20 下 / 一顿 ≥ 15 分钟</span>
+              </div>
+              <div class="slowfood-layer">
+                <span class="layer-label">第二层·总量</span>
+                <span class="layer-text">70% 饱停筷 / 餐前喝一杯水</span>
+              </div>
+              <div class="slowfood-layer">
+                <span class="layer-label">第三层·触发</span>
+                <span class="layer-text">马夫一问：饿了还是累了？</span>
+              </div>
+            </div>
+
+            <div class="sweet-ladder">
+              <h5>甜食替代阶梯</h5>
+              <ul>
+                <li class="ladder-red">❌ 含糖可乐 / 奶茶</li>
+                <li class="ladder-yellow">⚠️ 无糖可乐（周 1-2 次）</li>
+                <li class="ladder-yellow">⚠️ 72% 黑巧（每天 ≤ 3 块，放碟子里）</li>
+                <li class="ladder-green">✅ 柠檬水 / 纯牛奶 / 樱桃 / 蓝莓</li>
+              </ul>
+            </div>
+
+            <div class="slowfood-rule">
+              <strong>📌 黑巧小碟规则</strong>：从袋到碟 = 从无限到有限
+            </div>
+            <div class="slowfood-rule">
+              <strong>📌 马夫一问</strong>：吃前问"饿了还是累了？"<br>
+              饿了 → 吃（用 V1.0 速度）<br>
+              累了 → 休息 10 分钟<br>
+              烦了 → 走一圈
+            </div>
+          </div>
+
+          <!-- 饮食红绿灯 -->
+          <div class="health-stoplight-card">
+            <h4>🚦 饮食红绿灯</h4>
+            <div class="uric-section">
+              <div class="uric-section-label red">🚫 红色 · 禁止</div>
+              <div class="uric-pills">
+                <span class="uric-pill red">动物内脏（肝/肾/脑）</span>
+                <span class="uric-pill red">浓肉汤 / 骨头汤</span>
+                <span class="uric-pill red">火锅汤底</span>
+                <span class="uric-pill red">海鲜（虾蟹贝沙丁鱼）</span>
+                <span class="uric-pill red">啤酒</span>
+                <span class="uric-pill red">含糖饮料 / 果汁</span>
+              </div>
+            </div>
+            <div class="uric-section">
+              <div class="uric-section-label yellow">⚠️ 黄色 · 控量</div>
+              <div class="uric-pills">
+                <span class="uric-pill yellow">牛肉 ≤150g · 周 2-3 次</span>
+                <span class="uric-pill yellow">猪肉 / 羊肉</span>
+                <span class="uric-pill yellow">白肉鱼</span>
+                <span class="uric-pill yellow">菌菇</span>
+                <span class="uric-pill yellow">西瓜 ≤300g</span>
+                <span class="uric-pill yellow">芒果 / 荔枝 / 葡萄</span>
+                <span class="uric-pill yellow">无糖可乐 · 周 1-2 次</span>
+                <span class="uric-pill yellow">黑巧 ≤3 块/天</span>
+              </div>
+            </div>
+            <div class="uric-section">
+              <div class="uric-section-label green">✅ 绿色 · 放心吃</div>
+              <div class="uric-pills">
+                <span class="uric-pill green">鸡蛋（每天 2-3 个）</span>
+                <span class="uric-pill green">纯牛奶（每天 1-2 杯）</span>
+                <span class="uric-pill green">鸡胸肉</span>
+                <span class="uric-pill green">蔬菜</span>
+                <span class="uric-pill green">米饭 / 面 / 土豆</span>
+                <span class="uric-pill green">樱桃 🍒</span>
+                <span class="uric-pill green">蓝莓 / 苹果</span>
+                <span class="uric-pill green">豆腐</span>
+                <span class="uric-pill green">番茄炒蛋 / 黄瓜炒蛋</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 饮品指南 -->
+          <div class="health-drinks-card">
+            <h4>🥤 饮品指南</h4>
+            <ul class="uric-drinks">
+              <li><span class="stars">⭐⭐⭐</span><strong>柠檬水 / 纯牛奶 / 白水</strong>　基础保障</li>
+              <li><span class="stars">⭐⭐</span><strong>无糖苏打水 / 黑咖啡（午前）</strong></li>
+              <li><span class="stars">⭐</span><strong>淡茶（午后无咖啡因）</strong></li>
+              <li><span class="stars no">❌</span><strong>啤酒 / 含糖饮料 / 果汁</strong></li>
+            </ul>
+          </div>
+
+          <!-- 用药提醒 -->
+          <div class="health-medication-card">
+            <h4>💊 用药提醒</h4>
+            <ul>
+              <li>苯溴马隆 25mg/天（医生批准），饭后服</li>
+              <li>白天饮水 ≥ 2500ml（19:00 前完成）</li>
+              <li>4-6 周复查（~6 月底）</li>
+              <li>目标：尿酸 &lt; 420 μmol/L</li>
+            </ul>
+          </div>
+
+        </div>
       </details>
     </section>
 
@@ -6449,13 +6835,314 @@ input[type="checkbox"] {
         });
       }
 
-      function init() {
-        renderItems(loadToday());
-        renderScore();
-        bindEvents();
+      // ════════ 体重 × 尿酸 联合管理 ════════
+
+      const WEIGHT_KEY = "weight_records";
+      const URIC_KEY = "uric_acid_records";
+      const URIC_TARGET = 420;
+      const WEIGHT_TARGET = 80;
+
+      function loadWeights() {
+        try {
+          const raw = localStorage.getItem(WEIGHT_KEY);
+          if (raw) return JSON.parse(raw);
+        } catch (err) {}
+        // 首次：种 PRD 给的 7 条
+        const seed = [
+          { date: "2026-05-10", weight: 83.9, waist: null, note: "" },
+          { date: "2026-05-11", weight: 83.5, waist: null, note: "慢食首日" },
+          { date: "2026-05-12", weight: 84.0, waist: null, note: "牛排反弹" },
+          { date: "2026-05-13", weight: 83.1, waist: 88, note: "" },
+          { date: "2026-05-14", weight: 83.1, waist: 88, note: "" },
+          { date: "2026-05-15", weight: 83.5, waist: null, note: "" },
+          { date: "2026-05-16", weight: 83.2, waist: 87.5, note: "苯溴马隆首日" }
+        ];
+        localStorage.setItem(WEIGHT_KEY, JSON.stringify(seed));
+        return seed;
+      }
+      function saveWeights(arr) { localStorage.setItem(WEIGHT_KEY, JSON.stringify(arr)); }
+
+      function loadUric() {
+        try {
+          const raw = localStorage.getItem(URIC_KEY);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            // 兼容老结构（uricAcid → value）
+            return parsed.map((r) => ({
+              date: r.date,
+              value: r.value ?? r.uricAcid,
+              weight: r.weight ?? null,
+              medication: r.medication ?? "",
+              note: r.note ?? ""
+            }));
+          }
+        } catch (err) {}
+        const seed = [
+          { date: "2026-05-15", value: 566.57, weight: 83.5, medication: "苯溴马隆 25mg 启动", note: "基线" }
+        ];
+        localStorage.setItem(URIC_KEY, JSON.stringify(seed));
+        return seed;
+      }
+      function saveUric(arr) { localStorage.setItem(URIC_KEY, JSON.stringify(arr)); }
+
+      let chartInstance = null;
+
+      function fmtShortDate(iso) {
+        if (!iso) return "";
+        const [, m, d] = iso.split("-");
+        return `${Number(m)}/${Number(d)}`;
       }
 
-      init();
+      function renderCombinedTarget() {
+        const weights = loadWeights().slice().sort((a, b) => a.date.localeCompare(b.date));
+        const uric = loadUric().slice().sort((a, b) => a.date.localeCompare(b.date));
+        const latestW = weights[weights.length - 1];
+        const latestU = uric[uric.length - 1];
+        const tgt = document.getElementById("healthCombinedTarget");
+        if (!tgt) return;
+        const wPart = latestW ? `${latestW.weight.toFixed(1)} → ${WEIGHT_TARGET} kg` : `-- → ${WEIGHT_TARGET} kg`;
+        const uPart = latestU ? `${latestU.value.toFixed(0)} → ${URIC_TARGET}` : `-- → ${URIC_TARGET}`;
+        tgt.textContent = `${wPart} · ${uPart}`;
+      }
+
+      function renderRecordsTable() {
+        const tbody = document.getElementById("healthRecordsBody");
+        if (!tbody) return;
+        const weights = loadWeights();
+        const uric = loadUric();
+        // 按日期合并
+        const dates = [...new Set([...weights.map((w) => w.date), ...uric.map((u) => u.date)])].sort().reverse();
+        if (!dates.length) {
+          tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:10px">还没有记录</td></tr>`;
+          return;
+        }
+        tbody.innerHTML = dates.map((d) => {
+          const w = weights.find((x) => x.date === d);
+          const u = uric.find((x) => x.date === d);
+          const note = (u && u.note) || (w && w.note) || "";
+          const med = (u && u.medication) || "";
+          const uCls = u && u.value <= URIC_TARGET ? "uric-value ok" : "uric-value";
+          return `
+            <tr data-record-date="${d}">
+              <td>${fmtShortDate(d)}</td>
+              <td class="num weight-value">${w ? w.weight.toFixed(1) : "—"}</td>
+              <td class="num">${w && w.waist ? w.waist : "—"}</td>
+              <td class="num ${u ? uCls : ""}">${u ? u.value.toFixed(1) : "—"}</td>
+              <td>${med ? escapeHtml(med) : "—"}</td>
+              <td>${escapeHtml(note)}</td>
+              <td><button class="uric-record-del" type="button" data-action="delete-health-record" aria-label="删除">×</button></td>
+            </tr>
+          `;
+        }).join("");
+      }
+
+      function escapeHtml(s) {
+        return String(s || "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+      }
+
+      function renderCombinedChart() {
+        if (typeof Chart === "undefined") return;
+        const canvas = document.getElementById("healthCombinedChart");
+        if (!canvas) return;
+        const weights = loadWeights().slice().sort((a, b) => a.date.localeCompare(b.date));
+        const uric = loadUric().slice().sort((a, b) => a.date.localeCompare(b.date));
+        const labels = [...new Set([...weights.map((w) => w.date), ...uric.map((u) => u.date)])].sort();
+
+        const weightSeries = labels.map((d) => {
+          const w = weights.find((x) => x.date === d);
+          return w ? w.weight : null;
+        });
+        const waistSeries = labels.map((d) => {
+          const w = weights.find((x) => x.date === d);
+          return w && w.waist ? w.waist : null;
+        });
+        const uricSeries = labels.map((d) => {
+          const u = uric.find((x) => x.date === d);
+          return u ? u.value : null;
+        });
+
+        if (chartInstance) chartInstance.destroy();
+        chartInstance = new Chart(canvas.getContext("2d"), {
+          type: "line",
+          data: {
+            labels: labels.map(fmtShortDate),
+            datasets: [
+              {
+                label: "体重 kg",
+                data: weightSeries,
+                yAxisID: "yWeight",
+                borderColor: "#3a7bd5",
+                backgroundColor: "rgba(58,123,213,0.08)",
+                pointBackgroundColor: "#3a7bd5",
+                pointRadius: 4,
+                tension: 0.25,
+                spanGaps: true
+              },
+              {
+                label: "尿酸 μmol/L",
+                data: uricSeries,
+                yAxisID: "yUric",
+                borderColor: "#d17b1f",
+                backgroundColor: "rgba(209,123,31,0.1)",
+                pointBackgroundColor: "#d17b1f",
+                pointRadius: 5,
+                showLine: true,
+                tension: 0,
+                spanGaps: true
+              },
+              {
+                label: "腰围 cm",
+                data: waistSeries,
+                yAxisID: "yWeight",
+                borderColor: "rgba(110,110,98,0.65)",
+                borderDash: [4, 4],
+                pointRadius: 3,
+                pointBackgroundColor: "rgba(110,110,98,0.65)",
+                spanGaps: true
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: "index", intersect: false },
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                callbacks: {
+                  label: (ctx) => {
+                    const v = ctx.parsed.y;
+                    if (v === null) return null;
+                    return `${ctx.dataset.label}: ${v.toFixed(1)}`;
+                  }
+                }
+              }
+            },
+            scales: {
+              yWeight: {
+                type: "linear",
+                position: "left",
+                ticks: { color: "#3a7bd5", font: { size: 10 } },
+                title: { display: true, text: "kg / cm", color: "#3a7bd5", font: { size: 10 } },
+                grid: { color: "rgba(89,73,45,0.08)" }
+              },
+              yUric: {
+                type: "linear",
+                position: "right",
+                ticks: { color: "#d17b1f", font: { size: 10 } },
+                title: { display: true, text: "μmol/L", color: "#d17b1f", font: { size: 10 } },
+                grid: { display: false }
+              },
+              x: {
+                grid: { display: false },
+                ticks: { color: "#6e6a62", font: { size: 10 } }
+              }
+            }
+          },
+          plugins: [{
+            id: "combinedTargetLines",
+            afterDraw(chart) {
+              const { ctx, chartArea, scales } = chart;
+              if (!chartArea) return;
+              // 体重目标线 80kg（蓝色虚线）
+              const yW = scales.yWeight.getPixelForValue(WEIGHT_TARGET);
+              if (yW >= chartArea.top && yW <= chartArea.bottom) {
+                ctx.save();
+                ctx.setLineDash([3, 3]);
+                ctx.strokeStyle = "rgba(58,123,213,0.5)";
+                ctx.lineWidth = 1.2;
+                ctx.beginPath();
+                ctx.moveTo(chartArea.left, yW);
+                ctx.lineTo(chartArea.right, yW);
+                ctx.stroke();
+                ctx.fillStyle = "rgba(58,123,213,0.7)";
+                ctx.font = "10px sans-serif";
+                ctx.fillText(`目标 ${WEIGHT_TARGET}kg`, chartArea.left + 4, yW - 3);
+                ctx.restore();
+              }
+              // 尿酸目标线 420（橙色虚线）
+              const yU = scales.yUric.getPixelForValue(URIC_TARGET);
+              if (yU >= chartArea.top && yU <= chartArea.bottom) {
+                ctx.save();
+                ctx.setLineDash([3, 3]);
+                ctx.strokeStyle = "rgba(209,123,31,0.5)";
+                ctx.lineWidth = 1.2;
+                ctx.beginPath();
+                ctx.moveTo(chartArea.left, yU);
+                ctx.lineTo(chartArea.right, yU);
+                ctx.stroke();
+                ctx.fillStyle = "rgba(209,123,31,0.7)";
+                ctx.font = "10px sans-serif";
+                ctx.textAlign = "right";
+                ctx.fillText(`目标 ${URIC_TARGET}`, chartArea.right - 4, yU - 3);
+                ctx.restore();
+              }
+            }
+          }]
+        });
+      }
+
+      function renderCombined() {
+        renderCombinedTarget();
+        renderRecordsTable();
+        renderCombinedChart();
+      }
+
+      // 添加记录：6 字段 prompt 序列
+      function addRecordFlow() {
+        const date = window.prompt("日期 (YYYY-MM-DD)", todayISO());
+        if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) return;
+        const wStr = window.prompt("体重 kg（必填）");
+        if (wStr === null) return;
+        const weight = Number(wStr);
+        if (!Number.isFinite(weight) || weight <= 0) {
+          window.alert("体重需要是正数");
+          return;
+        }
+        const waistStr = window.prompt("腰围 cm（选填，留空跳过）", "");
+        const waist = waistStr === "" || waistStr === null ? null : Number(waistStr);
+        const uricStr = window.prompt("尿酸 μmol/L（选填，复查时才填）", "");
+        const uricValue = uricStr === "" || uricStr === null ? null : Number(uricStr);
+        const medication = window.prompt("用药情况（选填）", "") || "";
+        const note = window.prompt("备注（选填）", "") || "";
+
+        // 写体重记录（按日期 upsert）
+        const weights = loadWeights().filter((w) => w.date !== date);
+        weights.push({ date, weight, waist: Number.isFinite(waist) ? waist : null, note });
+        saveWeights(weights);
+
+        // 如果填了尿酸值，写尿酸记录（upsert）
+        if (Number.isFinite(uricValue) && uricValue > 0) {
+          const uric = loadUric().filter((u) => u.date !== date);
+          uric.push({ date, value: uricValue, weight, medication, note });
+          saveUric(uric);
+        }
+
+        renderCombined();
+      }
+
+      // 删除记录
+      function deleteRecord(date) {
+        if (!window.confirm(`确定删除 ${fmtShortDate(date)} 的记录吗？（体重和尿酸都会清掉）`)) return;
+        saveWeights(loadWeights().filter((w) => w.date !== date));
+        saveUric(loadUric().filter((u) => u.date !== date));
+        renderCombined();
+      }
+
+      function bindCombinedEvents() {
+        document.getElementById("healthAddRecordBtn").addEventListener("click", addRecordFlow);
+        document.getElementById("healthRecordsBody").addEventListener("click", (e) => {
+          const btn = e.target.closest("[data-action='delete-health-record']");
+          if (!btn) return;
+          const row = btn.closest("tr[data-record-date]");
+          if (!row) return;
+          deleteRecord(row.dataset.recordDate);
+        });
+      }
+
+      // init() 上面已执行过（评分模块）；这里追加联合模块初始化
+      renderCombined();
+      bindCombinedEvents();
     })();
 
     // ── 觅应运营看板 ──
