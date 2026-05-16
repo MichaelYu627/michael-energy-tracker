@@ -1953,6 +1953,244 @@ input[type="checkbox"] {
   letter-spacing: 0.02em;
 }
 
+/* ============================================
+   健康预管理系统 V2 · 顶部主版块
+   ============================================ */
+.health-panel {
+  background: linear-gradient(135deg, rgba(31,122,92,0.06) 0%, rgba(209,123,31,0.05) 100%);
+  border: 1px solid rgba(31,122,92,0.16);
+  border-radius: var(--radius-xl);
+  padding: 22px 22px 18px;
+  margin-top: 16px;
+  box-shadow: 0 10px 32px rgba(81, 57, 20, 0.06);
+}
+.health-panel .section-title h2 { font-size: 18px; }
+.health-panel .section-title span { color: var(--accent); font-weight: 600; }
+
+/* 评分卡 · 环形进度条 */
+.health-score-card {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+.health-ring-wrap { position: relative; flex-shrink: 0; }
+.health-ring {
+  width: 120px;
+  height: 120px;
+  display: block;
+}
+.health-ring .ring-bg {
+  fill: none;
+  stroke: rgba(89, 73, 45, 0.08);
+  stroke-width: 10;
+}
+.health-ring .ring-fill {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 10;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.45s ease, stroke 0.3s;
+}
+.health-ring-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+.health-ring-center .score-num {
+  font-family: var(--font-number);
+  font-size: 32px;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--text);
+}
+.health-ring-center .score-max {
+  font-family: var(--font-number);
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+.health-score-info { flex: 1; min-width: 180px; }
+.health-grade {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  line-height: 1.2;
+}
+.health-grade-tag {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  margin-right: 8px;
+  vertical-align: 3px;
+}
+.health-grade-tier-S { color: #b87f00; }
+.health-grade-tag.tier-S { background: linear-gradient(135deg, #ffd700, #b87f00); color: white; }
+.health-grade-tier-A { color: var(--accent); }
+.health-grade-tag.tier-A { background: var(--accent); color: white; }
+.health-grade-tier-B { color: #3a7bd5; }
+.health-grade-tag.tier-B { background: #3a7bd5; color: white; }
+.health-grade-tier-C { color: var(--accent-warm); }
+.health-grade-tag.tier-C { background: var(--accent-warm); color: white; }
+.health-grade-tier-D { color: var(--accent-hot); }
+.health-grade-tag.tier-D { background: var(--accent-hot); color: white; }
+
+.health-grade-text {
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 6px;
+  line-height: 1.5;
+}
+.health-meta {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 8px;
+  line-height: 1.7;
+  letter-spacing: 0.01em;
+}
+.health-meta strong {
+  color: var(--text);
+  font-family: var(--font-number);
+  font-weight: 700;
+  margin: 0 2px;
+}
+
+/* 加分/扣分 折叠组 */
+.health-items-section {
+  margin-top: 12px;
+  background: var(--panel-strong);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+.health-items-section summary {
+  list-style: none;
+  cursor: pointer;
+  padding: 12px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  user-select: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.health-items-section summary::-webkit-details-marker { display: none; }
+.health-items-section summary::after {
+  content: "▾";
+  margin-left: auto;
+  color: var(--muted);
+  font-size: 12px;
+  transition: transform 0.2s;
+}
+.health-items-section[open] summary::after { transform: rotate(180deg); }
+.health-items-section summary .group-sum {
+  font-family: var(--font-number);
+  font-size: 13px;
+  font-weight: 700;
+}
+.health-items-section .group-sum.add { color: var(--success); }
+.health-items-section .group-sum.sub { color: var(--accent-hot); }
+
+.health-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px;
+  border-top: 1px solid var(--line);
+  font-size: 13px;
+  line-height: 1.4;
+}
+.health-item label {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  color: var(--text);
+}
+.health-item input[type="checkbox"] {
+  margin: 0 !important;
+  flex-shrink: 0;
+  accent-color: var(--accent);
+}
+.health-item input[type="checkbox"]:checked + .item-text {
+  color: var(--text);
+  font-weight: 500;
+}
+.health-item .item-text { flex: 1; }
+.health-item .item-score {
+  font-family: var(--font-number);
+  font-weight: 700;
+  font-size: 13px;
+  width: 44px;
+  text-align: right;
+  letter-spacing: -0.02em;
+}
+.health-item .item-score.add { color: var(--success); }
+.health-item .item-score.sub { color: var(--accent-hot); }
+.health-item .item-score.muted { color: var(--muted); opacity: 0.6; }
+.health-item.numeric { padding: 10px 16px; }
+.health-item.numeric input[type="number"] {
+  width: 90px !important;
+  padding: 5px 10px !important;
+  font-family: var(--font-number);
+  text-align: right;
+}
+.health-item .item-cat {
+  font-size: 10px;
+  color: var(--muted);
+  padding: 1px 6px;
+  background: var(--bg);
+  border-radius: 4px;
+  letter-spacing: 0.04em;
+  margin-right: 4px;
+  flex-shrink: 0;
+}
+
+/* 今日明细条 */
+.health-detail-bar {
+  margin-top: 12px;
+  padding: 10px 14px;
+  background: var(--panel);
+  border: 1px dashed var(--line);
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  line-height: 1.8;
+  min-height: 32px;
+}
+.health-detail-bar .empty {
+  color: var(--muted);
+  font-style: italic;
+}
+.health-chip {
+  display: inline-block;
+  padding: 2px 9px;
+  margin: 2px 4px 2px 0;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-family: var(--font-number);
+  letter-spacing: -0.01em;
+}
+.health-chip.add { background: rgba(31,122,92,0.13); color: var(--accent); }
+.health-chip.sub { background: rgba(196,69,54,0.13); color: var(--accent-hot); }
+
+@media (max-width: 480px) {
+  .health-panel { padding: 18px 14px 14px; }
+  .health-ring { width: 100px; height: 100px; }
+  .health-ring-center .score-num { font-size: 26px; }
+  .health-grade { font-size: 19px; }
+  .health-item { padding: 7px 12px; font-size: 12.5px; }
+  .health-item .item-score { width: 38px; font-size: 12px; }
+}
+
 /* ===== 尿酸管理指南（替换原 Jarvis 简报） ===== */
 .uric-panel { margin-top: 16px; }
 .uric-panel .section-title h2 { font-size: 18px; }
@@ -2549,120 +2787,57 @@ input[type="checkbox"] {
       <div class="status-banner" id="statusBanner"></div>
     </header>
 
-    <!-- Jarvis 每日面板 -->
-    <!-- 尿酸管理指南（替换原 Jarvis 简报） -->
-    <section class="panel uric-panel" id="uricPanel">
-      <div class="panel-content">
-        <div class="section-title">
-          <h2>🩺 尿酸管理指南</h2>
-          <span id="uricSubtitle">566 → 420 目标追踪</span>
+    <!-- ============= 健康预管理系统 V2 ============= -->
+    <section class="health-panel" id="healthPanel">
+      <div class="section-title">
+        <h2>🏥 健康预管理</h2>
+        <span id="healthPanelSubtitle">今日健康评分</span>
+      </div>
+
+      <!-- 评分卡（顶部，环形 + 等级） -->
+      <div class="health-score-card">
+        <div class="health-ring-wrap">
+          <svg class="health-ring" viewBox="0 0 120 120">
+            <circle class="ring-bg" cx="60" cy="60" r="50"></circle>
+            <circle class="ring-fill" id="healthRingFill" cx="60" cy="60" r="50"
+              stroke-dasharray="314.16" stroke-dashoffset="125.66"
+              transform="rotate(-90 60 60)"></circle>
+          </svg>
+          <div class="health-ring-center">
+            <div class="score-num" id="healthScoreNum">60</div>
+            <div class="score-max">/ 100</div>
+          </div>
         </div>
-
-        <!-- 卡片 1：饮食红绿灯（默认展开） -->
-        <details class="uric-card" open>
-          <summary><span class="uric-card-icon">🚦</span>饮食红绿灯</summary>
-          <div class="uric-section">
-            <h4 class="uric-section-label red">🚫 红色 · 禁止</h4>
-            <div class="uric-pills">
-              <span class="uric-pill red">动物内脏（肝/肾/脑）</span>
-              <span class="uric-pill red">浓肉汤 / 骨头汤</span>
-              <span class="uric-pill red">火锅汤底</span>
-              <span class="uric-pill red">海鲜（虾/蟹/贝类/沙丁鱼）</span>
-              <span class="uric-pill red">啤酒</span>
-              <span class="uric-pill red">含糖饮料 / 果汁 / 西瓜汁</span>
-            </div>
+        <div class="health-score-info">
+          <div class="health-grade">
+            <span class="health-grade-tag tier-C" id="healthGradeTag">C</span>
+            <span id="healthGradeName">注意</span>
           </div>
-          <div class="uric-section">
-            <h4 class="uric-section-label yellow">⚠️ 黄色 · 控量（周 2-3 次）</h4>
-            <div class="uric-pills">
-              <span class="uric-pill yellow">牛肉 ≤150g/次</span>
-              <span class="uric-pill yellow">猪肉 / 羊肉</span>
-              <span class="uric-pill yellow">白肉鱼</span>
-              <span class="uric-pill yellow">菌菇类</span>
-              <span class="uric-pill yellow">西瓜 ≤300g</span>
-              <span class="uric-pill yellow">芒果 / 荔枝 / 葡萄</span>
-            </div>
-          </div>
-          <div class="uric-section">
-            <h4 class="uric-section-label green">✅ 绿色 · 放心吃</h4>
-            <div class="uric-pills">
-              <span class="uric-pill green">鸡蛋（每天 2-3 个）</span>
-              <span class="uric-pill green">纯牛奶（每天 1-2 杯）</span>
-              <span class="uric-pill green">鸡胸肉</span>
-              <span class="uric-pill green">蔬菜</span>
-              <span class="uric-pill green">米饭 / 面条 / 土豆</span>
-              <span class="uric-pill green">樱桃 🍒</span>
-              <span class="uric-pill green">蓝莓 / 苹果</span>
-              <span class="uric-pill green">豆腐</span>
-              <span class="uric-pill green">番茄炒蛋 / 黄瓜炒蛋（外食默认）</span>
-            </div>
-          </div>
-        </details>
-
-        <!-- 卡片 2：饮品指南 -->
-        <details class="uric-card">
-          <summary><span class="uric-card-icon">🥤</span>饮品指南</summary>
-          <ul class="uric-drinks">
-            <li><span class="stars">⭐⭐⭐</span><strong>柠檬水</strong>　碱化尿液，促排泄</li>
-            <li><span class="stars">⭐⭐⭐</span><strong>纯牛奶</strong>　促排泄 + 补蛋白</li>
-            <li><span class="stars">⭐⭐⭐</span><strong>白水</strong>　基础保障</li>
-            <li><span class="stars">⭐⭐</span><strong>无糖苏打水</strong>　碱性</li>
-            <li><span class="stars">⭐⭐</span><strong>黑咖啡（午前）</strong>　可能降尿酸</li>
-            <li><span class="stars">⭐</span><strong>淡茶</strong>　午后选无咖啡因</li>
-            <li><span class="stars no">❌</span><strong>啤酒 / 含糖饮料 / 果汁</strong>　禁止</li>
-          </ul>
-        </details>
-
-        <!-- 卡片 3：每日执行清单 -->
-        <details class="uric-card">
-          <summary><span class="uric-card-icon">📋</span>每日执行清单<span class="uric-card-meta" id="uricChecklistMeta"></span></summary>
-          <ul class="uric-checklist" id="uricChecklist">
-            <li>
-              <label>
-                <input type="checkbox" data-task="water">
-                <span>白天喝水 ≥ 2500ml（19:00 前完成）</span>
-              </label>
-              <div class="uric-checklist-sub">06-12 → 1200ml　12-17 → 1000ml　17-19 → 300ml</div>
-            </li>
-            <li>
-              <label>
-                <input type="checkbox" data-task="medication">
-                <span>苯溴马隆 饭后服（25mg/天，后续可加到 50mg）</span>
-              </label>
-            </li>
-            <li>
-              <label>
-                <input type="checkbox" data-task="beef-quota">
-                <span>牛肉今天在配额内（周 2-3 次 ≤150g）</span>
-              </label>
-            </li>
-            <li>
-              <label>
-                <input type="checkbox" data-task="avoid-red">
-                <span>避开红色标签食物</span>
-              </label>
-            </li>
-          </ul>
-        </details>
-
-        <!-- 追踪表：尿酸复查记录 -->
-        <div class="uric-tracking">
-          <div class="uric-tracking-header">
-            <h3>📊 尿酸复查记录</h3>
-            <button class="btn-secondary btn-slim" id="uricAddRecordBtn" type="button">+ 添加记录</button>
-          </div>
-          <div class="uric-tracking-wrap">
-            <table class="uric-table">
-              <thead><tr><th>日期</th><th class="num">尿酸 μmol/L</th><th class="num">体重 kg</th><th>用药</th><th>备注</th><th></th></tr></thead>
-              <tbody id="uricRecordsBody"></tbody>
-            </table>
-          </div>
-          <div class="uric-chart-wrap" id="uricChartWrap" hidden>
-            <div class="uric-chart-meta">目标：<strong>420 μmol/L</strong>（绿色虚线）</div>
-            <canvas id="uricChart"></canvas>
-          </div>
+          <div class="health-grade-text" id="healthGradeText">基础分 60 · 等你勾选今日行为</div>
+          <div class="health-meta" id="healthMeta">本周均分 <strong>--</strong> · 连续 A+ 天数 <strong>0</strong></div>
         </div>
       </div>
+
+      <!-- 今日明细 -->
+      <div class="health-detail-bar" id="healthDetailBar">
+        <span class="empty">今日还没勾选任何行为</span>
+      </div>
+
+      <!-- 加分项 -->
+      <details class="health-items-section" open id="healthAddSection">
+        <summary>
+          ✅ 加分项 <span class="group-sum add" id="healthAddSum">+0</span>
+        </summary>
+        <div id="healthAddItems"></div>
+      </details>
+
+      <!-- 扣分项 -->
+      <details class="health-items-section" id="healthSubSection">
+        <summary>
+          ❌ 扣分项 <span class="group-sum sub" id="healthSubSum">-0</span>
+        </summary>
+        <div id="healthSubItems"></div>
+      </details>
     </section>
 
     <!-- 觅应运营看板 -->
@@ -5962,256 +6137,326 @@ input[type="checkbox"] {
       initialize();
     })();
 
-    // ── 尿酸管理指南 ──
+    // ── 健康预管理系统 V2 · 今日评分 ──
     (() => {
-      const STORAGE_KEY = "uric_acid_records";
-      const CHECKLIST_KEY = "uric_acid_checklist";
-      const TARGET = 420;
+      const SCORE_KEY = "health_scores";
 
-      function todayISO() {
-        return new Date().toISOString().slice(0, 10);
-      }
-      function fmtDateShort(iso) {
-        if (!iso) return "";
-        const [, m, d] = iso.split("-");
-        return `${Number(m)}/${Number(d)}`;
-      }
-      function makeId() {
-        return `uric-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
-      }
+      // 加分项配置（PRD 表格）
+      const ADD_ITEMS = [
+        { id: "sleepSop",       cat: "睡眠", label: "执行睡前 SOP（断水+倒立+早睡）", score: 5 },
+        { id: "slowEating",     cat: "慢食", label: "全天慢食执行（每口20下/≥15分钟/70%停）", score: 5 },
+        { id: "waterBeforeMeal",cat: "慢食", label: "餐前喝了一杯水", score: 2 },
+        { id: "avoidRed",       cat: "饮食", label: "全天避开红灯食物", score: 5 },
+        { id: "cookedOnce",     cat: "饮食", label: "自己做饭 ≥ 1 餐", score: 3 },
+        { id: "water2500",      cat: "饮水", label: "白天饮水 ≥ 2500ml（19:00 前）", score: 5 },
+        { id: "lemonWater",     cat: "饮水", label: "喝了柠檬水", score: 2 },
+        { id: "milk",           cat: "饮水", label: "喝了纯牛奶", score: 2 },
+        { id: "workout",        cat: "运动", label: "完成囚徒健身训练", score: 5 },
+        { id: "eye2510",        cat: "用眼", label: "执行 25/10 用眼节律", score: 3 },
+        { id: "medicationTaken",cat: "用药", label: "苯溴马隆 按时饭后服", score: 2 },
+        { id: "horseQuestion",  cat: "觉察", label: "执行了「马夫一问」（饿了还是累了？）", score: 3 }
+      ];
 
-      // ── 数据：复查记录 ──
-      function loadRecords() {
+      // 扣分项配置
+      const SUB_ITEMS = [
+        { id: "ateRed",         cat: "饮食", label: "吃了红灯食物（内脏/浓汤/海鲜/啤酒）", score: 8 },
+        { id: "drankSugar",     cat: "饮食", label: "喝了含糖饮料 / 果汁", score: 5 },
+        { id: "binge",          cat: "饮食", label: "暴食 / 失控进食（吃到撑）", score: 5 },
+        { id: "beefOver",       cat: "饮食", label: "牛肉超配额（本周>3 次或单次>150g）", score: 3 },
+        { id: "darkChocOver",   cat: "饮食", label: "黑巧超量（>3 块/天）", score: 2 },
+        { id: "waterUnder1500", cat: "饮水", label: "白天饮水 < 1500ml", score: 5 },
+        { id: "noExercise",     cat: "运动", label: "全天未做任何运动", score: 5 },
+        { id: "eyeOver2h",      cat: "用眼", label: "连续用眼 > 2 小时未休息", score: 3 },
+        { id: "coffeeAfter2pm", cat: "其他", label: "下午 2 点后摄入咖啡因", score: 3 },
+        { id: "nutOrHard",      cat: "其他", label: "吃了坚果 / 硬物（TMD 风险）", score: 2 },
+        { id: "colaOverWeek",   cat: "其他", label: "无糖可乐（本周 > 2 次）", score: 2 }
+      ];
+
+      // 步数档位（替代式：勾 10000+ 自动覆盖 7000+）
+      const STEP_ITEMS = [
+        { id: "steps10000",     cat: "运动", label: "步行 ≥ 10000 步", score: 5 },
+        { id: "steps7000",      cat: "运动", label: "步行 ≥ 7000 步", score: 3 }
+      ];
+      const STEPS_UNDER_5000 = { id: "stepsUnder5000", cat: "运动", label: "步行 < 5000 步", score: 3 };
+
+      // 等级表
+      const GRADES = [
+        { min: 90, tier: "S", name: "完美健康日", text: "完美健康日——好状态固化成结构" },
+        { min: 80, tier: "A", name: "优秀",       text: "优秀——继续运转" },
+        { min: 70, tier: "B", name: "合格",       text: "合格——明天可以更好" },
+        { min: 60, tier: "C", name: "注意",       text: "注意——检查哪里漏了" },
+        { min: 0,  tier: "D", name: "警告",       text: "警告——身体在扣分，明天必须调整" }
+      ];
+
+      function todayISO() { return new Date().toISOString().slice(0, 10); }
+
+      function loadAll() {
         try {
-          const raw = localStorage.getItem(STORAGE_KEY);
-          if (!raw) return seedRecords();
-          const parsed = JSON.parse(raw);
-          return Array.isArray(parsed) ? parsed : seedRecords();
-        } catch (err) {
-          console.error("尿酸记录读取失败", err);
-          return seedRecords();
-        }
-      }
-      function saveRecords(records) {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
-      }
-      function seedRecords() {
-        const seeded = [
-          { id: makeId(), date: "2026-05-15", uricAcid: 566.57, weight: 83.5, medication: "苯溴马隆 25mg 启动", note: "基线" }
-        ];
-        saveRecords(seeded);
-        return seeded;
-      }
-
-      // ── 数据：每日清单 ──
-      function loadChecklist() {
-        try {
-          const raw = localStorage.getItem(CHECKLIST_KEY);
+          const raw = localStorage.getItem(SCORE_KEY);
           return raw ? JSON.parse(raw) : {};
-        } catch (err) {
-          return {};
-        }
+        } catch (err) { return {}; }
       }
-      function saveChecklist(state) {
-        localStorage.setItem(CHECKLIST_KEY, JSON.stringify(state));
-      }
-      function todayChecklist() {
-        const all = loadChecklist();
+      function saveAll(all) { localStorage.setItem(SCORE_KEY, JSON.stringify(all)); }
+      function loadToday() {
+        const all = loadAll();
         return all[todayISO()] || {};
       }
-      function setTodayCheck(task, checked) {
-        const all = loadChecklist();
-        if (!all[todayISO()]) all[todayISO()] = {};
-        all[todayISO()][task] = checked;
-        saveChecklist(all);
+      function patchToday(patch) {
+        const all = loadAll();
+        const today = todayISO();
+        all[today] = { ...(all[today] || {}), ...patch };
+        saveAll(all);
+        return all[today];
+      }
+
+      // 评分计算
+      function computeScore(state) {
+        let total = 60;
+        const details = []; // { label, value, sign }
+
+        // 睡眠分自动判档（直接输入分数）
+        const sleep = Number(state.sleepScore);
+        if (Number.isFinite(sleep) && sleep > 0) {
+          if (sleep >= 90)      { total += 10; details.push({ label: `睡眠 ${sleep}`, value: 10, sign: "add" }); }
+          else if (sleep >= 80) { total += 5;  details.push({ label: `睡眠 ${sleep}`, value: 5, sign: "add" }); }
+          else if (sleep >= 70) { total -= 5;  details.push({ label: `睡眠 ${sleep}`, value: 5, sign: "sub" }); }
+          else                  { total -= 10; details.push({ label: `睡眠 ${sleep}`, value: 10, sign: "sub" }); }
+        }
+
+        // 步数：10000+ 覆盖 7000+；<5000 扣分
+        if (state.steps10000) {
+          total += 5;
+          details.push({ label: "步行 ≥10000", value: 5, sign: "add" });
+        } else if (state.steps7000) {
+          total += 3;
+          details.push({ label: "步行 ≥7000", value: 3, sign: "add" });
+        } else if (state.stepsUnder5000) {
+          total -= 3;
+          details.push({ label: "步行 <5000", value: 3, sign: "sub" });
+        }
+
+        // 加分 checkboxes
+        ADD_ITEMS.forEach((item) => {
+          if (state[item.id]) {
+            total += item.score;
+            details.push({ label: item.label, value: item.score, sign: "add" });
+          }
+        });
+
+        // 扣分 checkboxes
+        SUB_ITEMS.forEach((item) => {
+          if (state[item.id]) {
+            total -= item.score;
+            details.push({ label: item.label, value: item.score, sign: "sub" });
+          }
+        });
+
+        // clamp 0-100
+        total = Math.max(0, Math.min(100, total));
+
+        // 分别算 add/sub 总和（顶部小数字用）
+        const addSum = details.filter((d) => d.sign === "add").reduce((s, d) => s + d.value, 0);
+        const subSum = details.filter((d) => d.sign === "sub").reduce((s, d) => s + d.value, 0);
+
+        return { total, details, addSum, subSum };
+      }
+
+      function getGrade(score) {
+        return GRADES.find((g) => score >= g.min) || GRADES[GRADES.length - 1];
+      }
+
+      // 周均分 + 连续 A+ 天数
+      function getStats() {
+        const all = loadAll();
+        const today = new Date();
+        const last7 = [];
+        for (let i = 0; i < 7; i++) {
+          const d = new Date(today); d.setDate(today.getDate() - i);
+          const iso = d.toISOString().slice(0, 10);
+          if (all[iso]) last7.push(computeScore(all[iso]).total);
+        }
+        const avg = last7.length ? last7.reduce((s, n) => s + n, 0) / last7.length : null;
+
+        // 连续 A+（80+）天数：从今天往回数
+        let streak = 0;
+        for (let i = 0; i < 60; i++) {
+          const d = new Date(today); d.setDate(today.getDate() - i);
+          const iso = d.toISOString().slice(0, 10);
+          if (!all[iso]) break;
+          const score = computeScore(all[iso]).total;
+          if (score >= 80) streak++; else break;
+        }
+        return { avg, streak };
       }
 
       // ── 渲染 ──
-      function renderRecords() {
-        const tbody = document.getElementById("uricRecordsBody");
-        if (!tbody) return;
-        const records = loadRecords().slice().sort((a, b) => a.date.localeCompare(b.date));
-        if (!records.length) {
-          tbody.innerHTML = `<tr class="empty-row"><td colspan="6">还没有复查记录，点右上"+ 添加记录"开始追踪。</td></tr>`;
-          return;
-        }
-        tbody.innerHTML = records.map((r) => {
-          let cls = "uric-value-mid";
-          if (r.uricAcid <= TARGET) cls = "uric-value-ok";
-          else if (r.uricAcid >= 500) cls = "uric-value-high";
-          return `
-            <tr data-record-id="${r.id}">
-              <td>${fmtDateShort(r.date)}</td>
-              <td class="num ${cls}">${Number(r.uricAcid).toFixed(1)}</td>
-              <td class="num">${r.weight ? Number(r.weight).toFixed(1) : "—"}</td>
-              <td>${escapeHtml(r.medication || "")}</td>
-              <td>${escapeHtml(r.note || "")}</td>
-              <td><button class="uric-record-del" type="button" data-action="delete-uric" aria-label="删除">×</button></td>
-            </tr>
-          `;
-        }).join("");
+      function renderItems(state) {
+        const addBox = document.getElementById("healthAddItems");
+        const subBox = document.getElementById("healthSubItems");
 
-        // 目标差距副标题
-        const latest = records[records.length - 1];
-        const subtitle = document.getElementById("uricSubtitle");
-        if (subtitle && latest) {
-          const diff = latest.uricAcid - TARGET;
-          if (diff <= 0) {
-            subtitle.textContent = `🎉 已达标 (${latest.uricAcid.toFixed(0)} ≤ ${TARGET})`;
-          } else {
-            subtitle.textContent = `当前 ${latest.uricAcid.toFixed(0)} → 目标 ${TARGET}（还差 ${diff.toFixed(0)}）`;
-          }
-        }
+        // 睡眠分 + 步数三档（特殊）
+        const sleepHtml = `
+          <div class="health-item numeric">
+            <span class="item-cat">睡眠</span>
+            <label class="item-text">睡眠分（0-100）</label>
+            <input type="number" min="0" max="100" id="healthSleepInput" value="${state.sleepScore ?? ""}" placeholder="--">
+            <span class="item-score muted" id="healthSleepScore">±0</span>
+          </div>
+        `;
+        const stepsHtml = STEP_ITEMS.map((it) => `
+          <div class="health-item">
+            <label>
+              <input type="checkbox" data-add="${it.id}" ${state[it.id] ? "checked" : ""}>
+              <span class="item-cat">${it.cat}</span>
+              <span class="item-text">${it.label}</span>
+            </label>
+            <span class="item-score add">+${it.score}</span>
+          </div>
+        `).join("");
 
-        // 折线图（≥3 条数据才显示）
-        const chartWrap = document.getElementById("uricChartWrap");
-        if (records.length >= 3 && chartWrap) {
-          chartWrap.hidden = false;
-          drawChart(records);
-        } else if (chartWrap) {
-          chartWrap.hidden = true;
-        }
+        const addHtml = ADD_ITEMS.map((it) => `
+          <div class="health-item">
+            <label>
+              <input type="checkbox" data-add="${it.id}" ${state[it.id] ? "checked" : ""}>
+              <span class="item-cat">${it.cat}</span>
+              <span class="item-text">${it.label}</span>
+            </label>
+            <span class="item-score add">+${it.score}</span>
+          </div>
+        `).join("");
+
+        addBox.innerHTML = sleepHtml + stepsHtml + addHtml;
+
+        const stepsUnderHtml = `
+          <div class="health-item">
+            <label>
+              <input type="checkbox" data-sub="${STEPS_UNDER_5000.id}" ${state[STEPS_UNDER_5000.id] ? "checked" : ""}>
+              <span class="item-cat">${STEPS_UNDER_5000.cat}</span>
+              <span class="item-text">${STEPS_UNDER_5000.label}</span>
+            </label>
+            <span class="item-score sub">-${STEPS_UNDER_5000.score}</span>
+          </div>
+        `;
+        const subHtml = SUB_ITEMS.map((it) => `
+          <div class="health-item">
+            <label>
+              <input type="checkbox" data-sub="${it.id}" ${state[it.id] ? "checked" : ""}>
+              <span class="item-cat">${it.cat}</span>
+              <span class="item-text">${it.label}</span>
+            </label>
+            <span class="item-score sub">-${it.score}</span>
+          </div>
+        `).join("");
+
+        subBox.innerHTML = stepsUnderHtml + subHtml;
       }
 
-      let chartInstance = null;
-      function drawChart(records) {
-        const canvas = document.getElementById("uricChart");
-        if (!canvas || typeof Chart === "undefined") return;
-        const labels = records.map((r) => fmtDateShort(r.date));
-        const values = records.map((r) => r.uricAcid);
-        if (chartInstance) chartInstance.destroy();
-        const yMax = Math.max(...values, TARGET) + 60;
-        const yMin = Math.min(...values, TARGET) - 60;
-        chartInstance = new Chart(canvas.getContext("2d"), {
-          type: "line",
-          data: {
-            labels,
-            datasets: [{
-              label: "尿酸 (μmol/L)",
-              data: values,
-              borderColor: "#c44536",
-              backgroundColor: "rgba(196, 69, 54, 0.08)",
-              tension: 0.25,
-              pointBackgroundColor: "#c44536",
-              pointRadius: 4,
-              fill: true
-            }]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-              legend: { display: false },
-              tooltip: { callbacks: { label: (ctx) => `${ctx.parsed.y} μmol/L` } },
-              annotation: undefined
-            },
-            scales: {
-              y: {
-                min: Math.max(0, yMin),
-                max: yMax,
-                grid: { color: "rgba(89,73,45,0.08)" },
-                ticks: { color: "#6e6a62", font: { size: 10 } }
-              },
-              x: {
-                grid: { display: false },
-                ticks: { color: "#6e6a62", font: { size: 10 } }
-              }
-            }
-          },
-          plugins: [{
-            id: "targetLine",
-            afterDraw(chart) {
-              const { ctx, chartArea, scales } = chart;
-              if (!chartArea) return;
-              const y = scales.y.getPixelForValue(TARGET);
-              ctx.save();
-              ctx.setLineDash([4, 4]);
-              ctx.strokeStyle = "#1f7a5c";
-              ctx.lineWidth = 1.5;
-              ctx.beginPath();
-              ctx.moveTo(chartArea.left, y);
-              ctx.lineTo(chartArea.right, y);
-              ctx.stroke();
-              ctx.fillStyle = "#1f7a5c";
-              ctx.font = "11px sans-serif";
-              ctx.fillText(`目标 ${TARGET}`, chartArea.left + 4, y - 4);
-              ctx.restore();
-            }
-          }]
-        });
-        canvas.style.height = "200px";
-      }
+      function renderScore() {
+        const state = loadToday();
+        const { total, details, addSum, subSum } = computeScore(state);
+        const grade = getGrade(total);
+        const stats = getStats();
 
-      function renderChecklist() {
-        const today = todayChecklist();
-        document.querySelectorAll("#uricChecklist input[type='checkbox'][data-task]").forEach((cb) => {
-          cb.checked = !!today[cb.dataset.task];
-        });
-        const meta = document.getElementById("uricChecklistMeta");
-        if (meta) {
-          const total = 4;
-          const done = ["water", "medication", "beef-quota", "avoid-red"].filter((t) => today[t]).length;
-          meta.textContent = `· 今日 ${done}/${total}`;
+        // 环形
+        const circumference = 2 * Math.PI * 50;
+        const ring = document.getElementById("healthRingFill");
+        if (ring) {
+          ring.setAttribute("stroke-dasharray", circumference.toFixed(2));
+          ring.setAttribute("stroke-dashoffset", (circumference * (1 - total / 100)).toFixed(2));
+          const colorMap = { S: "#b87f00", A: "#1f7a5c", B: "#3a7bd5", C: "#d17b1f", D: "#c44536" };
+          ring.style.stroke = colorMap[grade.tier];
+        }
+
+        document.getElementById("healthScoreNum").textContent = String(total);
+
+        const tag = document.getElementById("healthGradeTag");
+        tag.textContent = grade.tier;
+        tag.className = "health-grade-tag tier-" + grade.tier;
+        document.getElementById("healthGradeName").textContent = grade.name;
+        document.getElementById("healthGradeText").textContent = grade.text;
+
+        document.getElementById("healthMeta").innerHTML =
+          `本周均分 <strong>${stats.avg !== null ? stats.avg.toFixed(1) : "--"}</strong> · 连续 A+ 天数 <strong>${stats.streak}</strong>`;
+
+        document.getElementById("healthAddSum").textContent = "+" + addSum;
+        document.getElementById("healthSubSum").textContent = "-" + subSum;
+
+        // 今日明细
+        const bar = document.getElementById("healthDetailBar");
+        if (!details.length) {
+          bar.innerHTML = `<span class="empty">今日还没勾选任何行为</span>`;
+        } else {
+          bar.innerHTML = details.map((d) => {
+            const sign = d.sign === "add" ? "+" : "-";
+            return `<span class="health-chip ${d.sign}">${d.label.length > 8 ? d.label.slice(0, 8) + "…" : d.label} ${sign}${d.value}</span>`;
+          }).join("");
+        }
+
+        // 睡眠分数自动显示在数字框右侧
+        const sleepScoreEl = document.getElementById("healthSleepScore");
+        if (sleepScoreEl) {
+          const s = Number(state.sleepScore);
+          if (!Number.isFinite(s) || s <= 0) {
+            sleepScoreEl.textContent = "±0"; sleepScoreEl.className = "item-score muted";
+          } else if (s >= 90) { sleepScoreEl.textContent = "+10"; sleepScoreEl.className = "item-score add"; }
+          else if (s >= 80) { sleepScoreEl.textContent = "+5"; sleepScoreEl.className = "item-score add"; }
+          else if (s >= 70) { sleepScoreEl.textContent = "-5"; sleepScoreEl.className = "item-score sub"; }
+          else { sleepScoreEl.textContent = "-10"; sleepScoreEl.className = "item-score sub"; }
         }
       }
 
-      function escapeHtml(s) {
-        return String(s).replace(/[&<>"']/g, (c) => ({
-          "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
-        }[c]));
-      }
-
-      // ── 交互 ──
+      // ── 事件 ──
       function bindEvents() {
-        document.getElementById("uricAddRecordBtn").addEventListener("click", () => {
-          const date = window.prompt("复查日期 (YYYY-MM-DD)", todayISO());
-          if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) return;
-          const uricStr = window.prompt("尿酸值 μmol/L（数字）");
-          if (uricStr === null) return;
-          const uricAcid = Number(uricStr);
-          if (!Number.isFinite(uricAcid) || uricAcid <= 0) {
-            window.alert("尿酸值需要是正数");
+        const panel = document.getElementById("healthPanel");
+
+        panel.addEventListener("change", (e) => {
+          // checkbox
+          const addCb = e.target.closest("input[type='checkbox'][data-add]");
+          const subCb = e.target.closest("input[type='checkbox'][data-sub]");
+          if (addCb || subCb) {
+            const key = addCb ? addCb.dataset.add : subCb.dataset.sub;
+            const patch = { [key]: e.target.checked };
+
+            // 步数互斥：勾 10000 → 自动取消 7000；反之亦然
+            if (key === "steps10000" && e.target.checked) patch.steps7000 = false;
+            if (key === "steps7000" && e.target.checked) patch.steps10000 = false;
+            // 勾步行档位时，取消"<5000"
+            if ((key === "steps10000" || key === "steps7000") && e.target.checked) patch.stepsUnder5000 = false;
+            // 勾 <5000 时取消另外两档
+            if (key === "stepsUnder5000" && e.target.checked) { patch.steps7000 = false; patch.steps10000 = false; }
+
+            patchToday(patch);
+            renderItems(loadToday());
+            renderScore();
             return;
           }
-          const weightStr = window.prompt("体重 kg（可选，留空跳过）", "");
-          const weight = weightStr === "" || weightStr === null ? null : Number(weightStr);
-          const medication = window.prompt("用药（例如：苯溴马隆 25mg）", "") || "";
-          const note = window.prompt("备注（可选）", "") || "";
-
-          const records = loadRecords();
-          records.push({ id: makeId(), date, uricAcid, weight: weight || null, medication, note });
-          saveRecords(records);
-          renderRecords();
+          // 睡眠分输入
+          if (e.target.id === "healthSleepInput") {
+            const v = Number(e.target.value);
+            patchToday({ sleepScore: Number.isFinite(v) ? v : null });
+            renderScore();
+            return;
+          }
         });
 
-        document.getElementById("uricRecordsBody").addEventListener("click", (e) => {
-          const btn = e.target.closest("[data-action='delete-uric']");
-          if (!btn) return;
-          const row = btn.closest("tr[data-record-id]");
-          if (!row) return;
-          const id = row.dataset.recordId;
-          if (!window.confirm("确定删除这条尿酸复查记录吗？")) return;
-          saveRecords(loadRecords().filter((r) => r.id !== id));
-          renderRecords();
-        });
-
-        document.getElementById("uricChecklist").addEventListener("change", (e) => {
-          const cb = e.target.closest("input[type='checkbox'][data-task]");
-          if (!cb) return;
-          setTodayCheck(cb.dataset.task, cb.checked);
-          renderChecklist();
+        // input 事件（实时刷新睡眠分显示）
+        panel.addEventListener("input", (e) => {
+          if (e.target.id === "healthSleepInput") {
+            const v = Number(e.target.value);
+            patchToday({ sleepScore: Number.isFinite(v) ? v : null });
+            renderScore();
+          }
         });
       }
 
       function init() {
-        renderRecords();
-        renderChecklist();
+        renderItems(loadToday());
+        renderScore();
         bindEvents();
       }
 
       init();
     })();
-
 
     // ── 觅应运营看板 ──
     (() => {
