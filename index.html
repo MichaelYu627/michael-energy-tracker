@@ -2429,6 +2429,292 @@ input[type="checkbox"] {
   .slowfood-layer .layer-label { font-size: 11.5px; }
 }
 
+/* ============================================
+   🛡️ 白马熔断机制
+   ============================================ */
+
+/* 浮动盾牌按钮 */
+.circuit-breaker-btn {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #1e3a5f, #0f1f3a) !important;
+  color: #fff !important;
+  border: 2px solid rgba(255,255,255,0.15) !important;
+  font-size: 22px !important;
+  padding: 0 !important;
+  cursor: pointer;
+  z-index: 9000;
+  box-shadow: 0 6px 20px rgba(15,31,58,0.4);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.circuit-breaker-btn:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 8px 26px rgba(15,31,58,0.55);
+}
+.circuit-breaker-btn:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* 全屏熔断模态 */
+.circuit-breaker-modal {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(ellipse at center, #0a0e1f 0%, #050810 100%);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #e8e8e8;
+  font-family: var(--font-main);
+  overflow-y: auto;
+  animation: cb-fade-in 0.6s ease-out;
+}
+@keyframes cb-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.cb-stage {
+  width: 100%;
+  max-width: 480px;
+  padding: 40px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  animation: cb-stage-fade 0.7s ease-out;
+}
+/* 默认 display:flex 会盖过 [hidden]，需显式禁用 */
+.cb-stage[hidden] { display: none !important; }
+.cb-question[hidden] { display: none !important; }
+@keyframes cb-stage-fade {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* 阶段 1：呼吸 */
+.cb-breath-circle {
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(78,158,255,0.25) 0%, rgba(78,158,255,0.05) 70%, transparent 100%);
+  border: 2px solid rgba(78,158,255,0.4);
+  margin-bottom: 36px;
+  transition: transform 4s cubic-bezier(0.4, 0, 0.2, 1), background 0.8s, border-color 0.8s;
+  transform: scale(0.6);
+}
+.cb-breath-circle.inhale {
+  transform: scale(1);
+  background: radial-gradient(circle, rgba(78,158,255,0.4) 0%, rgba(78,158,255,0.1) 70%, transparent 100%);
+  border-color: rgba(78,158,255,0.7);
+}
+.cb-breath-circle.hold {
+  transform: scale(1);
+  background: radial-gradient(circle, rgba(255,213,122,0.35) 0%, rgba(255,213,122,0.08) 70%, transparent 100%);
+  border-color: rgba(255,213,122,0.6);
+}
+.cb-breath-circle.exhale {
+  transform: scale(0.6);
+  background: radial-gradient(circle, rgba(78,158,255,0.2) 0%, rgba(78,158,255,0.04) 70%, transparent 100%);
+  border-color: rgba(78,158,255,0.3);
+}
+.cb-breath-text {
+  font-size: 32px;
+  font-weight: 300;
+  letter-spacing: 0.2em;
+  color: rgba(255,255,255,0.92);
+  margin-bottom: 16px;
+  transition: opacity 0.5s;
+  min-height: 40px;
+}
+.cb-breath-hint {
+  font-size: 14px;
+  color: rgba(255,255,255,0.5);
+  letter-spacing: 0.1em;
+  margin-bottom: 24px;
+}
+.cb-breath-counter {
+  font-size: 13px;
+  color: rgba(255,255,255,0.35);
+  font-family: var(--font-number);
+}
+
+/* 阶段 2：问题 */
+.cb-question {
+  width: 100%;
+}
+.cb-question h2 {
+  font-size: 22px;
+  font-weight: 500;
+  margin: 0 0 28px;
+  color: #fff;
+  line-height: 1.5;
+  letter-spacing: 0.02em;
+}
+.cb-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.cb-options button {
+  background: rgba(255,255,255,0.06) !important;
+  color: rgba(255,255,255,0.92) !important;
+  border: 1px solid rgba(255,255,255,0.15) !important;
+  padding: 14px 18px !important;
+  border-radius: 14px !important;
+  font-size: 15px !important;
+  font-weight: 500 !important;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.cb-options button:hover {
+  background: rgba(255,255,255,0.12) !important;
+  border-color: rgba(255,255,255,0.3) !important;
+}
+.cb-options button.chosen {
+  background: rgba(78,158,255,0.25) !important;
+  border-color: rgba(78,158,255,0.7) !important;
+  color: #fff !important;
+}
+.cb-options.locked button:not(.chosen) {
+  opacity: 0.35;
+  pointer-events: none;
+}
+.cb-response {
+  padding: 14px 16px;
+  background: rgba(78,158,255,0.08);
+  border-left: 3px solid rgba(78,158,255,0.5);
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 1.7;
+  color: rgba(255,255,255,0.85);
+  margin-top: 8px;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.5s, transform 0.5s;
+}
+.cb-response.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* 阶段 3：财富清单 */
+.cb-stage3-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #fff;
+  margin: 0 0 20px;
+  letter-spacing: 0.02em;
+  user-select: none;
+}
+.cb-achievements {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 22px;
+}
+.cb-achievement-block {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.10);
+  border-radius: 14px;
+  padding: 14px 16px;
+  text-align: left;
+}
+.cb-achievement-block h3 {
+  margin: 0 0 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(255,213,122,0.95);
+  letter-spacing: 0.04em;
+}
+.cb-achievement-block .ach-row {
+  font-size: 13px;
+  color: rgba(255,255,255,0.82);
+  line-height: 1.85;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+.cb-achievement-block .ach-row strong {
+  color: #fff;
+  font-family: var(--font-number);
+  font-weight: 700;
+}
+.cb-anchors {
+  width: 100%;
+  margin-bottom: 22px;
+  padding: 16px;
+  background: rgba(255,213,122,0.05);
+  border: 1px solid rgba(255,213,122,0.15);
+  border-radius: 14px;
+}
+.cb-anchor-line {
+  font-size: 14px;
+  color: rgba(255,213,122,0.85);
+  line-height: 2.1;
+  letter-spacing: 0.03em;
+  text-align: center;
+  font-style: italic;
+}
+.cb-final-msg {
+  font-size: 15px;
+  line-height: 1.9;
+  color: rgba(255,255,255,0.95);
+  margin-bottom: 24px;
+  text-align: center;
+  letter-spacing: 0.02em;
+}
+.cb-final-msg strong { color: #ffd57a; font-weight: 700; }
+.cb-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+.cb-exit-btn {
+  background: linear-gradient(135deg, #4e9eff, #2e7dd5) !important;
+  color: #fff !important;
+  border: none !important;
+  padding: 14px 18px !important;
+  border-radius: 14px !important;
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  cursor: pointer;
+  letter-spacing: 0.04em;
+}
+.cb-exit-btn:hover { transform: translateY(-1px); }
+.cb-write-btn {
+  background: transparent !important;
+  color: rgba(255,255,255,0.6) !important;
+  border: 1px solid rgba(255,255,255,0.18) !important;
+  padding: 12px 18px !important;
+  border-radius: 14px !important;
+  font-size: 13.5px !important;
+  font-weight: 500 !important;
+  cursor: pointer;
+}
+.cb-write-btn:hover {
+  background: rgba(255,255,255,0.06) !important;
+  color: rgba(255,255,255,0.85) !important;
+}
+
+@media (max-width: 480px) {
+  .cb-stage { padding: 28px 20px; }
+  .cb-breath-circle { width: 150px; height: 150px; margin-bottom: 26px; }
+  .cb-breath-text { font-size: 26px; }
+  .cb-question h2 { font-size: 19px; margin-bottom: 22px; }
+  .cb-options button { padding: 12px 16px !important; font-size: 14px !important; }
+  .cb-stage3-title { font-size: 17px; }
+  .cb-achievement-block { padding: 12px 14px; }
+  .cb-final-msg { font-size: 14px; }
+}
+
 /* ===== 健康预管理 · TMD / 用眼 / 评分趋势 ===== */
 
 /* TMD 下颌关节 */
@@ -3776,6 +4062,78 @@ input[type="checkbox"] {
         </div>
       </div>
     </section>
+  </div>
+
+  <!-- ═══════════ 🛡️ 白马熔断机制 ═══════════ -->
+  <button class="circuit-breaker-btn" id="circuitBreakerBtn" type="button" aria-label="马夫上线 · 熔断冷静">🛡️</button>
+
+  <div class="circuit-breaker-modal" id="circuitBreakerModal" hidden>
+    <!-- 阶段 1：呼吸锚定 -->
+    <div class="cb-stage" data-stage="1" id="cbStage1">
+      <div class="cb-breath-circle" id="cbBreathCircle"></div>
+      <div class="cb-breath-text" id="cbBreathText">准备</div>
+      <div class="cb-breath-hint">跟着呼吸。什么都不用想。</div>
+      <div class="cb-breath-counter" id="cbBreathCounter">12 秒</div>
+    </div>
+
+    <!-- 阶段 2：马夫三问 -->
+    <div class="cb-stage" data-stage="2" id="cbStage2" hidden>
+      <!-- 问题 1 -->
+      <div class="cb-question" id="cbQ1">
+        <h2>现在，你的情绪是什么？</h2>
+        <div class="cb-options" data-question="emotion">
+          <button data-answer="愤怒" type="button">愤怒</button>
+          <button data-answer="焦虑" type="button">焦虑</button>
+          <button data-answer="委屈" type="button">委屈</button>
+          <button data-answer="恐惧" type="button">恐惧</button>
+          <button data-answer="烦躁" type="button">烦躁</button>
+          <button data-answer="其他" type="button">其他</button>
+        </div>
+        <div class="cb-response" id="cbR1"></div>
+      </div>
+      <!-- 问题 2 -->
+      <div class="cb-question" id="cbQ2" hidden>
+        <h2>这件事，明天还重要吗？</h2>
+        <div class="cb-options" data-question="tomorrow_important">
+          <button data-answer="重要" type="button">重要</button>
+          <button data-answer="不确定" type="button">不确定</button>
+          <button data-answer="可能不重要" type="button">可能不重要</button>
+        </div>
+        <div class="cb-response" id="cbR2"></div>
+      </div>
+      <!-- 问题 3 -->
+      <div class="cb-question" id="cbQ3" hidden>
+        <h2>你现在需要做决定吗？</h2>
+        <div class="cb-options" data-question="need_decision">
+          <button data-answer="是" type="button">是</button>
+          <button data-answer="不是" type="button">不是</button>
+          <button data-answer="不确定" type="button">不确定</button>
+        </div>
+        <div class="cb-response" id="cbR3"></div>
+      </div>
+    </div>
+
+    <!-- 阶段 3：财富清单 -->
+    <div class="cb-stage" data-stage="3" id="cbStage3" hidden>
+      <h2 class="cb-stage3-title" id="cbStage3Title">🛡️ 马夫已上线 · 看看你积累了什么</h2>
+      <div class="cb-achievements" id="cbAchievements"></div>
+      <div class="cb-anchors">
+        <div class="cb-anchor-line">"既不失真，也未失志"</div>
+        <div class="cb-anchor-line">"好状态不是拿来挥霍的，是固化成结构的"</div>
+        <div class="cb-anchor-line">"96% 生活方式 + 4% 训练 = 身体优化"</div>
+        <div class="cb-anchor-line">"结构 > 意志力"</div>
+        <div class="cb-anchor-line">"事以密成，言以泄败"</div>
+        <div class="cb-anchor-line">"谷底也是数据"</div>
+      </div>
+      <div class="cb-final-msg">
+        你花了这么久才建起这些东西。<br>
+        <strong>不要用一个冲动的决定，把它们推倒。</strong>
+      </div>
+      <div class="cb-actions">
+        <button class="cb-exit-btn" id="cbExitBtn" type="button">我冷静了，关闭</button>
+        <button class="cb-write-btn" id="cbWriteBtn" type="button">✍ 写下这一刻</button>
+      </div>
+    </div>
   </div>
 
   <script>
@@ -8042,6 +8400,332 @@ input[type="checkbox"] {
       }
 
       init();
+    })();
+
+    // ── 🛡️ 白马熔断机制 ──
+    (() => {
+      const CIRCUIT_KEY = "circuit_breaker_logs";
+      const ACHIEVE_KEY = "achievements";
+
+      const FILLER_ACHIEVEMENTS = {
+        total_revenue: 118000,
+        monthly_system_income: 30000,
+        ai_systems: 5,
+        years_in_industry: 9,
+        obsidian_notes: 760,
+        pullups_record: 25,
+        bridge_record: 50,
+        calisthenics_years: 11
+      };
+
+      function loadAchievements() {
+        try {
+          const raw = localStorage.getItem(ACHIEVE_KEY);
+          if (raw) return { ...FILLER_ACHIEVEMENTS, ...JSON.parse(raw) };
+        } catch (err) {}
+        return { ...FILLER_ACHIEVEMENTS };
+      }
+      function saveAchievements(obj) {
+        localStorage.setItem(ACHIEVE_KEY, JSON.stringify(obj));
+      }
+
+      function loadLogs() {
+        try {
+          const raw = localStorage.getItem(CIRCUIT_KEY);
+          return raw ? JSON.parse(raw) : [];
+        } catch (err) { return []; }
+      }
+      function appendLog(entry) {
+        const logs = loadLogs();
+        logs.push(entry);
+        localStorage.setItem(CIRCUIT_KEY, JSON.stringify(logs));
+      }
+
+      function fmtNumber(n) {
+        if (typeof n !== "number" || !Number.isFinite(n)) return "--";
+        return n.toLocaleString();
+      }
+
+      // 简化版健康评分（不依赖健康 IIFE 内部函数）
+      function computeScoreLite(state) {
+        let total = 60;
+        const sleep = Number(state.sleepScore);
+        if (Number.isFinite(sleep) && sleep > 0) {
+          if (sleep >= 90) total += 10;
+          else if (sleep >= 80) total += 5;
+          else if (sleep >= 70) total -= 5;
+          else total -= 10;
+        }
+        if (state.steps10000) total += 5;
+        else if (state.steps7000) total += 3;
+        else if (state.stepsUnder5000) total -= 3;
+        const adds = ["sleepSop","slowEating","waterBeforeMeal","avoidRed","cookedOnce","water2500","lemonWater","milk","workout","eye2510","medicationTaken","horseQuestion"];
+        const addScores = [5,5,2,5,3,5,2,2,5,3,2,3];
+        adds.forEach((id, i) => { if (state[id]) total += addScores[i]; });
+        const subs = ["ateRed","drankSugar","binge","beefOver","darkChocOver","waterUnder1500","noExercise","eyeOver2h","coffeeAfter2pm","nutOrHard","colaOverWeek"];
+        const subScores = [8,5,5,3,2,5,5,3,3,2,2];
+        subs.forEach((id, i) => { if (state[id]) total -= subScores[i]; });
+        return Math.max(0, Math.min(100, total));
+      }
+
+      // 从已有 localStorage 拉动态成就
+      function getDynamicStats() {
+        const stats = {};
+        try {
+          const entries = JSON.parse(localStorage.getItem("michael-energy-tracker-v1") || "[]");
+          const sorted = entries.slice().sort((a, b) => a.date.localeCompare(b.date));
+          const recent7 = sorted.slice(-7).filter((e) => e.sleepScore > 0);
+          stats.sleepAvg7 = recent7.length ? (recent7.reduce((s, e) => s + e.sleepScore, 0) / recent7.length).toFixed(1) : null;
+          stats.sleepMax = entries.length ? Math.max(...entries.map((e) => e.sleepScore || 0)) : null;
+          let earlyStreak = 0;
+          for (let i = sorted.length - 1; i >= 0; i--) {
+            const bt = sorted[i].bedtime;
+            if (!bt) break;
+            const [h] = bt.split(":").map(Number);
+            if (h >= 20 && h < 23) earlyStreak++; else break;
+          }
+          stats.earlySleepStreak = earlyStreak;
+        } catch (err) {}
+
+        try {
+          const weights = JSON.parse(localStorage.getItem("weight_records") || "[]")
+            .slice()
+            .sort((a, b) => a.date.localeCompare(b.date));
+          if (weights.length) {
+            stats.weightStart = weights[0].weight;
+            stats.weightCurrent = weights[weights.length - 1].weight;
+            stats.weightDelta = (stats.weightCurrent - stats.weightStart).toFixed(1);
+            const waistRecords = weights.filter((w) => w.waist);
+            if (waistRecords.length) {
+              stats.waistStart = waistRecords[0].waist;
+              stats.waistCurrent = waistRecords[waistRecords.length - 1].waist;
+            }
+          }
+        } catch (err) {}
+
+        try {
+          const scores = JSON.parse(localStorage.getItem("health_scores") || "{}");
+          const days = Object.values(scores);
+          stats.healthScoreDays = days.length;
+          stats.slowFoodDays = days.filter((d) => d.slowEating).length;
+          stats.sopDays = days.filter((d) => d.sleepSop).length;
+          stats.horseQuestionDays = days.filter((d) => d.horseQuestion).length;
+          stats.aPlusDays = days.filter((d) => computeScoreLite(d) >= 80).length;
+        } catch (err) {}
+
+        return stats;
+      }
+
+      function renderAchievements() {
+        const ach = loadAchievements();
+        const dyn = getDynamicStats();
+        const html = [];
+
+        // 😴 睡眠
+        const sleepRows = [];
+        if (dyn.earlySleepStreak !== undefined) sleepRows.push(`<div class="ach-row"><span>连续早睡</span><strong>${dyn.earlySleepStreak} 天</strong></div>`);
+        if (dyn.sleepAvg7) sleepRows.push(`<div class="ach-row"><span>最近 7 天均分</span><strong>${dyn.sleepAvg7} 分</strong></div>`);
+        if (dyn.sleepMax) sleepRows.push(`<div class="ach-row"><span>历史最高</span><strong>${dyn.sleepMax} 分</strong></div>`);
+        if (dyn.sopDays) sleepRows.push(`<div class="ach-row"><span>睡前 SOP 已运转</span><strong>${dyn.sopDays} 天</strong></div>`);
+        if (sleepRows.length) html.push(`<div class="cb-achievement-block"><h3>😴 睡眠</h3>${sleepRows.join("")}</div>`);
+
+        // ⚖️ 体重
+        const wRows = [];
+        if (dyn.weightStart && dyn.weightCurrent) {
+          const sign = Number(dyn.weightDelta) >= 0 ? "+" : "";
+          wRows.push(`<div class="ach-row"><span>起点 → 现在</span><strong>${dyn.weightStart.toFixed(1)} → ${dyn.weightCurrent.toFixed(1)} kg (${sign}${dyn.weightDelta})</strong></div>`);
+        }
+        if (dyn.waistStart && dyn.waistCurrent) wRows.push(`<div class="ach-row"><span>腰围变化</span><strong>${dyn.waistStart} → ${dyn.waistCurrent} cm</strong></div>`);
+        if (dyn.slowFoodDays) wRows.push(`<div class="ach-row"><span>慢食协议已运转</span><strong>${dyn.slowFoodDays} 天</strong></div>`);
+        if (wRows.length) html.push(`<div class="cb-achievement-block"><h3>⚖️ 体重</h3>${wRows.join("")}</div>`);
+
+        // 💪 训练（来自 achievements）
+        html.push(`<div class="cb-achievement-block"><h3>💪 训练</h3>
+          <div class="ach-row"><span>囚徒健身</span><strong>${ach.calisthenics_years} 年</strong></div>
+          <div class="ach-row"><span>合桥最高</span><strong>${ach.bridge_record} 个</strong></div>
+          <div class="ach-row"><span>引体最高</span><strong>${ach.pullups_record} 个</strong></div>
+          <div class="ach-row"><span>同龄水平</span><strong>前 1%</strong></div>
+        </div>`);
+
+        // 💰 事业
+        html.push(`<div class="cb-achievement-block"><h3>💰 事业</h3>
+          <div class="ach-row"><span>觅应累计成交</span><strong>¥${fmtNumber(ach.total_revenue)}+</strong></div>
+          <div class="ach-row"><span>系统月收入</span><strong>~¥${fmtNumber(ach.monthly_system_income)}</strong></div>
+          <div class="ach-row"><span>AI 五系统</span><strong>已协同上线</strong></div>
+          <div class="ach-row"><span>行业积累</span><strong>${ach.years_in_industry} 年</strong></div>
+        </div>`);
+
+        // 🧠 认知
+        const cogRows = [];
+        cogRows.push(`<div class="ach-row"><span>Obsidian 笔记</span><strong>${fmtNumber(ach.obsidian_notes)}+ 篇</strong></div>`);
+        if (dyn.aPlusDays !== undefined) cogRows.push(`<div class="ach-row"><span>健康 A+ 天数</span><strong>${dyn.aPlusDays} 天</strong></div>`);
+        if (dyn.horseQuestionDays) cogRows.push(`<div class="ach-row"><span>马夫一问执行</span><strong>${dyn.horseQuestionDays} 次</strong></div>`);
+        html.push(`<div class="cb-achievement-block"><h3>🧠 认知</h3>${cogRows.join("")}</div>`);
+
+        document.getElementById("cbAchievements").innerHTML = html.join("");
+      }
+
+      // ── 阶段控制 ──
+      const stages = {
+        1: document.getElementById("cbStage1"),
+        2: document.getElementById("cbStage2"),
+        3: document.getElementById("cbStage3")
+      };
+      function showStage(n) {
+        Object.entries(stages).forEach(([k, el]) => { el.hidden = Number(k) !== n; });
+      }
+
+      // 阶段 1：呼吸 4-4-4
+      let breathTimers = [];
+      function clearBreathTimers() {
+        breathTimers.forEach((t) => clearTimeout(t));
+        breathTimers = [];
+      }
+      function runBreathingCycle(onDone) {
+        const circle = document.getElementById("cbBreathCircle");
+        const text = document.getElementById("cbBreathText");
+        const counter = document.getElementById("cbBreathCounter");
+        clearBreathTimers();
+        const setPhase = (label, cls) => {
+          circle.classList.remove("inhale", "hold", "exhale");
+          if (cls) circle.classList.add(cls);
+          text.textContent = label;
+        };
+        // 12 秒倒计时数字
+        for (let s = 12; s >= 0; s--) {
+          breathTimers.push(setTimeout(() => {
+            counter.textContent = `${s} 秒`;
+          }, (12 - s) * 1000));
+        }
+        // 0s 开始吸气，4s 屏气，8s 呼气，12s 结束
+        setPhase("吸气", "inhale");
+        breathTimers.push(setTimeout(() => setPhase("屏气", "hold"), 4000));
+        breathTimers.push(setTimeout(() => setPhase("呼气", "exhale"), 8000));
+        breathTimers.push(setTimeout(() => {
+          setPhase("好", "");
+          breathTimers.push(setTimeout(onDone, 800));
+        }, 12000));
+      }
+
+      // 阶段 2：三问
+      const questionData = {
+        emotion: { responseText: '好，马夫看到了。白马在叫，但马夫已经接管方向盘了。', nextQ: "cbQ2" },
+        tomorrow_important: { responseText: '记住：90% 让你现在难受的事，72 小时后你不会再想起它。', nextQ: "cbQ3" },
+        need_decision: {
+          responseTextFn: (ans) => ans === "是"
+            ? '睡眠 < 80 分不做重大决策。先看看你已经拥有的东西。'
+            : '那就不做。先看看你已经拥有的东西。',
+          nextQ: null
+        }
+      };
+      let answers = {};
+
+      function bindQuestionOptions() {
+        document.querySelectorAll(".cb-options").forEach((box) => {
+          box.addEventListener("click", (e) => {
+            const btn = e.target.closest("button[data-answer]");
+            if (!btn || box.classList.contains("locked")) return;
+            const key = box.dataset.question;
+            const answer = btn.dataset.answer;
+            answers[key] = answer;
+            box.classList.add("locked");
+            btn.classList.add("chosen");
+            const def = questionData[key];
+            const responseEl = btn.closest(".cb-question").querySelector(".cb-response");
+            const text = def.responseTextFn ? def.responseTextFn(answer) : def.responseText;
+            responseEl.textContent = text;
+            requestAnimationFrame(() => responseEl.classList.add("show"));
+            setTimeout(() => {
+              btn.closest(".cb-question").hidden = true;
+              if (def.nextQ) {
+                document.getElementById(def.nextQ).hidden = false;
+              } else {
+                renderAchievements();
+                showStage(3);
+              }
+            }, 2200);
+          });
+        });
+      }
+
+      function openBreaker() {
+        const modal = document.getElementById("circuitBreakerModal");
+        answers = {};
+        document.querySelectorAll(".cb-options").forEach((b) => b.classList.remove("locked"));
+        document.querySelectorAll(".cb-options button").forEach((b) => b.classList.remove("chosen"));
+        document.querySelectorAll(".cb-response").forEach((r) => {
+          r.classList.remove("show");
+          r.textContent = "";
+        });
+        document.getElementById("cbQ1").hidden = false;
+        document.getElementById("cbQ2").hidden = true;
+        document.getElementById("cbQ3").hidden = true;
+        modal.hidden = false;
+        document.body.style.overflow = "hidden";
+        showStage(1);
+        runBreathingCycle(() => showStage(2));
+      }
+
+      function closeBreaker() {
+        document.getElementById("circuitBreakerModal").hidden = true;
+        document.body.style.overflow = "";
+        clearBreathTimers();
+        appendLog({
+          timestamp: new Date().toISOString(),
+          emotion: answers.emotion || null,
+          tomorrow_important: answers.tomorrow_important || null,
+          need_decision: answers.need_decision || null,
+          note: null
+        });
+      }
+
+      function writeMoment() {
+        const note = window.prompt("写下这一刻的情绪和触发事件（可选）：", "");
+        if (note === null) return;
+        appendLog({
+          timestamp: new Date().toISOString(),
+          emotion: answers.emotion || null,
+          tomorrow_important: answers.tomorrow_important || null,
+          need_decision: answers.need_decision || null,
+          note: note.trim()
+        });
+        document.getElementById("circuitBreakerModal").hidden = true;
+        document.body.style.overflow = "";
+        clearBreathTimers();
+      }
+
+      // 长按 3s 编辑静态成就
+      let pressTimer = null;
+      function bindLongPressEdit() {
+        const title = document.getElementById("cbStage3Title");
+        const start = () => {
+          pressTimer = setTimeout(() => {
+            const ach = loadAchievements();
+            const next = window.prompt("编辑静态成就 JSON（小心修改）：", JSON.stringify(ach, null, 2));
+            if (!next) return;
+            try {
+              saveAchievements(JSON.parse(next));
+              renderAchievements();
+              alert("✅ 已保存");
+            } catch (err) {
+              alert("❌ JSON 格式错误，未保存");
+            }
+          }, 3000);
+        };
+        const cancel = () => { if (pressTimer) { clearTimeout(pressTimer); pressTimer = null; } };
+        title.addEventListener("mousedown", start);
+        title.addEventListener("touchstart", start, { passive: true });
+        title.addEventListener("mouseup", cancel);
+        title.addEventListener("mouseleave", cancel);
+        title.addEventListener("touchend", cancel);
+        title.addEventListener("touchcancel", cancel);
+      }
+
+      document.getElementById("circuitBreakerBtn").addEventListener("click", openBreaker);
+      document.getElementById("cbExitBtn").addEventListener("click", closeBreaker);
+      document.getElementById("cbWriteBtn").addEventListener("click", writeMoment);
+      bindQuestionOptions();
+      bindLongPressEdit();
     })();
   </script>
 </body>
