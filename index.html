@@ -7402,7 +7402,12 @@ input[type="checkbox"] {
         });
       }
 
-      // init() 上面已执行过（评分模块）；这里追加联合模块初始化
+      // ── 评分模块初始化（Commit 2 误删了 init，这里补回来）──
+      renderItems(loadToday());
+      renderScore();
+      bindEvents();
+
+      // ── 体重×尿酸联合模块初始化 ──
       renderCombined();
       bindCombinedEvents();
 
