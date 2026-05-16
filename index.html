@@ -2473,6 +2473,8 @@ input[type="checkbox"] {
   overflow-y: auto;
   animation: cb-fade-in 0.6s ease-out;
 }
+/* 关键：display:flex 默认会覆盖 [hidden]，需显式让 hidden 生效 */
+.circuit-breaker-modal[hidden] { display: none !important; }
 @keyframes cb-fade-in {
   from { opacity: 0; }
   to { opacity: 1; }
