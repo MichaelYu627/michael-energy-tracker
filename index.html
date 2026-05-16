@@ -2429,6 +2429,205 @@ input[type="checkbox"] {
   .slowfood-layer .layer-label { font-size: 11.5px; }
 }
 
+/* ===== 健康预管理 · TMD / 用眼 / 评分趋势 ===== */
+
+/* TMD 下颌关节 */
+.health-tmd, .health-eye, .health-trend {
+  margin-top: 14px;
+  background: var(--panel-strong);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+.health-tmd > summary,
+.health-eye > summary,
+.health-trend > summary {
+  list-style: none;
+  cursor: pointer;
+  padding: 14px 16px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  user-select: none;
+}
+.health-tmd > summary::-webkit-details-marker,
+.health-eye > summary::-webkit-details-marker,
+.health-trend > summary::-webkit-details-marker { display: none; }
+.health-tmd > summary::after,
+.health-eye > summary::after,
+.health-trend > summary::after {
+  content: "▾";
+  margin-left: auto;
+  color: var(--muted);
+  font-size: 12px;
+  transition: transform 0.2s;
+}
+.health-tmd[open] > summary::after,
+.health-eye[open] > summary::after,
+.health-trend[open] > summary::after { transform: rotate(180deg); }
+
+.tmd-body { padding: 0 16px 14px; font-size: 13px; line-height: 1.7; color: var(--text); }
+.tmd-body > div { margin-top: 10px; }
+.tmd-body strong { color: var(--accent); font-weight: 700; }
+.tmd-body ul {
+  margin: 4px 0 0;
+  padding-left: 0;
+  list-style: none;
+}
+.tmd-body ul li {
+  padding-left: 4px;
+  font-size: 12.5px;
+  line-height: 1.85;
+}
+.tmd-diagnosis {
+  padding: 10px 12px;
+  background: rgba(196,69,54,0.06);
+  border-left: 3px solid var(--accent-hot);
+  border-radius: var(--radius-sm);
+}
+.tmd-doctor {
+  padding: 10px 12px;
+  background: rgba(31,122,92,0.06);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius-sm);
+}
+
+/* 用眼计时器 */
+.eye-body { padding: 0 16px 16px; }
+.eye-meta {
+  margin-left: 6px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--muted);
+  letter-spacing: 0.04em;
+  font-family: var(--font-number);
+}
+.eye-meta.alert { color: var(--accent-hot); font-weight: 700; }
+.eye-timer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 16px;
+  background: linear-gradient(135deg, rgba(58,123,213,0.07), rgba(31,122,92,0.05));
+  border-radius: var(--radius-md);
+  border: 1px solid var(--line);
+}
+.eye-timer-display {
+  font-family: var(--font-number);
+  font-size: 48px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+.eye-timer-display.resting { color: var(--accent); }
+.eye-timer-status {
+  font-size: 13px;
+  color: var(--muted);
+  letter-spacing: 0.02em;
+}
+.eye-timer-status.active { color: var(--accent); font-weight: 600; }
+.eye-timer-status.resting { color: var(--accent-warm); font-weight: 600; }
+.eye-timer button {
+  min-width: 140px;
+  padding: 10px 18px;
+}
+.eye-rules {
+  margin-top: 14px;
+  font-size: 12.5px;
+  line-height: 1.8;
+  color: var(--text);
+}
+.eye-rules strong { color: var(--accent); font-weight: 700; }
+.eye-rules ul {
+  margin: 4px 0 0;
+  padding-left: 0;
+  list-style: none;
+}
+.eye-rules ul li {
+  padding-left: 16px;
+  position: relative;
+}
+.eye-rules ul li::before {
+  content: "•";
+  position: absolute;
+  left: 4px;
+  color: var(--accent);
+}
+
+/* 评分趋势 */
+.trend-body { padding: 0 16px 14px; }
+.trend-toggle {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+.trend-toggle button {
+  padding: 6px 14px !important;
+  border-radius: 999px !important;
+  font-size: 12.5px !important;
+  font-weight: 600 !important;
+  background: var(--bg) !important;
+  border: 1px solid var(--line) !important;
+  color: var(--muted) !important;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.trend-toggle button.active {
+  background: var(--accent) !important;
+  color: white !important;
+  border-color: var(--accent) !important;
+}
+.trend-stats {
+  display: flex;
+  gap: 14px;
+  margin-bottom: 8px;
+  font-size: 12px;
+  color: var(--muted);
+  flex-wrap: wrap;
+}
+.trend-stats strong {
+  color: var(--text);
+  font-family: var(--font-number);
+  font-weight: 700;
+  margin: 0 2px;
+}
+.trend-chart-wrap {
+  height: 180px;
+  position: relative;
+}
+.trend-banner {
+  margin-top: 10px;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 600;
+  text-align: center;
+}
+.trend-banner.gold {
+  background: linear-gradient(135deg, rgba(255,215,0,0.18), rgba(184,127,0,0.10));
+  color: #8a5a00;
+  border: 1px solid rgba(184,127,0,0.3);
+}
+.trend-banner.red {
+  background: rgba(196,69,54,0.10);
+  color: var(--accent-hot);
+  border: 1px solid rgba(196,69,54,0.3);
+}
+
+@media (max-width: 480px) {
+  .health-tmd > summary,
+  .health-eye > summary,
+  .health-trend > summary { padding: 12px 14px; font-size: 13.5px; }
+  .tmd-body, .eye-body, .trend-body { padding: 0 14px 12px; }
+  .eye-timer-display { font-size: 40px; }
+  .trend-chart-wrap { height: 160px; }
+}
+
 /* ===== 尿酸管理指南（替换原 Jarvis 简报） ===== */
 .uric-panel { margin-top: 16px; }
 .uric-panel .section-title h2 { font-size: 18px; }
@@ -3222,6 +3421,69 @@ input[type="checkbox"] {
             </ul>
           </div>
 
+        </div>
+      </details>
+
+      <!-- ───── TMD 下颌关节 ───── -->
+      <details class="health-tmd">
+        <summary>🦷 TMD 下颌关节 · 保守管理</summary>
+        <div class="tmd-body">
+          <div class="tmd-diagnosis">
+            <strong>诊断</strong>：双侧颞下颌关节盘前移位（可复性）+ 积液（2026-05-12 MRI）
+          </div>
+          <div class="tmd-doctor">
+            <strong>医嘱（2026-05-15 九院）</strong>：牙齿位置问题，不建议正畸，保守管理
+          </div>
+          <div>
+            <strong>日常规则</strong>
+            <ul>
+              <li>⚠️ 少吃坚果和硬物</li>
+              <li>⚠️ 避免大张口（打呵欠托下巴）</li>
+              <li>⚠️ 避免单侧咀嚼</li>
+              <li>✅ 慢食协议同时保护关节</li>
+              <li>✅ 不适时及时就医</li>
+            </ul>
+          </div>
+        </div>
+      </details>
+
+      <!-- ───── 用眼健康 25/10 ───── -->
+      <details class="health-eye" open>
+        <summary>👀 用眼健康 · 25/10 节律 <span class="eye-meta" id="eyeMeta">今日 0 轮</span></summary>
+        <div class="eye-body">
+          <div class="eye-timer">
+            <div class="eye-timer-display" id="eyeTimerDisplay">25:00</div>
+            <div class="eye-timer-status" id="eyeTimerStatus">准备开始一轮专注</div>
+            <button class="btn-primary" id="eyeTimerBtn" type="button">▶ 开始专注</button>
+          </div>
+          <div class="eye-rules">
+            <strong>护眼三条</strong>
+            <ul>
+              <li>每 25 分钟休息 10 分钟</li>
+              <li>远眺 20 秒（20-20-20 法则）</li>
+              <li>屏幕亮度适中，避免暗室看屏幕</li>
+            </ul>
+          </div>
+        </div>
+      </details>
+
+      <!-- ───── 评分趋势 ───── -->
+      <details class="health-trend" open>
+        <summary>📈 评分趋势</summary>
+        <div class="trend-body">
+          <div class="trend-toggle" id="trendToggle">
+            <button data-range="7" class="active" type="button">7 天</button>
+            <button data-range="30" type="button">30 天</button>
+          </div>
+          <div class="trend-stats" id="trendStats">
+            <span>均分：<strong id="trendAvg">--</strong></span>
+            <span>S 级：<strong id="trendSDays">0</strong> 天</span>
+            <span>连续 A+：<strong id="trendStreak">0</strong> 天</span>
+          </div>
+          <div class="trend-chart-wrap">
+            <canvas id="healthTrendChart"></canvas>
+          </div>
+          <div class="trend-banner" id="trendBanner" hidden></div>
         </div>
       </details>
     </section>
@@ -7143,6 +7405,304 @@ input[type="checkbox"] {
       // init() 上面已执行过（评分模块）；这里追加联合模块初始化
       renderCombined();
       bindCombinedEvents();
+
+      // ════════ 用眼健康 25/10 计时器 ════════
+
+      const EYE_KEY = "eye_timer_sessions";
+      const FOCUS_SECONDS = 25 * 60;
+      const REST_SECONDS = 10 * 60;
+
+      function loadEyeSessions() {
+        try {
+          return JSON.parse(localStorage.getItem(EYE_KEY) || "{}");
+        } catch (err) { return {}; }
+      }
+      function incrementEyeRound() {
+        const all = loadEyeSessions();
+        const t = todayISO();
+        all[t] = (all[t] || 0) + 1;
+        localStorage.setItem(EYE_KEY, JSON.stringify(all));
+        return all[t];
+      }
+      function todayEyeRounds() {
+        return loadEyeSessions()[todayISO()] || 0;
+      }
+
+      let eyePhase = "idle"; // idle | focus | done-focus | rest | done-rest
+      let eyeRemaining = FOCUS_SECONDS;
+      let eyeInterval = null;
+
+      function fmtMMSS(s) {
+        const mm = Math.floor(s / 60);
+        const ss = s % 60;
+        return `${String(mm).padStart(2, "0")}:${String(ss).padStart(2, "0")}`;
+      }
+
+      function renderEye() {
+        const display = document.getElementById("eyeTimerDisplay");
+        const status = document.getElementById("eyeTimerStatus");
+        const btn = document.getElementById("eyeTimerBtn");
+        const meta = document.getElementById("eyeMeta");
+        if (!display || !status || !btn || !meta) return;
+
+        display.textContent = fmtMMSS(eyeRemaining);
+        display.classList.toggle("resting", eyePhase === "rest");
+
+        const rounds = todayEyeRounds();
+        meta.textContent = `今日 ${rounds} 轮`;
+        meta.classList.toggle("alert", rounds === 0 && eyePhase === "idle");
+
+        switch (eyePhase) {
+          case "idle":
+            status.textContent = "准备开始一轮专注（25 分钟）";
+            status.className = "eye-timer-status";
+            btn.textContent = "▶ 开始专注";
+            break;
+          case "focus":
+            status.textContent = "专注中... 屏幕请离眼 60cm";
+            status.className = "eye-timer-status active";
+            btn.textContent = "⏸ 取消";
+            break;
+          case "done-focus":
+            status.textContent = "🎉 25 分钟到！远眺 20 秒，准备休息 10 分钟";
+            status.className = "eye-timer-status resting";
+            btn.textContent = "🛌 开始休息";
+            break;
+          case "rest":
+            status.textContent = "休息中... 远眺、眨眼、走一走";
+            status.className = "eye-timer-status resting";
+            btn.textContent = "⏸ 取消";
+            break;
+          case "done-rest":
+            status.textContent = "✅ 一轮完成！按钮开始下一轮";
+            status.className = "eye-timer-status active";
+            btn.textContent = "▶ 开始专注";
+            break;
+        }
+      }
+
+      function startTimer(seconds, onDone) {
+        eyeRemaining = seconds;
+        clearInterval(eyeInterval);
+        eyeInterval = setInterval(() => {
+          eyeRemaining--;
+          renderEye();
+          if (eyeRemaining <= 0) {
+            clearInterval(eyeInterval);
+            eyeInterval = null;
+            notifyEye();
+            onDone();
+          }
+        }, 1000);
+      }
+
+      function notifyEye() {
+        try {
+          if ("Notification" in window && Notification.permission === "granted") {
+            const title = eyePhase === "focus" ? "🎉 25 分钟到！" : "✅ 休息结束";
+            const body = eyePhase === "focus" ? "远眺 20 秒，开始休息 10 分钟" : "可以开始下一轮专注";
+            new Notification(title, { body, silent: false });
+          }
+        } catch (err) {}
+        // 页面闪烁
+        const display = document.getElementById("eyeTimerDisplay");
+        if (display) {
+          display.style.transition = "background 0.3s";
+          display.style.background = "rgba(255,213,122,0.3)";
+          setTimeout(() => { display.style.background = ""; }, 1200);
+        }
+      }
+
+      function bindEyeEvents() {
+        const btn = document.getElementById("eyeTimerBtn");
+        if (!btn) return;
+        btn.addEventListener("click", () => {
+          // 首次点击请求通知权限
+          if ("Notification" in window && Notification.permission === "default") {
+            try { Notification.requestPermission(); } catch (err) {}
+          }
+
+          if (eyePhase === "idle" || eyePhase === "done-rest") {
+            eyePhase = "focus";
+            startTimer(FOCUS_SECONDS, () => {
+              eyePhase = "done-focus";
+              renderEye();
+            });
+            renderEye();
+          } else if (eyePhase === "done-focus") {
+            eyePhase = "rest";
+            startTimer(REST_SECONDS, () => {
+              eyePhase = "done-rest";
+              incrementEyeRound();
+              renderEye();
+            });
+            renderEye();
+          } else if (eyePhase === "focus" || eyePhase === "rest") {
+            // 取消
+            clearInterval(eyeInterval);
+            eyeInterval = null;
+            eyePhase = "idle";
+            eyeRemaining = FOCUS_SECONDS;
+            renderEye();
+          }
+        });
+      }
+
+      renderEye();
+      bindEyeEvents();
+
+      // ════════ 评分趋势图 ════════
+
+      let trendRange = 7;
+      let trendChartInstance = null;
+
+      function renderTrend() {
+        const all = loadAll();
+        const today = new Date();
+        const dates = [];
+        for (let i = trendRange - 1; i >= 0; i--) {
+          const d = new Date(today); d.setDate(today.getDate() - i);
+          dates.push(d.toISOString().slice(0, 10));
+        }
+        const series = dates.map((d) => {
+          if (all[d]) return computeScore(all[d]).total;
+          return null;
+        });
+        const present = series.filter((v) => v !== null);
+        const avg = present.length ? present.reduce((s, n) => s + n, 0) / present.length : null;
+        const sDays = present.filter((v) => v >= 90).length;
+
+        // 连续 A+ 天数（从今天往回）
+        let streak = 0;
+        for (let i = dates.length - 1; i >= 0; i--) {
+          const v = series[i];
+          if (v === null) break;
+          if (v >= 80) streak++; else break;
+        }
+
+        document.getElementById("trendAvg").textContent = avg !== null ? avg.toFixed(1) : "--";
+        document.getElementById("trendSDays").textContent = sDays;
+        document.getElementById("trendStreak").textContent = streak;
+
+        // banner: 连续 3 天 S → 金色；连续 2 天 D → 红色
+        const banner = document.getElementById("trendBanner");
+        const last3 = series.slice(-3);
+        const last2 = series.slice(-2);
+        if (last3.length === 3 && last3.every((v) => v !== null && v >= 90)) {
+          banner.textContent = "🌟 连续 3 天 S 级！好状态正在固化成结构。";
+          banner.className = "trend-banner gold";
+          banner.hidden = false;
+        } else if (last2.length === 2 && last2.every((v) => v !== null && v < 60)) {
+          banner.textContent = "⚠️ 连续 2 天 D 级，明天必须调整。";
+          banner.className = "trend-banner red";
+          banner.hidden = false;
+        } else {
+          banner.hidden = true;
+        }
+
+        // 折线图
+        if (typeof Chart === "undefined") return;
+        const canvas = document.getElementById("healthTrendChart");
+        if (!canvas) return;
+        if (trendChartInstance) trendChartInstance.destroy();
+
+        const labels = dates.map((d) => {
+          const [, m, dd] = d.split("-");
+          return `${Number(m)}/${Number(dd)}`;
+        });
+        const pointColors = series.map((v) => {
+          if (v === null) return "rgba(110,110,98,0.3)";
+          if (v >= 90) return "#b87f00";
+          if (v >= 80) return "#1f7a5c";
+          if (v >= 70) return "#3a7bd5";
+          if (v >= 60) return "#d17b1f";
+          return "#c44536";
+        });
+
+        trendChartInstance = new Chart(canvas.getContext("2d"), {
+          type: "line",
+          data: {
+            labels,
+            datasets: [{
+              label: "评分",
+              data: series.map((v) => v ?? 0),
+              borderColor: "var(--accent)",
+              backgroundColor: "rgba(31,122,92,0.08)",
+              pointBackgroundColor: pointColors,
+              pointRadius: 5,
+              pointBorderColor: "white",
+              pointBorderWidth: 1.5,
+              tension: 0.3,
+              fill: true,
+              spanGaps: false
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                callbacks: {
+                  label: (ctx) => `评分 ${ctx.parsed.y}`
+                }
+              }
+            },
+            scales: {
+              y: {
+                min: 0,
+                max: 100,
+                ticks: { color: "#6e6a62", font: { size: 10 }, stepSize: 20 },
+                grid: { color: "rgba(89,73,45,0.06)" }
+              },
+              x: {
+                grid: { display: false },
+                ticks: { color: "#6e6a62", font: { size: 10 }, maxRotation: 0 }
+              }
+            }
+          },
+          plugins: [{
+            id: "trendAvgLine",
+            afterDraw(chart) {
+              if (avg === null) return;
+              const { ctx, chartArea, scales } = chart;
+              if (!chartArea) return;
+              const y = scales.y.getPixelForValue(avg);
+              ctx.save();
+              ctx.setLineDash([3, 3]);
+              ctx.strokeStyle = "rgba(31,122,92,0.5)";
+              ctx.lineWidth = 1.2;
+              ctx.beginPath();
+              ctx.moveTo(chartArea.left, y);
+              ctx.lineTo(chartArea.right, y);
+              ctx.stroke();
+              ctx.fillStyle = "rgba(31,122,92,0.7)";
+              ctx.font = "10px sans-serif";
+              ctx.textAlign = "right";
+              ctx.fillText(`均分 ${avg.toFixed(0)}`, chartArea.right - 4, y - 3);
+              ctx.restore();
+            }
+          }]
+        });
+      }
+
+      function bindTrendEvents() {
+        document.getElementById("trendToggle").addEventListener("click", (e) => {
+          const btn = e.target.closest("button[data-range]");
+          if (!btn) return;
+          trendRange = Number(btn.dataset.range);
+          document.querySelectorAll("#trendToggle button").forEach((b) => b.classList.toggle("active", b === btn));
+          renderTrend();
+        });
+
+        // 评分改变时也要刷新趋势（因为今天分数变了）
+        const panel = document.getElementById("healthPanel");
+        panel.addEventListener("change", () => setTimeout(renderTrend, 50));
+        panel.addEventListener("input", () => setTimeout(renderTrend, 50));
+      }
+
+      renderTrend();
+      bindTrendEvents();
     })();
 
     // ── 觅应运营看板 ──
