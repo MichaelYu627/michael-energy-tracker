@@ -2794,6 +2794,193 @@ input[type="checkbox"] {
   border-radius: var(--radius-sm);
 }
 
+/* 口腔休息位 · 三步图 */
+.tmd-rest-position {
+  margin-top: 8px;
+  padding: 14px 14px 12px;
+  background: linear-gradient(135deg, rgba(31,122,92,0.07), rgba(209,123,31,0.05));
+  border: 1px solid rgba(31,122,92,0.18);
+  border-radius: var(--radius-md);
+}
+.tmd-rest-position h4 {
+  margin: 0 0 12px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--accent);
+  text-align: center;
+  letter-spacing: 0.04em;
+}
+.rest-steps {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+.rest-step {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-align: center;
+}
+.rest-icon {
+  font-size: 28px;
+  height: 44px;
+  width: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--panel-strong);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  line-height: 1.1;
+}
+.rest-icon small { font-size: 9px; opacity: 0.7; }
+.rest-label {
+  font-size: 12px;
+  color: var(--text);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+.rest-arrow {
+  color: var(--accent);
+  font-size: 16px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.rest-slogan {
+  text-align: center;
+  padding: 8px 12px;
+  margin-bottom: 10px;
+  background: var(--accent);
+  color: white;
+  border-radius: 999px;
+  font-size: 13.5px;
+  letter-spacing: 0.08em;
+  font-weight: 600;
+}
+.rest-slogan strong { font-weight: 700; color: #fff !important; }
+.rest-timer-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: center;
+}
+.tmd-timer-btn {
+  background: var(--panel-strong) !important;
+  color: var(--accent) !important;
+  border: 1px solid var(--accent) !important;
+  padding: 8px 16px !important;
+  border-radius: 999px !important;
+  font-size: 12.5px !important;
+  font-weight: 600 !important;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.tmd-timer-btn:hover {
+  background: var(--accent-soft) !important;
+}
+.tmd-timer-btn.active {
+  background: var(--accent) !important;
+  color: white !important;
+  box-shadow: 0 3px 10px rgba(31,122,92,0.22);
+}
+.tmd-timer-meta {
+  font-size: 11px;
+  color: var(--muted);
+  font-family: var(--font-number);
+}
+
+/* 每日康复动作表格 */
+.tmd-exercises {
+  margin-top: 14px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+.tmd-exercises > summary {
+  list-style: none;
+  cursor: pointer;
+  padding: 10px 14px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text);
+  user-select: none;
+}
+.tmd-exercises > summary::-webkit-details-marker { display: none; }
+.tmd-exercises > summary::after {
+  content: "▾";
+  float: right;
+  color: var(--muted);
+  font-size: 11px;
+  transition: transform 0.2s;
+}
+.tmd-exercises[open] > summary::after { transform: rotate(180deg); display: inline-block; }
+.tmd-exercises-wrap { padding: 0 10px 12px; overflow-x: auto; }
+.tmd-exercises-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+  color: var(--text);
+}
+.tmd-exercises-table th {
+  text-align: left;
+  font-weight: 500;
+  color: var(--muted);
+  font-size: 10.5px;
+  padding: 5px 6px;
+  letter-spacing: 0.04em;
+  border-bottom: 1px solid var(--line);
+}
+.tmd-exercises-table td {
+  padding: 7px 6px;
+  border-bottom: 1px dashed var(--line);
+  vertical-align: top;
+  line-height: 1.55;
+}
+.tmd-exercises-table td:nth-child(1) { width: 26%; color: var(--accent); }
+.tmd-exercises-table td:nth-child(3) { width: 24%; color: var(--accent-warm); font-family: var(--font-number); white-space: nowrap; }
+.tmd-exercises-table tr:last-child td { border-bottom: none; }
+
+/* TMD 提醒 toast */
+.tmd-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 90px;
+  transform: translateX(-50%) translateY(20px);
+  z-index: 9100;
+  background: rgba(15, 31, 58, 0.96);
+  color: #fff;
+  padding: 12px 20px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  box-shadow: 0 8px 28px rgba(15, 31, 58, 0.4);
+  opacity: 0;
+  transition: opacity 0.3s, transform 0.3s;
+  pointer-events: none;
+  white-space: nowrap;
+  max-width: calc(100vw - 32px);
+}
+.tmd-toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+@media (max-width: 480px) {
+  .tmd-toast {
+    font-size: 13px;
+    padding: 11px 16px;
+    bottom: 84px;
+    white-space: normal;
+    text-align: center;
+    line-height: 1.5;
+  }
+}
+
 /* 用眼计时器 */
 .eye-body { padding: 0 16px 16px; }
 .eye-meta {
@@ -3724,9 +3911,36 @@ input[type="checkbox"] {
       </details>
 
       <!-- ───── TMD 下颌关节 ───── -->
-      <details class="health-tmd">
+      <details class="health-tmd" open>
         <summary>🦷 TMD 下颌关节 · 保守管理</summary>
         <div class="tmd-body">
+
+          <!-- 口腔休息位（常驻置顶） -->
+          <div class="tmd-rest-position">
+            <h4>🫷 口腔休息位</h4>
+            <div class="rest-steps">
+              <div class="rest-step">
+                <div class="rest-icon">👄</div>
+                <div class="rest-label">唇闭</div>
+              </div>
+              <div class="rest-arrow">→</div>
+              <div class="rest-step">
+                <div class="rest-icon">⎯⎯⎯<br>2-3<small>mm</small></div>
+                <div class="rest-label">齿开</div>
+              </div>
+              <div class="rest-arrow">→</div>
+              <div class="rest-step">
+                <div class="rest-icon">👅⬆</div>
+                <div class="rest-label">舌贴上颚</div>
+              </div>
+            </div>
+            <div class="rest-slogan"><strong>唇闭、齿开、舌贴上颚</strong></div>
+            <div class="rest-timer-row">
+              <button class="tmd-timer-btn" id="tmdTimerBtn" type="button">⏰ 开启提醒（每 45 分钟）</button>
+              <span class="tmd-timer-meta" id="tmdTimerMeta"></span>
+            </div>
+          </div>
+
           <div class="tmd-diagnosis">
             <strong>诊断</strong>：双侧颞下颌关节盘前移位（可复性）+ 积液（2026-05-12 MRI）
           </div>
@@ -3743,6 +3957,39 @@ input[type="checkbox"] {
               <li>✅ 不适时及时就医</li>
             </ul>
           </div>
+
+          <!-- 每日康复动作 -->
+          <details class="tmd-exercises" open>
+            <summary>💆 每日康复动作</summary>
+            <div class="tmd-exercises-wrap">
+              <table class="tmd-exercises-table">
+                <thead><tr><th>动作</th><th>方法</th><th>频次</th></tr></thead>
+                <tbody>
+                  <tr>
+                    <td><strong>咬肌松解</strong></td>
+                    <td>双手中指按耳前下颌角咬肌位置，画小圈轻揉</td>
+                    <td>2 次/日 × 1 分钟</td>
+                  </tr>
+                  <tr>
+                    <td><strong>缩下巴</strong></td>
+                    <td>头水平后移做"双下巴"姿态，保持 5 秒（不抬头不低头）</td>
+                    <td>10 次 × 3 组</td>
+                  </tr>
+                  <tr>
+                    <td><strong>金鱼练习</strong></td>
+                    <td>舌尖贴上颚不动，缓慢张闭口至最大舒适位</td>
+                    <td>6 次 × 6 组</td>
+                  </tr>
+                  <tr>
+                    <td><strong>热敷</strong></td>
+                    <td>温毛巾 40°C 敷咬肌（炎症急性期不超 38°C）</td>
+                    <td>1 次/日 × 10 分钟</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </details>
+
         </div>
       </details>
 
@@ -7174,7 +7421,8 @@ input[type="checkbox"] {
         { id: "workout",        cat: "运动", label: "完成囚徒健身训练", score: 5 },
         { id: "eye2510",        cat: "用眼", label: "执行 25/10 用眼节律", score: 3 },
         { id: "medicationTaken",cat: "用药", label: "苯溴马隆 按时饭后服", score: 2 },
-        { id: "horseQuestion",  cat: "觉察", label: "执行了「马夫一问」（饿了还是累了？）", score: 3 }
+        { id: "horseQuestion",  cat: "觉察", label: "执行了「马夫一问」（饿了还是累了？）", score: 3 },
+        { id: "tmdExercise",    cat: "康复", label: "执行 TMD 康复动作", score: 3 }
       ];
 
       // 扣分项配置
@@ -8080,6 +8328,67 @@ input[type="checkbox"] {
 
       renderTrend();
       bindTrendEvents();
+
+      // ════════ 🦷 TMD · 口腔休息位 45 分钟提醒 ════════
+      const TMD_INTERVAL_MS = 45 * 60 * 1000;
+      let tmdTimerId = null;
+      let tmdStartedAt = null;
+      let tmdMetaInterval = null;
+
+      function showTMDToast() {
+        const old = document.querySelector(".tmd-toast");
+        if (old) old.remove();
+        const toast = document.createElement("div");
+        toast.className = "tmd-toast";
+        toast.textContent = "🦷 牙齿分开了吗？唇闭、齿开、舌贴上颚";
+        document.body.appendChild(toast);
+        requestAnimationFrame(() => toast.classList.add("show"));
+        setTimeout(() => {
+          toast.classList.remove("show");
+          setTimeout(() => toast.remove(), 350);
+        }, 3000);
+      }
+
+      function updateTMDMeta() {
+        const meta = document.getElementById("tmdTimerMeta");
+        if (!meta || !tmdStartedAt) return;
+        const elapsedMs = Date.now() - tmdStartedAt;
+        const nextInMs = TMD_INTERVAL_MS - (elapsedMs % TMD_INTERVAL_MS);
+        const mins = Math.floor(nextInMs / 60000);
+        const secs = Math.floor((nextInMs % 60000) / 1000);
+        meta.textContent = `下次 ${String(mins).padStart(2,"0")}:${String(secs).padStart(2,"0")}`;
+      }
+
+      function startTMDReminder() {
+        if (tmdTimerId) return;
+        tmdStartedAt = Date.now();
+        tmdTimerId = setInterval(showTMDToast, TMD_INTERVAL_MS);
+        // 倒计时元数据每秒刷
+        updateTMDMeta();
+        tmdMetaInterval = setInterval(updateTMDMeta, 1000);
+        const btn = document.getElementById("tmdTimerBtn");
+        btn.textContent = "提醒中 ⏱ · 每 45 分钟";
+        btn.classList.add("active");
+      }
+
+      function stopTMDReminder() {
+        if (tmdTimerId) { clearInterval(tmdTimerId); tmdTimerId = null; }
+        if (tmdMetaInterval) { clearInterval(tmdMetaInterval); tmdMetaInterval = null; }
+        tmdStartedAt = null;
+        const btn = document.getElementById("tmdTimerBtn");
+        btn.textContent = "⏰ 开启提醒（每 45 分钟）";
+        btn.classList.remove("active");
+        const meta = document.getElementById("tmdTimerMeta");
+        if (meta) meta.textContent = "";
+      }
+
+      const tmdBtn = document.getElementById("tmdTimerBtn");
+      if (tmdBtn) {
+        tmdBtn.addEventListener("click", () => {
+          if (tmdTimerId) stopTMDReminder();
+          else startTMDReminder();
+        });
+      }
     })();
 
     // ── 觅应运营看板 ──
@@ -8473,8 +8782,8 @@ input[type="checkbox"] {
         if (state.steps10000) total += 5;
         else if (state.steps7000) total += 3;
         else if (state.stepsUnder5000) total -= 3;
-        const adds = ["sleepSop","slowEating","waterBeforeMeal","avoidRed","cookedOnce","water2500","lemonWater","milk","workout","eye2510","medicationTaken","horseQuestion"];
-        const addScores = [5,5,2,5,3,5,2,2,5,3,2,3];
+        const adds = ["sleepSop","slowEating","waterBeforeMeal","avoidRed","cookedOnce","water2500","lemonWater","milk","workout","eye2510","medicationTaken","horseQuestion","tmdExercise"];
+        const addScores = [5,5,2,5,3,5,2,2,5,3,2,3,3];
         adds.forEach((id, i) => { if (state[id]) total += addScores[i]; });
         const subs = ["ateRed","drankSugar","binge","beefOver","darkChocOver","waterUnder1500","noExercise","eyeOver2h","coffeeAfter2pm","nutOrHard","colaOverWeek"];
         const subScores = [8,5,5,3,2,5,5,3,3,2,2];
