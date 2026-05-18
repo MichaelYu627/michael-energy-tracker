@@ -2717,6 +2717,152 @@ input[type="checkbox"] {
   color: rgba(255,255,255,0.85) !important;
 }
 
+/* 效果反馈 */
+.cb-effectiveness {
+  width: 100%;
+  margin-bottom: 18px;
+  padding: 14px 16px;
+  background: rgba(78,158,255,0.06);
+  border: 1px solid rgba(78,158,255,0.18);
+  border-radius: 14px;
+}
+.cb-effectiveness-label {
+  font-size: 13px;
+  color: rgba(255,255,255,0.7);
+  margin-bottom: 10px;
+  text-align: center;
+}
+.cb-eff-hint {
+  display: block;
+  font-size: 11px;
+  color: rgba(255,255,255,0.4);
+  margin-top: 2px;
+}
+.cb-effectiveness-options {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.cb-effectiveness-options button {
+  background: rgba(255,255,255,0.05) !important;
+  color: rgba(255,255,255,0.85) !important;
+  border: 1px solid rgba(255,255,255,0.12) !important;
+  padding: 9px 14px !important;
+  border-radius: 999px !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex: 1;
+  min-width: 96px;
+}
+.cb-effectiveness-options button:hover {
+  background: rgba(78,158,255,0.15) !important;
+  border-color: rgba(78,158,255,0.4) !important;
+}
+.cb-effectiveness-options button.chosen {
+  background: rgba(78,158,255,0.3) !important;
+  border-color: rgba(78,158,255,0.8) !important;
+  color: #fff !important;
+  font-weight: 700 !important;
+}
+
+/* 历史触发按钮 */
+.cb-history-btn {
+  background: transparent !important;
+  color: rgba(255,255,255,0.5) !important;
+  border: none !important;
+  padding: 8px !important;
+  font-size: 12.5px !important;
+  font-weight: 500 !important;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.cb-history-btn:hover { color: rgba(255,255,255,0.8) !important; }
+
+/* 历史子页 */
+.cb-history-stats {
+  width: 100%;
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.cb-history-stat {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.10);
+  border-radius: 10px;
+  padding: 10px 14px;
+  text-align: center;
+  flex: 1;
+  min-width: 100px;
+}
+.cb-history-stat .stat-num {
+  font-family: var(--font-number);
+  font-size: 22px;
+  font-weight: 800;
+  color: #ffd57a;
+  line-height: 1;
+}
+.cb-history-stat .stat-label {
+  font-size: 11px;
+  color: rgba(255,255,255,0.55);
+  margin-top: 4px;
+  letter-spacing: 0.04em;
+}
+.cb-history-wrap {
+  width: 100%;
+  margin-bottom: 18px;
+  max-height: 360px;
+  overflow-y: auto;
+  background: rgba(255,255,255,0.04);
+  border-radius: 12px;
+  padding: 8px;
+}
+.cb-history-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  color: rgba(255,255,255,0.85);
+}
+.cb-history-table th {
+  text-align: left;
+  font-weight: 500;
+  color: rgba(255,255,255,0.5);
+  font-size: 10.5px;
+  padding: 6px 8px;
+  letter-spacing: 0.04em;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  position: sticky;
+  top: 0;
+  background: rgba(15,20,40,0.95);
+  z-index: 1;
+}
+.cb-history-table td {
+  padding: 8px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  vertical-align: top;
+}
+.cb-history-table tr:last-child td { border-bottom: none; }
+.cb-history-table .eff-tag {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 999px;
+  font-size: 10.5px;
+}
+.cb-history-table .eff-tag.quick_calm { background: rgba(31,122,92,0.25); color: #7dd3a3; }
+.cb-history-table .eff-tag.focus_boost { background: rgba(78,158,255,0.25); color: #9ec8ff; }
+.cb-history-table .eff-tag.mild { background: rgba(255,213,122,0.15); color: #ffd57a; }
+.cb-history-empty {
+  text-align: center;
+  padding: 24px 16px;
+  color: rgba(255,255,255,0.4);
+  font-size: 13px;
+}
+
 @media (max-width: 480px) {
   .cb-stage { padding: 28px 20px; }
   .cb-breath-circle { width: 150px; height: 150px; margin-bottom: 26px; }
@@ -4390,9 +4536,36 @@ input[type="checkbox"] {
         你花了这么久才建起这些东西。<br>
         <strong>不要用一个冲动的决定，把它们推倒。</strong>
       </div>
+
+      <!-- 效果反馈：让 Michael 给这次熔断打分，数据将沉淀为未来洞察 -->
+      <div class="cb-effectiveness">
+        <div class="cb-effectiveness-label">调用后，你感觉如何？<span class="cb-eff-hint">（可选，会沉淀为效果数据）</span></div>
+        <div class="cb-effectiveness-options" id="cbEffectivenessOptions">
+          <button type="button" data-effect="quick_calm">🌊 迅速平静</button>
+          <button type="button" data-effect="focus_boost">🎯 专注提升</button>
+          <button type="button" data-effect="mild">😐 效果一般</button>
+        </div>
+      </div>
+
       <div class="cb-actions">
         <button class="cb-exit-btn" id="cbExitBtn" type="button">我冷静了，关闭</button>
         <button class="cb-write-btn" id="cbWriteBtn" type="button">✍ 写下这一刻</button>
+        <button class="cb-history-btn" id="cbHistoryBtn" type="button">📋 查看历史触发记录</button>
+      </div>
+    </div>
+
+    <!-- 阶段 4（可选）：历史触发记录 -->
+    <div class="cb-stage" data-stage="history" id="cbStageHistory" hidden>
+      <h2 class="cb-stage3-title">📋 历史触发记录</h2>
+      <div class="cb-history-stats" id="cbHistoryStats"></div>
+      <div class="cb-history-wrap">
+        <table class="cb-history-table">
+          <thead><tr><th>时间</th><th>情绪</th><th>效果</th><th>备注</th></tr></thead>
+          <tbody id="cbHistoryBody"></tbody>
+        </table>
+      </div>
+      <div class="cb-actions">
+        <button class="cb-exit-btn" id="cbHistoryBackBtn" type="button">← 返回</button>
       </div>
     </div>
   </div>
@@ -8892,10 +9065,11 @@ input[type="checkbox"] {
       const stages = {
         1: document.getElementById("cbStage1"),
         2: document.getElementById("cbStage2"),
-        3: document.getElementById("cbStage3")
+        3: document.getElementById("cbStage3"),
+        history: document.getElementById("cbStageHistory")
       };
       function showStage(n) {
-        Object.entries(stages).forEach(([k, el]) => { el.hidden = Number(k) !== n; });
+        Object.entries(stages).forEach(([k, el]) => { el.hidden = String(k) !== String(n); });
       }
 
       // 阶段 1：呼吸 4-4-4
@@ -8976,6 +9150,7 @@ input[type="checkbox"] {
         answers = {};
         document.querySelectorAll(".cb-options").forEach((b) => b.classList.remove("locked"));
         document.querySelectorAll(".cb-options button").forEach((b) => b.classList.remove("chosen"));
+        document.querySelectorAll(".cb-effectiveness-options button").forEach((b) => b.classList.remove("chosen"));
         document.querySelectorAll(".cb-response").forEach((r) => {
           r.classList.remove("show");
           r.textContent = "";
@@ -8989,32 +9164,111 @@ input[type="checkbox"] {
         runBreathingCycle(() => showStage(2));
       }
 
-      function closeBreaker() {
-        document.getElementById("circuitBreakerModal").hidden = true;
-        document.body.style.overflow = "";
-        clearBreathTimers();
-        appendLog({
+      function buildLogEntry(noteText) {
+        return {
           timestamp: new Date().toISOString(),
           emotion: answers.emotion || null,
           tomorrow_important: answers.tomorrow_important || null,
           need_decision: answers.need_decision || null,
-          note: null
-        });
+          effectiveness: answers.effectiveness || null,
+          note: noteText || null
+        };
+      }
+
+      function closeBreaker() {
+        document.getElementById("circuitBreakerModal").hidden = true;
+        document.body.style.overflow = "";
+        clearBreathTimers();
+        appendLog(buildLogEntry(null));
       }
 
       function writeMoment() {
         const note = window.prompt("写下这一刻的情绪和触发事件（可选）：", "");
         if (note === null) return;
-        appendLog({
-          timestamp: new Date().toISOString(),
-          emotion: answers.emotion || null,
-          tomorrow_important: answers.tomorrow_important || null,
-          need_decision: answers.need_decision || null,
-          note: note.trim()
-        });
+        appendLog(buildLogEntry(note.trim()));
         document.getElementById("circuitBreakerModal").hidden = true;
         document.body.style.overflow = "";
         clearBreathTimers();
+      }
+
+      // ── 效果反馈选项 ──
+      function bindEffectivenessOptions() {
+        const box = document.getElementById("cbEffectivenessOptions");
+        if (!box) return;
+        box.addEventListener("click", (e) => {
+          const btn = e.target.closest("button[data-effect]");
+          if (!btn) return;
+          answers.effectiveness = btn.dataset.effect;
+          box.querySelectorAll("button").forEach((b) => b.classList.toggle("chosen", b === btn));
+        });
+      }
+
+      // ── 历史触发查看 ──
+      const EFF_LABEL = {
+        quick_calm: { text: "迅速平静", cls: "quick_calm" },
+        focus_boost: { text: "专注提升", cls: "focus_boost" },
+        mild:        { text: "效果一般", cls: "mild" }
+      };
+      function fmtLogTime(iso) {
+        try {
+          const d = new Date(iso);
+          const mm = String(d.getMonth() + 1).padStart(2, "0");
+          const dd = String(d.getDate()).padStart(2, "0");
+          const hh = String(d.getHours()).padStart(2, "0");
+          const mi = String(d.getMinutes()).padStart(2, "0");
+          return `${mm}/${dd} ${hh}:${mi}`;
+        } catch (err) { return iso; }
+      }
+      function renderHistory() {
+        const logs = loadLogs().slice().reverse(); // 新→旧
+        const body = document.getElementById("cbHistoryBody");
+        const stats = document.getElementById("cbHistoryStats");
+        if (!body || !stats) return;
+
+        // 统计：总次数 / 最常情绪 / 迅速平静比例
+        const total = logs.length;
+        const emotionCount = {};
+        let quickCalm = 0;
+        logs.forEach((l) => {
+          if (l.emotion) emotionCount[l.emotion] = (emotionCount[l.emotion] || 0) + 1;
+          if (l.effectiveness === "quick_calm") quickCalm++;
+        });
+        const topEmotion = Object.entries(emotionCount).sort((a, b) => b[1] - a[1])[0];
+        const quickRate = total ? Math.round((quickCalm / total) * 100) : 0;
+
+        stats.innerHTML = `
+          <div class="cb-history-stat">
+            <div class="stat-num">${total}</div>
+            <div class="stat-label">总触发次数</div>
+          </div>
+          <div class="cb-history-stat">
+            <div class="stat-num">${topEmotion ? topEmotion[0] : "—"}</div>
+            <div class="stat-label">最常情绪</div>
+          </div>
+          <div class="cb-history-stat">
+            <div class="stat-num">${quickRate}%</div>
+            <div class="stat-label">迅速平静占比</div>
+          </div>
+        `;
+
+        if (!logs.length) {
+          body.innerHTML = `<tr><td colspan="4" class="cb-history-empty">还没有历史记录</td></tr>`;
+          return;
+        }
+        body.innerHTML = logs.map((l) => {
+          const eff = l.effectiveness && EFF_LABEL[l.effectiveness];
+          const effHtml = eff ? `<span class="eff-tag ${eff.cls}">${eff.text}</span>` : `<span style="color:rgba(255,255,255,0.3)">—</span>`;
+          const note = l.note ? escapeAttr(l.note) : `<span style="color:rgba(255,255,255,0.3)">—</span>`;
+          return `<tr>
+            <td>${fmtLogTime(l.timestamp)}</td>
+            <td>${l.emotion || "<span style='color:rgba(255,255,255,0.3)'>—</span>"}</td>
+            <td>${effHtml}</td>
+            <td>${note}</td>
+          </tr>`;
+        }).join("");
+      }
+      function escapeAttr(s) {
+        return String(s).replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
       }
 
       // 长按 3s 编辑静态成就
@@ -9047,7 +9301,15 @@ input[type="checkbox"] {
       document.getElementById("circuitBreakerBtn").addEventListener("click", openBreaker);
       document.getElementById("cbExitBtn").addEventListener("click", closeBreaker);
       document.getElementById("cbWriteBtn").addEventListener("click", writeMoment);
+      document.getElementById("cbHistoryBtn").addEventListener("click", () => {
+        renderHistory();
+        showStage("history");
+      });
+      document.getElementById("cbHistoryBackBtn").addEventListener("click", () => {
+        showStage(3);
+      });
       bindQuestionOptions();
+      bindEffectivenessOptions();
       bindLongPressEdit();
     })();
   </script>
