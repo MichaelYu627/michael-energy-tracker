@@ -3662,7 +3662,7 @@ input[type="checkbox"] {
 .miying-toggle:hover { background: rgba(255,255,255,0.14) !important; }
 .miying-body.collapsed { display: none; }
 
-/* 5 天周期指示器 */
+/* 自然周（周一-周日）指示器 */
 .miying-cycle {
   display: flex;
   align-items: baseline;
@@ -4361,17 +4361,17 @@ input[type="checkbox"] {
         <button class="miying-toggle" id="miyingToggleBtn" type="button">收起</button>
       </header>
 
-      <!-- 5 天周期指示器 -->
+      <!-- 自然周（周一-周日）指示器 -->
       <div class="miying-cycle" id="miyingCycle">
-        <span class="cycle-label">本周期</span>
+        <span class="cycle-label">本周</span>
         <span class="cycle-dates" id="miyingCycleDates">—</span>
         <span class="cycle-day" id="miyingCycleDay">—</span>
       </div>
 
-      <!-- 周期到期横幅（仅 days >= 5 时显示） -->
+      <!-- 周日提示复盘横幅（仅周日且未点过"已复盘"时显示） -->
       <div class="miying-cycle-banner" id="miyingCycleBanner" hidden>
-        <span>💡 5 天周期结束 — 建议复盘 KPI 数字</span>
-        <button class="cycle-reset-btn" id="miyingCycleResetBtn" type="button">开始新周期</button>
+        <span>💡 本周结束 — 建议复盘 KPI 数字</span>
+        <button class="cycle-reset-btn" id="miyingCycleResetBtn" type="button">本周已复盘</button>
       </div>
 
       <div class="miying-body" id="miyingBody">
@@ -8828,12 +8828,19 @@ input[type="checkbox"] {
       function makeId(prefix) {
         return `${prefix}-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
       }
+      // 本地时区安全的 YYYY-MM-DD（避免 toISOString 的 UTC 偏移在 CST 把日期算少一天）
+      function localISO(d) {
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, "0");
+        const dd = String(d.getDate()).padStart(2, "0");
+        return `${y}-${m}-${dd}`;
+      }
       function getMondayISO(date) {
         const d = new Date(date);
         const day = d.getDay() || 7;
         d.setDate(d.getDate() - (day - 1));
         d.setHours(0, 0, 0, 0);
-        return d.toISOString().slice(0, 10);
+        return localISO(d);
       }
       function getWeekDates() {
         const today = new Date();
@@ -8841,11 +8848,11 @@ input[type="checkbox"] {
         return Array.from({ length: 7 }, (_, i) => {
           const d = new Date(monday);
           d.setDate(monday.getDate() + i);
-          return d.toISOString().slice(0, 10);
+          return localISO(d);
         });
       }
       function todayISO() {
-        return new Date().toISOString().slice(0, 10);
+        return localISO(new Date());
       }
       function fmtShortDate(iso) {
         const [, mm, dd] = iso.split("-");
@@ -9083,9 +9090,9 @@ input[type="checkbox"] {
         }, true);
       }
 
-      // ── 5 天周期复盘提醒 ──
-      const CYCLE_KEY = "miying_cycle_start_v1";
-      const CYCLE_LEN_DAYS = 5;
+      // ── 自然周（周一-周日）复盘提醒 ──
+      const WEEK_KEY = "miying_week_reviewed_v1"; // 存上次复盘的周一 ISO
+      const WEEK_DAYS_ZH = ["日", "一", "二", "三", "四", "五", "六"];
 
       // 本地时区安全的日期格式化（避免 toISOString 的 UTC 偏移导致少一天）
       function fmtLocalISO(d) {
@@ -9094,62 +9101,63 @@ input[type="checkbox"] {
         const dd = String(d.getDate()).padStart(2, "0");
         return `${y}-${m}-${dd}`;
       }
-      function todayISO() { return fmtLocalISO(new Date()); }
 
-      function loadCycleStart() {
-        let s = localStorage.getItem(CYCLE_KEY);
-        if (!s || !/^\d{4}-\d{2}-\d{2}$/.test(s)) {
-          s = todayISO();
-          localStorage.setItem(CYCLE_KEY, s);
-        }
-        return s;
+      function todayDate() {
+        const d = new Date();
+        d.setHours(0, 0, 0, 0);
+        return d;
       }
 
-      function saveCycleStart(iso) { localStorage.setItem(CYCLE_KEY, iso); }
-
-      function daysSince(iso) {
-        const start = new Date(iso + "T00:00:00");
-        const now = new Date();
-        now.setHours(0, 0, 0, 0);
-        return Math.floor((now - start) / 86400000);
+      // 取 d 所在自然周的周一（Date 对象，零时）
+      function getMonday(d) {
+        const dt = new Date(d);
+        dt.setHours(0, 0, 0, 0);
+        const day = dt.getDay(); // 0=日, 1=一, ..., 6=六
+        const diff = day === 0 ? -6 : 1 - day;
+        dt.setDate(dt.getDate() + diff);
+        return dt;
       }
 
-      function addDays(iso, n) {
-        const d = new Date(iso + "T00:00:00");
+      function addDays(date, n) {
+        const d = new Date(date);
         d.setDate(d.getDate() + n);
-        return fmtLocalISO(d);
+        return d;
       }
 
-      function fmtMD(iso) {
-        const [, m, dd] = iso.split("-");
-        return `${Number(m)}/${Number(dd)}`;
+      function fmtMDDay(d) {
+        return `${d.getMonth() + 1}/${d.getDate()}(${WEEK_DAYS_ZH[d.getDay()]})`;
       }
 
       function renderCycle() {
-        const start = loadCycleStart();
-        const end = addDays(start, CYCLE_LEN_DAYS - 1);
-        const elapsed = daysSince(start);
-        const dayNo = elapsed + 1; // 第几天
-        const overdue = elapsed >= CYCLE_LEN_DAYS;
+        const today = todayDate();
+        const monday = getMonday(today);
+        const sunday = addDays(monday, 6);
+        const dayNo = ((today.getDay() + 6) % 7) + 1; // 周一=1, 周日=7
+        const isSunday = dayNo === 7;
+
+        const mondayISO = fmtLocalISO(monday);
+        const reviewedISO = localStorage.getItem(WEEK_KEY) || "";
+        const reviewedThisWeek = reviewedISO === mondayISO;
+        const needReview = isSunday && !reviewedThisWeek;
 
         const datesEl = document.getElementById("miyingCycleDates");
         const dayEl = document.getElementById("miyingCycleDay");
-        if (datesEl) datesEl.textContent = `${fmtMD(start)} - ${fmtMD(end)}`;
+        if (datesEl) datesEl.textContent = `${fmtMDDay(monday)} - ${fmtMDDay(sunday)}`;
         if (dayEl) {
-          dayEl.textContent = overdue ? `已超 ${elapsed - CYCLE_LEN_DAYS + 1} 天` : `第 ${dayNo} 天 / ${CYCLE_LEN_DAYS}`;
-          dayEl.classList.toggle("overdue", overdue);
+          dayEl.textContent = `第 ${dayNo} 天 / 7`;
+          dayEl.classList.toggle("overdue", needReview);
         }
 
         const banner = document.getElementById("miyingCycleBanner");
-        if (banner) banner.hidden = !overdue;
+        if (banner) banner.hidden = !needReview;
       }
 
       function bindCycleEvents() {
         const btn = document.getElementById("miyingCycleResetBtn");
         if (!btn) return;
         btn.addEventListener("click", () => {
-          if (!window.confirm("开始新的 5 天周期？\n（建议先回顾完上一周期的 KPI 数字再点）")) return;
-          saveCycleStart(todayISO());
+          const monday = getMonday(todayDate());
+          localStorage.setItem(WEEK_KEY, fmtLocalISO(monday));
           renderCycle();
         });
       }
