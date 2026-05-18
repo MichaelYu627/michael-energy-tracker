@@ -3662,6 +3662,70 @@ input[type="checkbox"] {
 .miying-toggle:hover { background: rgba(255,255,255,0.14) !important; }
 .miying-body.collapsed { display: none; }
 
+/* 5 天周期指示器 */
+.miying-cycle {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 6px 14px;
+  margin: -4px 0 12px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 999px;
+  font-size: 12px;
+  width: fit-content;
+}
+.miying-cycle .cycle-label {
+  color: rgba(255,255,255,0.4);
+  letter-spacing: 0.05em;
+  font-size: 11px;
+}
+.miying-cycle .cycle-dates {
+  color: rgba(255,255,255,0.85);
+  font-family: var(--font-number);
+  font-weight: 600;
+}
+.miying-cycle .cycle-day {
+  color: #6fcd9f;
+  font-family: var(--font-number);
+  font-weight: 700;
+  padding: 0 8px;
+  border-left: 1px solid rgba(255,255,255,0.12);
+}
+.miying-cycle .cycle-day.overdue {
+  color: #ffb347;
+}
+
+/* 周期到期横幅 */
+.miying-cycle-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  margin-bottom: 14px;
+  background: linear-gradient(135deg, rgba(255,179,71,0.18), rgba(255,179,71,0.08));
+  border: 1px solid rgba(255,179,71,0.4);
+  border-radius: 12px;
+  font-size: 13px;
+  color: #ffe1a0;
+  font-weight: 500;
+}
+.miying-cycle-banner .cycle-reset-btn {
+  margin-left: auto;
+  background: rgba(255,179,71,0.3) !important;
+  color: #fff !important;
+  border: 1px solid rgba(255,179,71,0.6) !important;
+  border-radius: 999px !important;
+  padding: 6px 14px !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.miying-cycle-banner .cycle-reset-btn:hover {
+  background: rgba(255,179,71,0.45) !important;
+}
+
 /* KPI cards */
 .miying-kpis {
   display: grid;
@@ -4297,6 +4361,19 @@ input[type="checkbox"] {
         <button class="miying-toggle" id="miyingToggleBtn" type="button">收起</button>
       </header>
 
+      <!-- 5 天周期指示器 -->
+      <div class="miying-cycle" id="miyingCycle">
+        <span class="cycle-label">本周期</span>
+        <span class="cycle-dates" id="miyingCycleDates">—</span>
+        <span class="cycle-day" id="miyingCycleDay">—</span>
+      </div>
+
+      <!-- 周期到期横幅（仅 days >= 5 时显示） -->
+      <div class="miying-cycle-banner" id="miyingCycleBanner" hidden>
+        <span>💡 5 天周期结束 — 建议复盘 KPI 数字</span>
+        <button class="cycle-reset-btn" id="miyingCycleResetBtn" type="button">开始新周期</button>
+      </div>
+
       <div class="miying-body" id="miyingBody">
         <!-- Module 1: KPI cards -->
         <div class="miying-kpis">
@@ -4640,7 +4717,7 @@ input[type="checkbox"] {
       <div class="cb-achievements" id="cbAchievements"></div>
       <div class="cb-anchors">
         <div class="cb-anchor-line soul">"好事和坏事都有同样的概率发生。但是只要守住底线不被击穿，不下牌桌，那么好事同样会如影随形，接踵而至。"</div>
-        <div class="cb-anchor-line soul">"个人在高铁上做俯卧撑，和在火箭飞船上做俯卧撑，个数是最无关紧要的了。"</div>
+        <div class="cb-anchor-line soul">"个人在高铁上做俯卧撑，和在火箭飞船上做俯卧撑，个数是最无关紧要的参数，等到火箭飞船才是。"</div>
         <div class="cb-anchor-line">"既不失真，也未失志"</div>
         <div class="cb-anchor-line">"好状态不是拿来挥霍的，是固化成结构的"</div>
         <div class="cb-anchor-line">"96% 生活方式 + 4% 训练 = 身体优化"</div>
@@ -9006,9 +9083,82 @@ input[type="checkbox"] {
         }, true);
       }
 
+      // ── 5 天周期复盘提醒 ──
+      const CYCLE_KEY = "miying_cycle_start_v1";
+      const CYCLE_LEN_DAYS = 5;
+
+      // 本地时区安全的日期格式化（避免 toISOString 的 UTC 偏移导致少一天）
+      function fmtLocalISO(d) {
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, "0");
+        const dd = String(d.getDate()).padStart(2, "0");
+        return `${y}-${m}-${dd}`;
+      }
+      function todayISO() { return fmtLocalISO(new Date()); }
+
+      function loadCycleStart() {
+        let s = localStorage.getItem(CYCLE_KEY);
+        if (!s || !/^\d{4}-\d{2}-\d{2}$/.test(s)) {
+          s = todayISO();
+          localStorage.setItem(CYCLE_KEY, s);
+        }
+        return s;
+      }
+
+      function saveCycleStart(iso) { localStorage.setItem(CYCLE_KEY, iso); }
+
+      function daysSince(iso) {
+        const start = new Date(iso + "T00:00:00");
+        const now = new Date();
+        now.setHours(0, 0, 0, 0);
+        return Math.floor((now - start) / 86400000);
+      }
+
+      function addDays(iso, n) {
+        const d = new Date(iso + "T00:00:00");
+        d.setDate(d.getDate() + n);
+        return fmtLocalISO(d);
+      }
+
+      function fmtMD(iso) {
+        const [, m, dd] = iso.split("-");
+        return `${Number(m)}/${Number(dd)}`;
+      }
+
+      function renderCycle() {
+        const start = loadCycleStart();
+        const end = addDays(start, CYCLE_LEN_DAYS - 1);
+        const elapsed = daysSince(start);
+        const dayNo = elapsed + 1; // 第几天
+        const overdue = elapsed >= CYCLE_LEN_DAYS;
+
+        const datesEl = document.getElementById("miyingCycleDates");
+        const dayEl = document.getElementById("miyingCycleDay");
+        if (datesEl) datesEl.textContent = `${fmtMD(start)} - ${fmtMD(end)}`;
+        if (dayEl) {
+          dayEl.textContent = overdue ? `已超 ${elapsed - CYCLE_LEN_DAYS + 1} 天` : `第 ${dayNo} 天 / ${CYCLE_LEN_DAYS}`;
+          dayEl.classList.toggle("overdue", overdue);
+        }
+
+        const banner = document.getElementById("miyingCycleBanner");
+        if (banner) banner.hidden = !overdue;
+      }
+
+      function bindCycleEvents() {
+        const btn = document.getElementById("miyingCycleResetBtn");
+        if (!btn) return;
+        btn.addEventListener("click", () => {
+          if (!window.confirm("开始新的 5 天周期？\n（建议先回顾完上一周期的 KPI 数字再点）")) return;
+          saveCycleStart(todayISO());
+          renderCycle();
+        });
+      }
+
       function init() {
         renderAll();
         bindEvents();
+        renderCycle();
+        bindCycleEvents();
       }
 
       init();
