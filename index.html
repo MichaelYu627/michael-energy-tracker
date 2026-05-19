@@ -5784,7 +5784,7 @@ input[type="checkbox"] {
               mood: "提不起劲",
               dailyStory: "白天明显有点拖，晚上还是硬撑着练了两项，算是没让节奏彻底掉下去。",
               workoutItems: [
-                { name: "宽距引体向上", volume: "10 个 x 1 组", rating: 6, note: "今天发力感偏散，先把动作做完整。" },
+                { name: "标准引体向上", volume: "10 个 x 1 组", rating: 6, note: "今天发力感偏散，先把动作做完整。" },
                 { name: "拉伸", volume: "10 分钟", rating: 7, note: "训练后身体稍微舒展开一点。" }
               ]
             },
@@ -5809,7 +5809,7 @@ input[type="checkbox"] {
               mood: "充实",
               dailyStory: "白天安排得比较满，但完成度不错，训练做完后感觉身体和精神都比较扎实。",
               workoutItems: [
-                { name: "窄距俯卧撑", volume: "20 个 x 1 组", rating: 8, note: "胸和手臂发力很顺。" },
+                { name: "level up-台阶宽距俯卧撑", volume: "20 个 x 1 组", rating: 8, note: "胸和手臂发力很顺。" },
                 { name: "悬垂举腿", volume: "14 个 x 1 组", rating: 7, note: "下放时继续慢一点会更稳。" }
               ]
             },
@@ -8021,8 +8021,37 @@ input[type="checkbox"] {
         });
       }
 
+      // ── 训练动作名一次性迁移（preset 升级后回填旧记录，幂等）──
+      const WORKOUT_NAME_MIGRATION_KEY = "michael-energy-tracker-workout-name-migration-v1";
+      const WORKOUT_RENAME_MAP = {
+        "宽距引体向上": "标准引体向上",
+        "窄距俯卧撑": "level up-台阶宽距俯卧撑"
+      };
+      function migrateWorkoutNames() {
+        if (localStorage.getItem(WORKOUT_NAME_MIGRATION_KEY) === "done") return;
+        let changed = 0;
+        const migrated = state.entries.map((entry) => {
+          if (!Array.isArray(entry.workoutItems) || !entry.workoutItems.length) return entry;
+          let entryChanged = false;
+          const newItems = entry.workoutItems.map((item) => {
+            const newName = WORKOUT_RENAME_MAP[item.name];
+            if (!newName) return item;
+            entryChanged = true;
+            changed += 1;
+            return { ...item, name: newName };
+          });
+          return entryChanged ? { ...entry, workoutItems: newItems } : entry;
+        });
+        if (changed > 0) {
+          state.entries = StorageService.saveEntries(migrated);
+          console.log(`[migration] 训练动作改名：共更新 ${changed} 条`);
+        }
+        localStorage.setItem(WORKOUT_NAME_MIGRATION_KEY, "done");
+      }
+
       function initialize() {
         state.entries = StorageService.ensureSeedData();
+        migrateWorkoutNames();
         // 清理"非今日且已推"的事件：今日已推的保留供时间线展示，跨日后丢弃
         SyncQueue.cleanOldPushed(DateUtils.getTodayISO());
         bindEvents();
