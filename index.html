@@ -540,6 +540,31 @@
       font-size: 13px;
     }
 
+    /* 顶层面板的折叠包装：把 section-title 当 summary 用 */
+    .panel-collapse > summary.section-title {
+      cursor: pointer;
+      list-style: none;
+      user-select: none;
+    }
+    .panel-collapse > summary.section-title::-webkit-details-marker { display: none; }
+    .panel-collapse > summary.section-title::after {
+      content: "▾";
+      color: var(--muted);
+      font-size: 12px;
+      transition: transform 0.2s ease;
+      margin-left: 8px;
+      flex-shrink: 0;
+    }
+    .panel-collapse[open] > summary.section-title::after {
+      transform: rotate(180deg);
+    }
+    .panel-collapse:not([open]) > summary.section-title {
+      margin-bottom: 0;
+    }
+    .panel-collapse > summary.section-title:hover h2 {
+      color: var(--accent, #3a7bd5);
+    }
+
     .summary-grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -4736,10 +4761,11 @@ input[type="checkbox"] {
 
       <article class="panel">
         <div class="panel-content">
-          <div class="section-title">
+          <details class="panel-collapse" open>
+          <summary class="section-title">
             <h2>今日概览</h2>
             <span id="todayStatusLabel">以最新一条记录为准</span>
-          </div>
+          </summary>
           <div class="summary-grid">
             <div class="summary-card">
               <div class="summary-label">主观能量值</div>
@@ -4783,14 +4809,6 @@ input[type="checkbox"] {
                 <strong id="todayFuelValue">--</strong>
               </div>
               <div class="vital">
-                <span>深工 / 琐事</span>
-                <strong id="todayWorkValue">--</strong>
-              </div>
-              <div class="vital">
-                <span>上午 / 下午 / 晚上</span>
-                <strong id="todayRhythmValue">--</strong>
-              </div>
-              <div class="vital">
                 <span>今日体重</span>
                 <strong id="todayWeightValue">--</strong>
               </div>
@@ -4800,16 +4818,18 @@ input[type="checkbox"] {
             <div class="today-story-label">今天发生的事情</div>
             <div class="today-story-value" id="todayStoryValue">还没有记录，后面这里会变成你当天的简短复盘，也会一起发进 Obsidian。</div>
           </div>
+          </details>
         </div>
       </article>
     </section>
 
     <section class="panel">
       <div class="panel-content">
-        <div class="section-title">
+        <details class="panel-collapse" open>
+        <summary class="section-title">
           <h2>核心卡片</h2>
           <span>最近 7 天 + 最近 30 天</span>
-        </div>
+        </summary>
         <div class="metrics-grid">
           <div class="metric">
             <div class="kicker">本周平均睡眠分</div>
@@ -4837,52 +4857,60 @@ input[type="checkbox"] {
             <div class="hint" id="sleepTrendText">数据不足时默认显示平稳</div>
           </div>
         </div>
+        </details>
       </div>
     </section>
 
     <section class="panel-grid">
       <article class="panel">
         <div class="panel-content">
-        <div class="section-title">
+        <details class="panel-collapse">
+        <summary class="section-title">
           <h2>30 天睡眠走势</h2>
-          <span id="chartStatusLabel">Chart.js 折线图</span>
-        </div>
+          <span id="chartStatusLabel">点击展开</span>
+        </summary>
         <div class="chart-wrap">
           <canvas id="sleepChart"></canvas>
         </div>
           <div class="footer-note">
             睡眠分会按日期连续展示，缺失日期会留空，方便看清作息波动和恢复节奏。
           </div>
+        </details>
         </div>
       </article>
 
       <article class="panel">
         <div class="panel-content">
-          <div class="section-title">
+          <details class="panel-collapse">
+          <summary class="section-title">
             <h2>最近记录</h2>
             <span>点击编辑可载入表单</span>
-          </div>
+          </summary>
           <div class="record-list" id="recordList"></div>
+          </details>
         </div>
       </article>
     </section>
 
     <section class="panel">
       <div class="panel-content">
-        <div class="section-title">
+        <details class="panel-collapse">
+        <summary class="section-title">
           <h2>能量守恒提醒</h2>
           <span>根据最新一天数据自动生成</span>
-        </div>
+        </summary>
         <div class="reminder-list" id="reminderList"></div>
+        </details>
       </div>
     </section>
 
     <section class="panel">
       <div class="panel-content">
-        <div class="section-title">
+        <details class="panel-collapse">
+        <summary class="section-title">
           <h2>数据管理</h2>
           <span>备份、恢复</span>
-        </div>
+        </summary>
         <div class="manage-row">
           <button class="btn-secondary" id="exportBtn" type="button">导出 JSON</button>
           <button class="btn-secondary" id="importBtn" type="button">导入 JSON</button>
@@ -4908,6 +4936,7 @@ input[type="checkbox"] {
         <div class="footer-note">
           首次打开会自动写入最近 5 天示例数据，之后不会覆盖你自己的记录。网页部署后也可以添加到手机主屏幕，体验会更像一个轻量应用。
         </div>
+        </details>
       </div>
     </section>
   </div>
@@ -5084,8 +5113,6 @@ input[type="checkbox"] {
         todayWakeupsValue: document.getElementById("todayWakeupsValue"),
         todayHabitsValue: document.getElementById("todayHabitsValue"),
         todayFuelValue: document.getElementById("todayFuelValue"),
-        todayWorkValue: document.getElementById("todayWorkValue"),
-        todayRhythmValue: document.getElementById("todayRhythmValue"),
         todayWeightValue: document.getElementById("todayWeightValue"),
         todayStoryValue: document.getElementById("todayStoryValue"),
         avgSleepScore: document.getElementById("avgSleepScore"),
@@ -5682,8 +5709,9 @@ input[type="checkbox"] {
             moodLogs: this.normalizeMoodLogs(raw.moodLogs || []),
             healthyFood: this.normalizeBoolean(raw.healthyFood) || mealItems.some((item) => item.healthy),
             ateOut: this.normalizeBoolean(raw.ateOut) || mealItems.some((item) => item.ateOut),
+            // 历史字段保留兼容（老数据加载用），新记录不再要求填
             deepWorkTasks: this.normalizeNumber(raw.deepWorkTasks, 0),
-            adminTasks: this.normalizeNumber(raw.adminTasks, this.normalizeNumber(raw.completedTasks, 0)),
+            adminTasks: this.normalizeNumber(raw.adminTasks, 0),
             morningEnergy: this.normalizeNullableNumber(raw.morningEnergy),
             afternoonEnergy: this.normalizeNullableNumber(raw.afternoonEnergy),
             eveningEnergy: this.normalizeNullableNumber(raw.eveningEnergy),
@@ -5702,15 +5730,11 @@ input[type="checkbox"] {
           if (!/^\d{4}-\d{2}-\d{2}$/.test(entry.date)) return "日期格式不正确。";
           if (!entry.bedtime || !entry.wakeTime) return "请把入睡时间和起床时间填完整。";
           if (entry.sleepScore < 0 || entry.sleepScore > 100) return "睡眠分需要在 0 到 100 之间。";
-          if (entry.energy < 1 || entry.energy > 10) return "主观能量值需要在 1 到 10 之间。";
+          // energy（旧主观能量字段）已由 wakingEnergy 接管，不再强校验
           if (entry.wakeups < 0 || entry.wakeups > 10) return "起夜次数需要在 0 到 10 之间。";
           if (entry.weight !== null && (entry.weight < 20 || entry.weight > 300)) return "今日体重请填写在 20 到 300 kg 之间。";
           if (entry.energyBoost < 0 || entry.energyBoost > 40) return "今日补能加分需要在 0% 到 40% 之间。";
-          if (entry.deepWorkTasks < 0 || entry.deepWorkTasks > 10) return "深度工作次数请填写在 0 到 10 之间。";
-          if (entry.adminTasks < 0 || entry.adminTasks > 20) return "琐事处理次数请填写在 0 到 20 之间。";
-          if (entry.morningEnergy !== null && (entry.morningEnergy < 1 || entry.morningEnergy > 10)) return "上午能量感受请填写在 1 到 10 之间。";
-          if (entry.afternoonEnergy !== null && (entry.afternoonEnergy < 1 || entry.afternoonEnergy > 10)) return "下午能量感受请填写在 1 到 10 之间。";
-          if (entry.eveningEnergy !== null && (entry.eveningEnergy < 1 || entry.eveningEnergy > 10)) return "晚上能量感受请填写在 1 到 10 之间。";
+          // 已移除：深工/琐事/上午/下午/晚上 字段（无输入控件，仅老数据兼容）
           const workoutError = WorkoutModel.validateItems(entry.workoutItems || []);
           if (workoutError) return workoutError;
           return "";
@@ -6710,9 +6734,7 @@ input[type="checkbox"] {
               recoveryBonus: 0,
               nutritionBonus: 0,
               exerciseBonus: 0,
-              outsidePenalty: 0,
-              deepWorkPenalty: 0,
-              adminPenalty: 0
+              outsidePenalty: 0
             };
           }
 
@@ -6721,9 +6743,7 @@ input[type="checkbox"] {
           const nutritionBonus = entry.healthyFood ? CONFIG.healthyFoodBatteryBonus : 0;
           const exerciseBonus = EntryModel.isExerciseDay(entry) ? 10 : 0;
           const outsidePenalty = entry.ateOut ? 10 : 0;
-          const deepWorkPenalty = Math.max(0, entry.deepWorkTasks) * 15;
-          const adminPenalty = Math.max(0, entry.adminTasks) * 5;
-          const rawTotal = sleepBase + recoveryBonus + nutritionBonus + exerciseBonus - outsidePenalty - deepWorkPenalty - adminPenalty;
+          const rawTotal = sleepBase + recoveryBonus + nutritionBonus + exerciseBonus - outsidePenalty;
           const total = this.clamp(rawTotal, 0, 100);
 
           return {
@@ -6732,9 +6752,7 @@ input[type="checkbox"] {
             recoveryBonus,
             nutritionBonus,
             exerciseBonus,
-            outsidePenalty,
-            deepWorkPenalty,
-            adminPenalty
+            outsidePenalty
           };
         },
 
@@ -6774,9 +6792,9 @@ input[type="checkbox"] {
             delta: null,
             deltaText: "昨天暂无记录",
             deltaClass: "neutral",
-            summary: "睡眠是你的主电池，饮食和锻炼是补给，深度工作和琐事会分层消耗电量。",
-            baseline: "主观能量先和仪表盘一起看，再慢慢校准成属于你的河床结构。",
-            breakdown: "睡眠底盘、饮食、锻炼、工作消耗和时段节奏都会显示在这里。"
+            summary: "睡眠是你的主电池，饮食和锻炼是补给，外食会消耗一些电量。",
+            baseline: "今天的能量底盘从昨晚睡眠开始算。",
+            breakdown: "睡眠底盘、饮食、锻炼会显示在这里。"
           };
 
           if (!targetEntry) return emptyState;
@@ -6786,10 +6804,9 @@ input[type="checkbox"] {
           const yesterdayEntry = entryMap.get(DateUtils.addDays(targetEntry.date, -1)) || null;
           const yesterdayScore = yesterdayEntry ? this.calculateGrowthScore(yesterdayEntry) : null;
           const delta = yesterdayScore ? todayScore.total - yesterdayScore.total : null;
-          const rhythmInsight = this.getRhythmInsight(targetEntry);
           let deltaText = "昨天暂无记录";
           let deltaClass = "neutral";
-          let summary = "睡眠是你的主电池，饮食和锻炼是补给，深度工作和琐事会分层消耗电量。";
+          let summary = "睡眠是你的主电池，饮食和锻炼是补给，外食会消耗一些电量。";
 
           if (delta !== null) {
             if (delta >= 0.01) {
@@ -6816,12 +6833,15 @@ input[type="checkbox"] {
             `补能 +${todayScore.recoveryBonus}`,
             `营养 +${todayScore.nutritionBonus}`,
             `锻炼 +${todayScore.exerciseBonus}`,
-            `外食 -${todayScore.outsidePenalty}`,
-            `深工 -${todayScore.deepWorkPenalty}`,
-            `琐事 -${todayScore.adminPenalty}`,
-            `时段 ${rhythmInsight.rhythmText}`,
-            `建议 ${rhythmInsight.recommendation}`
+            `外食 -${todayScore.outsidePenalty}`
           ].join("\n");
+
+          const wakingE = (targetEntry.wakingEnergy != null && targetEntry.wakingEnergy !== "")
+            ? targetEntry.wakingEnergy
+            : (targetEntry.energy != null ? targetEntry.energy : null);
+          const baseline = wakingE != null
+            ? `起床能量 ${wakingE}/10 · 今天的底盘从昨晚睡眠开始算。`
+            : `今天的能量底盘从昨晚睡眠开始算。`;
 
           return {
             score: todayScore.total,
@@ -6829,9 +6849,8 @@ input[type="checkbox"] {
             deltaText,
             deltaClass,
             summary,
-            baseline: `主观能量 ${targetEntry.energy}/10。${rhythmInsight.bestWindow}`,
-            breakdown,
-            rhythmInsight
+            baseline,
+            breakdown
           };
         },
 
@@ -7244,26 +7263,25 @@ input[type="checkbox"] {
             elements.todayWakeupsValue.textContent = "--";
             elements.todayHabitsValue.textContent = "--";
             elements.todayFuelValue.textContent = "--";
-            elements.todayWorkValue.textContent = "--";
-            elements.todayRhythmValue.textContent = "--";
             elements.todayWeightValue.textContent = "--";
             elements.todayStoryValue.textContent = "还没有记录，后面这里会变成你当天的简短复盘，也会一起发进 Obsidian。";
             return;
           }
 
-          const rhythmInsight = Analytics.getRhythmInsight(latestEntry);
           elements.todayStatusLabel.textContent = latestEntry.date === todayISO
             ? `今天已保存：${DateUtils.formatShortDate(latestEntry.date)}`
             : `最新记录：${DateUtils.formatShortDate(latestEntry.date)} · 今天 ${DateUtils.formatShortDate(todayISO)} 还没保存`;
-          elements.todayEnergyValue.textContent = `${latestEntry.energy}/10`;
-          elements.todayMoodValue.textContent = latestEntry.mood || "没有填写心情备注";
+          // 主观能量值 = 起床能量（从睡眠面板写入；老数据 fallback 到 energy）
+          const subjEnergy = (latestEntry.wakingEnergy != null && latestEntry.wakingEnergy !== "")
+            ? latestEntry.wakingEnergy
+            : (latestEntry.energy != null && latestEntry.energy !== "" ? latestEntry.energy : null);
+          elements.todayEnergyValue.textContent = subjEnergy != null ? `${subjEnergy}/10` : "--";
+          elements.todayMoodValue.textContent = latestEntry.mood || "今早记录起床能量后会更新这里";
           elements.todaySleepValue.textContent = `${latestEntry.sleepScore} 分`;
           elements.todayTimeValue.textContent = `${latestEntry.bedtime} / ${latestEntry.wakeTime}`;
           elements.todayWakeupsValue.textContent = `${latestEntry.wakeups} 次`;
           elements.todayHabitsValue.textContent = `${EntryModel.getWorkoutSummary(latestEntry)} / ${latestEntry.cooked ? "做饭" : "未做饭"}`;
           elements.todayFuelValue.textContent = `餐食 ${latestEntry.mealItems?.length || 0} / 补能 ${latestEntry.recoveryItems?.length || 0} 次 / +${latestEntry.energyBoost || 0}% / ${latestEntry.healthyFood ? "营养好" : "营养弱"} / ${latestEntry.ateOut ? "外食" : "未外食"}`;
-          elements.todayWorkValue.textContent = `深工 ${latestEntry.deepWorkTasks} / 琐事 ${latestEntry.adminTasks}`;
-          elements.todayRhythmValue.textContent = rhythmInsight.rhythmText;
           elements.todayWeightValue.textContent = this.formatWeight(latestEntry.weight);
           elements.todayStoryValue.textContent = latestEntry.dailyStory || "今天还没有补充事件记录。";
         },
@@ -7376,9 +7394,6 @@ input[type="checkbox"] {
                       ${entry.healthyFood ? "营养补给到位" : "营养补给一般"}，
                       补能 +${entry.energyBoost || 0}%，
                       ${entry.ateOut ? "有外食" : "没有外食"}，
-                      深度工作 ${entry.deepWorkTasks} 次，
-                      琐事处理 ${entry.adminTasks} 次，
-                      时段节奏 ${Analytics.getRhythmInsight(entry).rhythmText}，
                       体重 ${this.formatWeight(entry.weight)}。<br />
                       心情：${mood}
                     </div>
@@ -7670,14 +7685,14 @@ input[type="checkbox"] {
           const workoutAverage = EntryModel.getWorkoutAverageRating(entry);
           const workoutSummary = EntryModel.getWorkoutSummary(entry);
           const growthDashboard = Analytics.calculateGrowthDashboard(state.entries, entry);
-          const rhythmInsight = Analytics.getRhythmInsight(entry);
+          const subjEnergy = entry.wakingEnergy != null ? entry.wakingEnergy : (entry.energy || null);
           const sections = [
             `## ${DateUtils.formatDateLabel(entry.date)} 训练、能量与复盘记录`,
             "",
             `- 睡眠分：${entry.sleepScore}`,
             `- 入睡 / 起床：${entry.bedtime} / ${entry.wakeTime}`,
             `- 起夜次数：${entry.wakeups} 次`,
-            `- 主观能量：${entry.energy}/10`,
+            subjEnergy != null ? `- 起床能量：${subjEnergy}/10` : null,
             `- 今日体重：${UI.formatWeight(entry.weight)}`,
             `- 今日补能加分：+${entry.energyBoost || 0}%`,
             `- 训练概览：${workoutSummary}${workoutAverage !== null ? `，平均状态 ${workoutAverage.toFixed(1)}/10` : ""}`,
@@ -7685,18 +7700,13 @@ input[type="checkbox"] {
             `- 今日食物：${entry.mealDetails || "未记录"}`,
             `- 健康营养补给：${entry.healthyFood ? "是" : "否"}`,
             `- 外食：${entry.ateOut ? "是" : "否"}`,
-            `- 深度工作：${entry.deepWorkTasks} 次`,
-            `- 琐事处理：${entry.adminTasks} 次`,
-            `- 上午 / 下午 / 晚上：${rhythmInsight.rhythmText}`,
             `- 心情备注：${entry.mood || "无"}`,
             `- 能量仪表盘：${growthDashboard.score === null ? "--" : growthDashboard.score.toFixed(2)}`,
             `- 与昨天对比：${growthDashboard.deltaText}`,
             `- 仪表盘解读：${growthDashboard.summary}`,
             `- 加减分明细：${growthDashboard.breakdown || "无"}`,
-            `- 时段建议：${rhythmInsight.bestWindow}`,
-            `- 避坑提醒：${rhythmInsight.cautionWindow}`,
             ""
-          ];
+          ].filter(Boolean);
 
           if (workoutItems.length) {
             sections.push("### 训练明细", "");
