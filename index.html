@@ -3955,9 +3955,250 @@ input[type="checkbox"] {
   .miying-distrib-cell { width: 24px; height: 24px; font-size: 13px; }
   .miying-distrib-table th, .miying-distrib-table td { padding: 4px 2px; font-size: 11px; }
 }
+
+/* ════════ 增强回路引擎 ════════ */
+
+/* 胜利里程碑弹窗 */
+.lp-milestone-overlay {
+  position: fixed; inset: 0;
+  background: rgba(20, 18, 12, 0.55);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 2000;
+  padding: 20px;
+  animation: lp-fade-in 0.18s ease-out;
+}
+.lp-milestone-overlay[hidden] { display: none !important; }
+@keyframes lp-fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes lp-pulse {
+  0%   { transform: scale(1);    }
+  50%  { transform: scale(1.02); }
+  100% { transform: scale(1);    }
+}
+.lp-milestone-card {
+  width: min(440px, 100%);
+  background: linear-gradient(135deg, #f7d794 0%, #f5cd79 100%);
+  border-radius: 16px;
+  padding: 24px 22px 20px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.3), 0 0 0 1px rgba(245,205,121,0.4);
+  color: #2a1f0a;
+  animation: lp-pulse 0.3s ease-out;
+}
+.lp-milestone-card h3 {
+  margin: 0 0 6px;
+  font-size: 17px;
+  font-weight: 700;
+  color: #2a1f0a;
+  letter-spacing: 0.02em;
+}
+.lp-milestone-card .lp-milestone-msg {
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 8px 0 14px;
+  color: #3a2a10;
+  font-weight: 500;
+}
+.lp-causal-chain {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 4px;
+  padding: 10px 8px;
+  background: rgba(255,255,255,0.35);
+  border-radius: 10px;
+  margin-bottom: 14px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #3a2a10;
+}
+.lp-causal-chain .lp-chain-node {
+  flex: 1; text-align: center;
+  white-space: nowrap;
+}
+.lp-causal-chain .lp-chain-arrow {
+  color: rgba(58,42,16,0.5);
+  font-size: 12px;
+}
+.lp-milestone-card .lp-note-wrap {
+  margin-bottom: 12px;
+}
+.lp-milestone-card .lp-note-label {
+  display: block;
+  font-size: 11px;
+  color: #5a4a20;
+  margin-bottom: 4px;
+  letter-spacing: 0.04em;
+}
+.lp-milestone-card textarea.lp-note-input {
+  width: 100%;
+  min-height: 50px;
+  padding: 8px 10px;
+  border: 1px solid rgba(58,42,16,0.2);
+  border-radius: 8px;
+  background: rgba(255,255,255,0.7);
+  font-family: inherit;
+  font-size: 12px;
+  color: #2a1f0a;
+  resize: vertical;
+  box-sizing: border-box;
+}
+.lp-milestone-card .lp-confirm-btn {
+  width: 100%;
+  padding: 11px 14px;
+  border: none;
+  border-radius: 10px;
+  background: #2a1f0a;
+  color: #f7d794;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.lp-milestone-card .lp-confirm-btn:hover { background: #1a1206; }
+
+/* 慢食正念 toast */
+.lp-meal-toast {
+  position: fixed;
+  top: 16px; left: 50%;
+  transform: translate(-50%, -150%);
+  z-index: 1900;
+  width: min(380px, calc(100% - 32px));
+  padding: 14px 18px;
+  background: rgba(76, 159, 112, 0.92);
+  color: #fff;
+  border-radius: 14px;
+  box-shadow: 0 12px 36px rgba(76,159,112,0.4);
+  font-size: 13px;
+  line-height: 1.55;
+  backdrop-filter: blur(8px);
+  transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.32s;
+  opacity: 0;
+  text-align: center;
+}
+.lp-meal-toast.lp-show {
+  transform: translate(-50%, 0);
+  opacity: 1;
+}
+.lp-meal-toast .lp-toast-title {
+  font-size: 14px; font-weight: 700;
+  margin-bottom: 4px;
+  letter-spacing: 0.04em;
+}
+.lp-meal-toast .lp-toast-waist {
+  font-family: var(--font-number, monospace);
+  font-size: 13px;
+  margin-bottom: 4px;
+  color: rgba(255,255,255,0.95);
+}
+.lp-meal-toast .lp-toast-quote {
+  font-size: 11px;
+  color: rgba(255,255,255,0.75);
+  margin-top: 6px;
+  font-style: italic;
+}
+
+/* 平台期守护卡片 */
+.lp-plateau-card {
+  margin-top: 14px;
+  padding: 14px 16px;
+  background: linear-gradient(135deg, #e4ebf2 0%, #d8e1ea 100%);
+  border: 1px solid rgba(80,100,130,0.22);
+  border-radius: 12px;
+  color: #2d3a4f;
+  font-size: 12.5px;
+  line-height: 1.55;
+}
+.lp-plateau-card[hidden] { display: none !important; }
+.lp-plateau-card h4 {
+  margin: 0 0 8px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #1f2a3f;
+  letter-spacing: 0.02em;
+}
+.lp-plateau-card .lp-plateau-wave {
+  display: flex; align-items: flex-end; justify-content: space-between;
+  gap: 3px;
+  height: 36px;
+  margin: 8px 0 10px;
+  padding: 4px 6px;
+  background: rgba(255,255,255,0.5);
+  border-radius: 6px;
+}
+.lp-plateau-card .lp-wave-bar {
+  flex: 1;
+  background: linear-gradient(180deg, #5a7ba8 0%, #7a99c2 100%);
+  border-radius: 2px;
+  min-height: 4px;
+  transition: height 0.3s;
+}
+.lp-plateau-card .lp-plateau-model {
+  margin: 8px 0;
+  padding: 8px 10px;
+  background: rgba(255,255,255,0.55);
+  border-left: 3px solid #5a7ba8;
+  border-radius: 4px;
+  font-size: 12px;
+  color: #2d3a4f;
+}
+.lp-plateau-card .lp-plateau-tips {
+  margin: 8px 0;
+  padding-left: 18px;
+  color: #2d3a4f;
+}
+.lp-plateau-card .lp-plateau-tips li {
+  margin-bottom: 3px;
+  font-size: 12px;
+}
+.lp-plateau-card .lp-plateau-footer {
+  font-size: 11.5px;
+  color: #506378;
+  font-style: italic;
+  margin: 6px 0 10px;
+}
+.lp-plateau-card .lp-plateau-btn {
+  display: inline-block;
+  padding: 7px 14px;
+  border: 1px solid rgba(45,58,79,0.3);
+  border-radius: 999px;
+  background: rgba(255,255,255,0.65);
+  color: #2d3a4f;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.lp-plateau-card .lp-plateau-btn:hover { background: rgba(255,255,255,0.9); }
+.lp-plateau-card.lp-dismissed { display: none; }
   </style>
 </head>
 <body>
+  <!-- ════════ 增强回路引擎：全局弹窗 / Toast ════════ -->
+  <div class="lp-milestone-overlay" id="lpMilestoneOverlay" hidden>
+    <div class="lp-milestone-card" role="dialog" aria-modal="true" aria-labelledby="lpMilestoneTitle">
+      <h3 id="lpMilestoneTitle">🏆 里程碑达成</h3>
+      <div class="lp-milestone-msg" id="lpMilestoneMsg">—</div>
+      <div class="lp-causal-chain" aria-hidden="true">
+        <span class="lp-chain-node">😴 睡眠</span>
+        <span class="lp-chain-arrow">→</span>
+        <span class="lp-chain-node">🧠 马夫</span>
+        <span class="lp-chain-arrow">→</span>
+        <span class="lp-chain-node">🍽️ 慢食</span>
+        <span class="lp-chain-arrow">→</span>
+        <span class="lp-chain-node">⚖️ 腰围</span>
+      </div>
+      <div class="lp-note-wrap">
+        <label class="lp-note-label" for="lpMilestoneNote">胜利笔记（可选 · 锚定记忆）</label>
+        <textarea id="lpMilestoneNote" class="lp-note-input" placeholder="此刻的感受 / 关键支点……"></textarea>
+      </div>
+      <button class="lp-confirm-btn" id="lpMilestoneConfirm" type="button">确认 · 继续运转</button>
+    </div>
+  </div>
+
+  <div class="lp-meal-toast" id="lpMealToast" role="status" aria-live="polite">
+    <div class="lp-toast-title">🍽️ 慢食确认</div>
+    <div class="lp-toast-waist" id="lpMealToastWaist">—</div>
+    <div>每一口都在建造你想要的身体。</div>
+    <div class="lp-toast-quote">── 今天的每口饭 = 明天的腰围数字 ──</div>
+  </div>
+
   <div class="app">
     <header class="hero">
       <div class="hero-grid">
@@ -4103,6 +4344,21 @@ input[type="checkbox"] {
               <span style="color:#d17b1f;">●</span> 尿酸 ·
               <span style="color:rgba(110,110,98,0.7);">—— —— ——</span> 腰围
             </div>
+
+            <!-- 平台期守护者卡片（嵌入趋势图下方，非弹窗）-->
+            <div class="lp-plateau-card" id="lpPlateauCard" hidden>
+              <h4>📊 平台期 · 这是系统在重新校准</h4>
+              <div class="lp-plateau-wave" id="lpPlateauWave"></div>
+              <div class="lp-plateau-model" id="lpPlateauModel">波浪模型提醒：上一次平台期后发生了什么？继续下降。</div>
+              <ul class="lp-plateau-tips">
+                <li>碳水集中在训练日</li>
+                <li>午后间歇步行 30 分钟</li>
+                <li>检查睡眠分（&lt;80 → 系统出力下降）</li>
+              </ul>
+              <div class="lp-plateau-footer">谷底也是数据。平台期也是数据。波浪终将抬升。</div>
+              <button class="lp-plateau-btn" id="lpPlateauBtn" type="button">我知道了 · 继续信任系统</button>
+            </div>
+
             <details class="health-records-toggle">
               <summary>查看完整记录</summary>
               <div class="health-records-wrap" style="overflow-x:auto;margin-top:6px">
@@ -8062,6 +8318,15 @@ input[type="checkbox"] {
             patchToday(patch);
             renderItems(loadToday());
             renderScore();
+
+            // 增强回路引擎：勾上"慢食执行" → 弹正念 toast
+            if (key === "slowEating" && e.target.checked && window.LoopEngine) {
+              window.LoopEngine.showMealMindfulness();
+            }
+            // 睡眠/慢食/腰围都可能改变里程碑成立条件
+            if (window.LoopEngine && e.target.checked) {
+              window.LoopEngine.checkMilestones();
+            }
             return;
           }
           // 睡眠分输入
@@ -8081,6 +8346,13 @@ input[type="checkbox"] {
             renderScore();
           }
         });
+
+        // 睡眠分失焦时再跑一次里程碑检测（避免每打一个字符就检测）
+        panel.addEventListener("blur", (e) => {
+          if (e.target.id === "healthSleepInput" && window.LoopEngine) {
+            window.LoopEngine.checkMilestones();
+          }
+        }, true);
       }
 
       // ════════ 体重 × 尿酸 联合管理 ════════
@@ -8367,6 +8639,12 @@ input[type="checkbox"] {
         }
 
         renderCombined();
+
+        // 增强回路引擎：新记录 → 检测里程碑 + 重算平台期卡片
+        if (window.LoopEngine) {
+          window.LoopEngine.refreshPlateauCard();
+          window.LoopEngine.checkMilestones();
+        }
       }
 
       // 删除记录
@@ -9585,6 +9863,338 @@ input[type="checkbox"] {
       bindQuestionOptions();
       bindEffectivenessOptions();
       bindLongPressEdit();
+    })();
+
+    // ════════════════════════════════════════════════════════════
+    // 增强回路引擎（LoopEngine）— 胜利里程碑 + 慢食正念 + 平台期守护
+    // ════════════════════════════════════════════════════════════
+    (() => {
+      const MILESTONE_KEY = "victory_milestones";
+      const NOTES_KEY = "victory_milestone_notes";
+      const PLATEAU_DISMISS_KEY = "plateau_card_dismissed_at";
+      const PLATEAU_WINDOW_DAYS = 7;
+      const PLATEAU_RANGE_KG = 0.6;   // 7 天 max-min ≤ 0.6kg 视为平台
+      const URIC_TARGET_FOR_ENGINE = 400;
+      const WEIGHT_TARGET_KG = 80;
+
+      // ── localStorage helpers ────────────────────────────────────
+      function loadFiredMilestones() {
+        try { return JSON.parse(localStorage.getItem(MILESTONE_KEY) || "[]"); }
+        catch { return []; }
+      }
+      function markMilestoneFired(id) {
+        const list = loadFiredMilestones();
+        if (!list.includes(id)) {
+          list.push(id);
+          localStorage.setItem(MILESTONE_KEY, JSON.stringify(list));
+        }
+      }
+      function saveMilestoneNote(id, note) {
+        if (!note) return;
+        let map = {};
+        try { map = JSON.parse(localStorage.getItem(NOTES_KEY) || "{}"); } catch {}
+        map[id] = { note, ts: new Date().toISOString() };
+        localStorage.setItem(NOTES_KEY, JSON.stringify(map));
+      }
+      function loadWeightRecords() {
+        try { return JSON.parse(localStorage.getItem("weight_records") || "[]"); }
+        catch { return []; }
+      }
+      function loadUricRecords() {
+        try { return JSON.parse(localStorage.getItem("uric_acid_records") || "[]"); }
+        catch { return []; }
+      }
+      function loadHealthScores() {
+        try { return JSON.parse(localStorage.getItem("health_scores") || "{}"); }
+        catch { return {}; }
+      }
+
+      // ── 复用：computeScoreLite（与 cb-achievements 里同款）────────
+      function computeScoreLite(state) {
+        let total = 60;
+        const sleep = Number(state.sleepScore);
+        if (Number.isFinite(sleep) && sleep > 0) {
+          if (sleep >= 90) total += 10;
+          else if (sleep >= 80) total += 5;
+          else if (sleep >= 70) total -= 5;
+          else total -= 10;
+        }
+        if (state.steps10000) total += 5;
+        else if (state.steps7000) total += 3;
+        else if (state.stepsUnder5000) total -= 3;
+        const adds = ["sleepSop","slowEating","waterBeforeMeal","avoidRed","cookedOnce","water2500","lemonWater","milk","workout","eye2510","medicationTaken","horseQuestion","tmdExercise"];
+        const addScores = [5,5,2,5,3,5,2,2,5,3,2,3,3];
+        adds.forEach((id, i) => { if (state[id]) total += addScores[i]; });
+        const subs = ["ateRed","drankSugar","binge","beefOver","darkChocOver","waterUnder1500","noExercise","eyeOver2h","coffeeAfter2pm","nutOrHard","colaOverWeek"];
+        const subScores = [8,5,5,3,2,5,5,3,3,2,2];
+        subs.forEach((id, i) => { if (state[id]) total -= subScores[i]; });
+        return Math.max(0, Math.min(100, total));
+      }
+
+      function localISO(d) {
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, "0");
+        const dd = String(d.getDate()).padStart(2, "0");
+        return `${y}-${m}-${dd}`;
+      }
+
+      // ── 里程碑规则表 ────────────────────────────────────────────
+      const MILESTONES = [
+        {
+          id: "sleep_waist_combo",
+          msg: "睡好了→马夫在线→慢食执行→腰围下降。这不是运气，这是系统。",
+          detect({ weights, scores }) {
+            // 最近一条睡眠记录 ≥85（按日期降序，取首条有 sleepScore 的）
+            const sleepDays = Object.entries(scores)
+              .filter(([, e]) => Number.isFinite(Number(e.sleepScore)) && Number(e.sleepScore) > 0)
+              .sort(([a], [b]) => b.localeCompare(a));
+            if (!sleepDays.length) return false;
+            if (Number(sleepDays[0][1].sleepScore) < 85) return false;
+            // 最新腰围 < 上一条腰围
+            const waistRecs = weights
+              .filter((w) => Number.isFinite(Number(w.waist)) && Number(w.waist) > 0)
+              .sort((a, b) => a.date.localeCompare(b.date));
+            if (waistRecs.length < 2) return false;
+            return Number(waistRecs[waistRecs.length - 1].waist) < Number(waistRecs[waistRecs.length - 2].waist);
+          }
+        },
+        {
+          id: "waist_milestone_3",
+          msg: "腰围-3cm。每一厘米都是慢食×训练×睡眠的系统产出。河床在改道。",
+          detect({ weights }) {
+            const w = weights
+              .filter((r) => Number.isFinite(Number(r.waist)) && Number(r.waist) > 0)
+              .sort((a, b) => a.date.localeCompare(b.date));
+            if (w.length < 2) return false;
+            return (Number(w[0].waist) - Number(w[w.length - 1].waist)) >= 3;
+          }
+        },
+        {
+          id: "waist_milestone_5",
+          msg: "腰围-5cm。私立学校20年的河床，正在被你一口一口地重写。",
+          detect({ weights }) {
+            const w = weights
+              .filter((r) => Number.isFinite(Number(r.waist)) && Number(r.waist) > 0)
+              .sort((a, b) => a.date.localeCompare(b.date));
+            if (w.length < 2) return false;
+            return (Number(w[0].waist) - Number(w[w.length - 1].waist)) >= 5;
+          }
+        },
+        {
+          id: "weight_80",
+          msg: "80kg。从84.3到这里，不是节食的胜利——是结构的胜利。",
+          detect({ weights }) {
+            if (!weights.length) return false;
+            const latest = weights.slice().sort((a, b) => a.date.localeCompare(b.date)).pop();
+            return Number(latest.weight) <= WEIGHT_TARGET_KG;
+          }
+        },
+        {
+          id: "uric_acid_400",
+          msg: "尿酸<400。四条防线生效了。身体在回应你的'蓄'。",
+          detect({ uric }) {
+            if (!uric.length) return false;
+            const latest = uric.slice().sort((a, b) => a.date.localeCompare(b.date)).pop();
+            return Number(latest.value) <= URIC_TARGET_FOR_ENGINE;
+          }
+        },
+        {
+          id: "streak_a_7",
+          msg: "连续7天A级。这不是爆发——这是河床在自动运转。",
+          detect({ scores }) {
+            // 从今天往前数 7 天，每一天都必须 ≥80
+            const today = new Date();
+            for (let i = 0; i < 7; i++) {
+              const d = new Date(today);
+              d.setDate(today.getDate() - i);
+              const key = localISO(d);
+              if (!scores[key]) return false;
+              if (computeScoreLite(scores[key]) < 80) return false;
+            }
+            return true;
+          }
+        }
+      ];
+
+      // ── 弹窗渲染 ────────────────────────────────────────────────
+      let currentMilestoneId = null;
+      function showMilestoneModal(milestone) {
+        currentMilestoneId = milestone.id;
+        const overlay = document.getElementById("lpMilestoneOverlay");
+        const msgEl = document.getElementById("lpMilestoneMsg");
+        const noteEl = document.getElementById("lpMilestoneNote");
+        if (!overlay || !msgEl || !noteEl) return;
+        msgEl.textContent = milestone.msg;
+        noteEl.value = "";
+        overlay.hidden = false;
+        // 强制重排让 keyframe 重跑
+        const card = overlay.querySelector(".lp-milestone-card");
+        if (card) {
+          card.style.animation = "none";
+          void card.offsetWidth;
+          card.style.animation = "";
+        }
+        setTimeout(() => noteEl.focus(), 50);
+      }
+      function closeMilestoneModal() {
+        const overlay = document.getElementById("lpMilestoneOverlay");
+        const noteEl = document.getElementById("lpMilestoneNote");
+        if (currentMilestoneId && noteEl) {
+          saveMilestoneNote(currentMilestoneId, noteEl.value.trim());
+        }
+        if (overlay) overlay.hidden = true;
+        currentMilestoneId = null;
+      }
+      function bindMilestoneEvents() {
+        const btn = document.getElementById("lpMilestoneConfirm");
+        const overlay = document.getElementById("lpMilestoneOverlay");
+        if (btn) btn.addEventListener("click", closeMilestoneModal);
+        if (overlay) {
+          overlay.addEventListener("click", (e) => {
+            if (e.target === overlay) closeMilestoneModal();
+          });
+        }
+        document.addEventListener("keydown", (e) => {
+          if (e.key === "Escape" && overlay && !overlay.hidden) closeMilestoneModal();
+        });
+      }
+
+      // ── 检测 + 触发（addRecordFlow 后调用）──────────────────────
+      function checkMilestones() {
+        const fired = loadFiredMilestones();
+        const ctx = {
+          weights: loadWeightRecords(),
+          uric: loadUricRecords(),
+          scores: loadHealthScores()
+        };
+        // 队列化：找到第一个新触发的就弹，其余等下次记录再触发（避免连弹）
+        for (const m of MILESTONES) {
+          if (fired.includes(m.id)) continue;
+          let hit = false;
+          try { hit = !!m.detect(ctx); } catch (err) { hit = false; }
+          if (hit) {
+            markMilestoneFired(m.id);
+            showMilestoneModal(m);
+            return;
+          }
+        }
+      }
+
+      // ── 慢食正念 toast ─────────────────────────────────────────
+      let mealToastTimer = null;
+      function showMealMindfulness() {
+        const toast = document.getElementById("lpMealToast");
+        const waistEl = document.getElementById("lpMealToastWaist");
+        if (!toast || !waistEl) return;
+        // 动态读取首条 vs 最新腰围
+        const recs = loadWeightRecords()
+          .filter((r) => Number.isFinite(Number(r.waist)) && Number(r.waist) > 0)
+          .sort((a, b) => a.date.localeCompare(b.date));
+        if (recs.length >= 1) {
+          const start = Number(recs[0].waist);
+          const cur = Number(recs[recs.length - 1].waist);
+          const delta = (start - cur).toFixed(1);
+          const sign = Number(delta) > 0 ? `-${delta}` : (Number(delta) < 0 ? `+${Math.abs(delta).toFixed(1)}` : "±0");
+          waistEl.textContent = `腰围：${start} → ${cur} cm（${sign} cm）`;
+        } else {
+          waistEl.textContent = "记录腰围后查看变化";
+        }
+        toast.classList.add("lp-show");
+        if (mealToastTimer) clearTimeout(mealToastTimer);
+        mealToastTimer = setTimeout(() => {
+          toast.classList.remove("lp-show");
+          mealToastTimer = null;
+        }, 3000);
+      }
+
+      // ── 平台期检测 ─────────────────────────────────────────────
+      function detectPlateau(records) {
+        if (!records || records.length < 3) return false;
+        const sorted = records.slice().sort((a, b) => a.date.localeCompare(b.date));
+
+        // 条件 1：体重最近 7 天波动 ≤ 0.6kg
+        const recent = sorted.slice(-PLATEAU_WINDOW_DAYS);
+        if (recent.length >= 3) {
+          const ws = recent.map((r) => Number(r.weight)).filter((x) => Number.isFinite(x));
+          if (ws.length >= 3) {
+            const range = Math.max(...ws) - Math.min(...ws);
+            if (range <= PLATEAU_RANGE_KG) return { type: "weight", recent };
+          }
+        }
+
+        // 条件 2：腰围连续 2 次记录无变化
+        const waistRecs = sorted.filter((r) => Number.isFinite(Number(r.waist)) && Number(r.waist) > 0);
+        if (waistRecs.length >= 2) {
+          const last = waistRecs[waistRecs.length - 1];
+          const prev = waistRecs[waistRecs.length - 2];
+          if (Number(last.waist) === Number(prev.waist)) return { type: "waist", recent };
+        }
+
+        return false;
+      }
+
+      function renderPlateauCard() {
+        const card = document.getElementById("lpPlateauCard");
+        if (!card) return;
+        const recs = loadWeightRecords();
+        const result = detectPlateau(recs);
+        if (!result) {
+          card.hidden = true;
+          card.classList.remove("lp-dismissed");
+          return;
+        }
+        // 渲染波形（按 recent 体重数据做迷你柱状）
+        const wave = document.getElementById("lpPlateauWave");
+        if (wave && result.recent && result.recent.length) {
+          const ws = result.recent.map((r) => Number(r.weight)).filter((x) => Number.isFinite(x));
+          if (ws.length) {
+            const minW = Math.min(...ws);
+            const maxW = Math.max(...ws);
+            const span = Math.max(0.3, maxW - minW); // 防 0
+            wave.innerHTML = ws.map((w) => {
+              const h = 6 + ((w - minW) / span) * 28; // 6~34px
+              return `<span class="lp-wave-bar" style="height:${h}px"></span>`;
+            }).join("");
+          }
+        }
+        // 模型文案
+        const model = document.getElementById("lpPlateauModel");
+        if (model) {
+          model.textContent = result.type === "waist"
+            ? "波浪模型提醒：腰围连续两次未变 — 上一次平台后发生了什么？继续下降。"
+            : "波浪模型提醒：体重 7 天波动 ≤0.6kg — 上一次平台后发生了什么？继续下降。";
+        }
+        card.hidden = false;
+      }
+      function bindPlateauEvents() {
+        const btn = document.getElementById("lpPlateauBtn");
+        if (btn) {
+          btn.addEventListener("click", () => {
+            // 只是隐藏；下次体重突破/记录变化后 renderPlateauCard 会重新评估
+            const card = document.getElementById("lpPlateauCard");
+            if (card) card.hidden = true;
+            localStorage.setItem(PLATEAU_DISMISS_KEY, new Date().toISOString());
+          });
+        }
+      }
+
+      // ── 全局对外暴露 ─────────────────────────────────────────────
+      window.LoopEngine = {
+        checkMilestones,
+        showMealMindfulness,
+        refreshPlateauCard: renderPlateauCard,
+        // 测试 helper（可在 console 调用）
+        _debug: {
+          resetMilestones: () => localStorage.removeItem(MILESTONE_KEY),
+          listMilestones: () => MILESTONES.map((m) => m.id),
+          listFired: loadFiredMilestones
+        }
+      };
+
+      // ── 初始化 ─────────────────────────────────────────────────
+      bindMilestoneEvents();
+      bindPlateauEvents();
+      renderPlateauCard();
     })();
   </script>
 </body>
