@@ -5689,7 +5689,8 @@ input[type="checkbox"] {
                 mood: data.mood,
                 energy: data.energy,
                 dailyStory: data.dailyStory || "",
-                dailySteps: data.dailySteps ?? null
+                dailySteps: data.dailySteps ?? null,
+                microEvolution: data.microEvolution || ""
               });
             },
             toMarkdown(event) {
@@ -5701,6 +5702,9 @@ input[type="checkbox"] {
               ];
               if (typeof d.dailySteps === "number") {
                 lines.push(`- 今日步数：${d.dailySteps.toLocaleString()}`);
+              }
+              if (d.microEvolution) {
+                lines.push(`- 🧬 每日微进化：${d.microEvolution}`);
               }
               if (d.dailyStory) lines.push("", d.dailyStory);
               return lines.join("\n");
@@ -5856,6 +5860,7 @@ input[type="checkbox"] {
             morningPlan: String(raw.morningPlan || "").trim(),
             waistCircumference: this.normalizeNullableNumber(raw.waistCircumference),
             dailySteps: this.normalizeNullableNumber(raw.dailySteps),
+            microEvolution: String(raw.microEvolution || "").trim(),
             workoutItems
           };
         },
@@ -6348,6 +6353,10 @@ input[type="checkbox"] {
         <label>想复盘什么</label>
         <textarea id="reflectionPanelStory" rows="5" placeholder="例如：今天哪里做得不错，哪里消耗了能量，明天醒来最重要的一件事。">${p.dailyStory ?? today.dailyStory ?? ""}</textarea>
       </div>
+      <div class="field">
+        <label style="color:var(--accent-warm);font-weight:600;">🧬 每日微进化 · Daily Micro-Evolution</label>
+        <textarea id="reflectionPanelMicroEvo" rows="2" placeholder="今天我进化了什么？（一句话，例如：发现白马能量可以用俯卧撑转化）" style="border-color:var(--accent-warm);border-width:1.5px">${p.microEvolution ?? today.microEvolution ?? ""}</textarea>
+      </div>
       <div class="panel-actions">
         <button class="btn-primary" id="reflectionPanelSave" type="button">💾 保存</button>
         <label class="immediate-push-check">
@@ -6617,7 +6626,8 @@ input[type="checkbox"] {
       mood: document.getElementById("reflectionPanelMood").value,
       energy: Number(document.getElementById("reflectionPanelEnergy").value),
       dailySteps: stepsRaw === "" ? null : Number(stepsRaw),
-      dailyStory: document.getElementById("reflectionPanelStory").value.trim()
+      dailyStory: document.getElementById("reflectionPanelStory").value.trim(),
+      microEvolution: document.getElementById("reflectionPanelMicroEvo").value.trim()
     };
     const err = EventModel.types.reflection.validate(data);
     if (err) {
@@ -7532,6 +7542,7 @@ input[type="checkbox"] {
                       心情：${mood}
                     </div>
                     ${entry.dailyStory ? `<div class="record-story"><strong>今天发生的事：</strong>${storyHtml}</div>` : ""}
+                    ${entry.microEvolution ? `<div class="record-story" style="border-left:3px solid var(--accent-warm);"><strong>🧬 微进化：</strong>${this.escapeHtml(entry.microEvolution)}</div>` : ""}
                     ${mealLogDetails}
                     ${recoveryLogDetails}
                     ${workoutDetails}
@@ -7886,6 +7897,9 @@ input[type="checkbox"] {
           }
 
           sections.push("### 今天发生的事情", "", entry.dailyStory || "无", "");
+          if (entry.microEvolution) {
+            sections.push("### 🧬 每日微进化", "", entry.microEvolution, "");
+          }
           sections.push("---", "");
           return sections.join("\n");
         },
