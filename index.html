@@ -1602,6 +1602,139 @@
   transform: translateY(-1px);
 }
 
+/* 白马熔断按钮 · 特殊高亮 */
+.capture-pill.circuit-breaker {
+  background: linear-gradient(135deg, #1a1a2e, #16213e);
+  color: #d4a843;
+  border: 1.5px solid #d4a843;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+.capture-pill.circuit-breaker:hover {
+  background: linear-gradient(135deg, #16213e, #0f3460);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(212, 168, 67, 0.3);
+}
+
+/* 白马熔断全屏覆盖层 */
+.circuit-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(160deg, #0a0a1a 0%, #1a1a2e 40%, #16213e 100%);
+  color: #e8e0d0;
+  padding: 32px 24px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.35s ease;
+  overflow-y: auto;
+}
+.circuit-overlay.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+.circuit-overlay .co-shield {
+  font-size: 64px;
+  margin-bottom: 16px;
+  animation: shieldPulse 2s ease-in-out infinite;
+}
+@keyframes shieldPulse {
+  0%, 100% { transform: scale(1); opacity: 0.9; }
+  50% { transform: scale(1.08); opacity: 1; }
+}
+.circuit-overlay .co-title {
+  font-size: 26px;
+  font-weight: 800;
+  color: #d4a843;
+  text-align: center;
+  margin-bottom: 12px;
+  line-height: 1.4;
+}
+.circuit-overlay .co-message {
+  font-size: 18px;
+  text-align: center;
+  max-width: 480px;
+  line-height: 1.7;
+  margin-bottom: 24px;
+  color: #c8bfae;
+}
+.circuit-overlay .co-message strong {
+  color: #d4a843;
+}
+.circuit-overlay .co-trash-list {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.circuit-overlay .co-trash-tag {
+  background: rgba(196, 69, 54, 0.15);
+  border: 1px solid rgba(196, 69, 54, 0.4);
+  color: #777;
+  padding: 6px 16px;
+  border-radius: 999px;
+  font-size: 13px;
+  text-decoration: line-through;
+  letter-spacing: 0.05em;
+}
+.circuit-overlay .co-breathe {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 3px solid #d4a843;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: 700;
+  color: #d4a843;
+  font-family: var(--font-number);
+  margin-bottom: 12px;
+  animation: breatheRing 4s ease-in-out infinite;
+}
+@keyframes breatheRing {
+  0%, 100% { transform: scale(1); border-color: #d4a843; }
+  50% { transform: scale(1.1); border-color: #f0d080; }
+}
+.circuit-overlay .co-breathe-label {
+  font-size: 13px;
+  color: #888;
+  margin-bottom: 28px;
+}
+.circuit-overlay .co-redirect {
+  background: rgba(212, 168, 67, 0.12);
+  border: 1px solid rgba(212, 168, 67, 0.3);
+  border-radius: 16px;
+  padding: 16px 24px;
+  max-width: 420px;
+  text-align: center;
+  margin-bottom: 32px;
+  font-size: 15px;
+  color: #d4a843;
+  line-height: 1.6;
+}
+.circuit-overlay .co-dismiss {
+  padding: 14px 40px;
+  border-radius: 999px;
+  border: 2px solid #d4a843;
+  background: transparent;
+  color: #d4a843;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  letter-spacing: 0.05em;
+}
+.circuit-overlay .co-dismiss:hover {
+  background: #d4a843;
+  color: #0a0a1a;
+}
+
 .capture-panel-container {
   min-height: 20px;
 }
@@ -4736,6 +4869,7 @@ input[type="checkbox"] {
       <button class="capture-pill" type="button" data-event-type="training">💪 训练</button>
       <button class="capture-pill" type="button" data-event-type="reflection">🌙 复盘</button>
       <button class="capture-pill" type="button" data-event-type="mood">💭 心情</button>
+      <button class="capture-pill circuit-breaker" type="button" id="circuitBreakerBtn">🛡️ 白马熔断</button>
     </div>
 
     <div class="capture-panel-container" id="capturePanelContainer"></div>
@@ -10234,6 +10368,80 @@ input[type="checkbox"] {
       bindMilestoneEvents();
       bindPlateauEvents();
       renderPlateauCard();
+    })();
+  </script>
+
+  <!-- 白马熔断 · Circuit Breaker Overlay -->
+  <div class="circuit-overlay" id="circuitOverlay">
+    <div class="co-shield">🛡️</div>
+    <div class="co-title">白马熔断 · 马夫上线</div>
+    <div class="co-message">
+      白马的高能量（high-energy fuel）应该去<strong>锻造高质量的未来</strong>，<br>
+      而不是去<strong>烧垃圾</strong>。
+    </div>
+    <div class="co-trash-list">
+      <span class="co-trash-tag">垃圾A · 韩</span>
+      <span class="co-trash-tag">垃圾B · 吴</span>
+      <span class="co-trash-tag">垃圾C · 柳</span>
+    </div>
+    <div class="co-breathe" id="coBreatheTimer">12</div>
+    <div class="co-breathe-label">深呼吸 · Breathe（呼吸锚定）</div>
+    <div class="co-redirect">
+      「这股能量可以用在哪里？」<br>
+      ——立刻转向当前最重要的一件事。<br>
+      <strong>Case closed. No open loops.</strong>
+    </div>
+    <button class="co-dismiss" id="coDismissBtn" type="button">✅ 马夫已上线 · 带宽归零</button>
+  </div>
+
+  <script>
+    // 白马熔断 Circuit Breaker logic
+    (function() {
+      const overlay = document.getElementById('circuitOverlay');
+      const breatheEl = document.getElementById('coBreatheTimer');
+      const dismissBtn = document.getElementById('coDismissBtn');
+      const triggerBtn = document.getElementById('circuitBreakerBtn');
+      let breatheInterval = null;
+
+      function startBreathe() {
+        let count = 12;
+        breatheEl.textContent = count;
+        if (breatheInterval) clearInterval(breatheInterval);
+        breatheInterval = setInterval(() => {
+          count--;
+          breatheEl.textContent = count;
+          if (count <= 0) {
+            clearInterval(breatheInterval);
+            breatheInterval = null;
+            breatheEl.textContent = '✓';
+          }
+        }, 1000);
+      }
+
+      function openOverlay() {
+        overlay.classList.add('visible');
+        document.body.style.overflow = 'hidden';
+        startBreathe();
+      }
+
+      function closeOverlay() {
+        overlay.classList.remove('visible');
+        document.body.style.overflow = '';
+        if (breatheInterval) {
+          clearInterval(breatheInterval);
+          breatheInterval = null;
+        }
+      }
+
+      if (triggerBtn) triggerBtn.addEventListener('click', openOverlay);
+      if (dismissBtn) dismissBtn.addEventListener('click', closeOverlay);
+
+      // ESC 也可关闭
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && overlay.classList.contains('visible')) {
+          closeOverlay();
+        }
+      });
     })();
   </script>
 </body>
