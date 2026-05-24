@@ -5237,9 +5237,22 @@ input[type="checkbox"] {
         dataUpdatedValue: document.getElementById("dataUpdatedValue")
       };
 
+      const DAY_BOUNDARY_HOUR = 2; // 凌晨2点换日——早起者在5点看到的已经是新的一天
+
       const DateUtils = {
+        /** 返回"有效日期"：凌晨 0:00-1:59 仍算前一天 */
+        getEffectiveDate() {
+          const now = new Date();
+          if (now.getHours() < DAY_BOUNDARY_HOUR) {
+            const shifted = new Date(now);
+            shifted.setDate(shifted.getDate() - 1);
+            return shifted;
+          }
+          return now;
+        },
+
         getTodayISO() {
-          return this.dateToISO(new Date());
+          return this.dateToISO(this.getEffectiveDate());
         },
 
         getCurrentTimeString() {
@@ -8261,7 +8274,7 @@ input[type="checkbox"] {
         { min: 0,  tier: "D", name: "警告",       text: "警告——身体在扣分，明天必须调整" }
       ];
 
-      function todayISO() { return new Date().toISOString().slice(0, 10); }
+      function todayISO() { return DateUtils.getTodayISO(); }
 
       function loadAll() {
         try {
@@ -8341,11 +8354,11 @@ input[type="checkbox"] {
       // 周均分 + 连续 A+ 天数
       function getStats() {
         const all = loadAll();
-        const today = new Date();
+        const today = DateUtils.getEffectiveDate();
         const last7 = [];
         for (let i = 0; i < 7; i++) {
           const d = new Date(today); d.setDate(today.getDate() - i);
-          const iso = d.toISOString().slice(0, 10);
+          const iso = DateUtils.dateToISO(d);
           if (all[iso]) last7.push(computeScore(all[iso]).total);
         }
         const avg = last7.length ? last7.reduce((s, n) => s + n, 0) / last7.length : null;
@@ -8354,7 +8367,7 @@ input[type="checkbox"] {
         let streak = 0;
         for (let i = 0; i < 60; i++) {
           const d = new Date(today); d.setDate(today.getDate() - i);
-          const iso = d.toISOString().slice(0, 10);
+          const iso = DateUtils.dateToISO(d);
           if (!all[iso]) break;
           const score = computeScore(all[iso]).total;
           if (score >= 80) streak++; else break;
@@ -9313,7 +9326,7 @@ input[type="checkbox"] {
         });
       }
       function todayISO() {
-        return localISO(new Date());
+        return DateUtils.getTodayISO();
       }
       function fmtShortDate(iso) {
         const [, mm, dd] = iso.split("-");
