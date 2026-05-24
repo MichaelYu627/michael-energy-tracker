@@ -6073,6 +6073,10 @@ input[type="checkbox"] {
     return `
       <div class="capture-panel" data-panel-type="sleep">
         <h3>😴 记睡眠</h3>
+        <div style="text-align:center;padding:6px 12px 10px;font-size:13px;line-height:1.6;color:var(--muted);letter-spacing:0.02em;border-bottom:1px solid var(--line);margin-bottom:12px;">
+          <span style="font-style:italic;font-weight:600;color:var(--accent);">Win the morning, win the day.</span><br>
+          <span style="font-size:12.5px;">一日之计在于晨</span>
+        </div>
         <div class="field-row">
           <div class="field" style="flex:1;min-width:200px">
             <label>睡眠分 <strong id="sleepPanelScoreValue">${p.sleepScore ?? today.sleepScore ?? 80}</strong></label>
