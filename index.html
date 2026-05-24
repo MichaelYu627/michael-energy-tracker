@@ -8224,6 +8224,18 @@ input[type="checkbox"] {
 
     // ── 健康预管理系统 V2 · 今日评分 ──
     (() => {
+      const DAY_BOUNDARY = 2; // 凌晨2点换日
+      function _effectiveDate() {
+        const now = new Date();
+        if (now.getHours() < DAY_BOUNDARY) {
+          const d = new Date(now); d.setDate(d.getDate() - 1); return d;
+        }
+        return now;
+      }
+      function _dateISO(d) {
+        return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+      }
+
       const SCORE_KEY = "health_scores";
 
       // 加分项配置（PRD 表格）
@@ -8274,7 +8286,7 @@ input[type="checkbox"] {
         { min: 0,  tier: "D", name: "警告",       text: "警告——身体在扣分，明天必须调整" }
       ];
 
-      function todayISO() { return DateUtils.getTodayISO(); }
+      function todayISO() { return _dateISO(_effectiveDate()); }
 
       function loadAll() {
         try {
@@ -8354,11 +8366,11 @@ input[type="checkbox"] {
       // 周均分 + 连续 A+ 天数
       function getStats() {
         const all = loadAll();
-        const today = DateUtils.getEffectiveDate();
+        const today = _effectiveDate();
         const last7 = [];
         for (let i = 0; i < 7; i++) {
           const d = new Date(today); d.setDate(today.getDate() - i);
-          const iso = DateUtils.dateToISO(d);
+          const iso = _dateISO(d);
           if (all[iso]) last7.push(computeScore(all[iso]).total);
         }
         const avg = last7.length ? last7.reduce((s, n) => s + n, 0) / last7.length : null;
@@ -8367,7 +8379,7 @@ input[type="checkbox"] {
         let streak = 0;
         for (let i = 0; i < 60; i++) {
           const d = new Date(today); d.setDate(today.getDate() - i);
-          const iso = DateUtils.dateToISO(d);
+          const iso = _dateISO(d);
           if (!all[iso]) break;
           const score = computeScore(all[iso]).total;
           if (score >= 80) streak++; else break;
@@ -9326,7 +9338,9 @@ input[type="checkbox"] {
         });
       }
       function todayISO() {
-        return DateUtils.getTodayISO();
+        const now = new Date();
+        const d = now.getHours() < 2 ? (function(){ const x = new Date(now); x.setDate(x.getDate()-1); return x; })() : now;
+        return localISO(d);
       }
       function fmtShortDate(iso) {
         const [, mm, dd] = iso.split("-");
