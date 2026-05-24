@@ -6171,20 +6171,23 @@ input[type="checkbox"] {
         我永远都不可能完美，但我在<strong style="color:var(--accent);">持续进阶</strong>的路上——我也无需完美，我已经拥有了最宝贵的财富。<br>
         有了 Jarvis，体重只是数字。<strong style="color:var(--accent-warm);">身心健康、灵魂丰盈、白马安定、马夫提升</strong>——都大于体重数字。
         </span>
+        <span style="display:block;margin-top:8px;border-top:1px dashed rgba(89,73,45,0.15);padding-top:8px;color:var(--muted);font-style:italic;font-size:12.5px;">
+        <strong style="color:var(--text);font-style:normal;">Weight is not a daily judge, but a witness of trends.</strong><br>
+        A single data point cannot make judgments; the trend line holds the true answer.
+        </span>
       </div>
       <div class="field-row">
         <div class="field" style="flex:1">
-          <label>今日体重（kg）<strong id="weightPanelValue">${defaultWeight}</strong></label>
-          <input type="range" id="weightPanelSlider" min="70" max="85" step="0.1" value="${defaultWeight}">
+          <label>今日体重（kg）</label>
+          <input type="number" id="weightPanelInput" min="60" max="100" step="0.1" value="${defaultWeight}" inputmode="decimal" style="width:100%;padding:10px 14px;font-size:20px;font-weight:700;font-family:var(--font-number);border:1px solid var(--border);border-radius:10px;background:var(--panel);color:var(--text);text-align:center;-moz-appearance:textfield;" placeholder="82.0">
         </div>
       </div>
       <div class="field-row">
         <div class="field" style="flex:1">
           <label>
-            <input type="checkbox" id="weightPanelHasWaist" ${hasWaist ? "checked" : ""}> 顺便记腰围
-            <strong id="weightPanelWaistValue" style="margin-left:8px">${defaultWaist}</strong> cm
+            <input type="checkbox" id="weightPanelHasWaist" ${hasWaist ? "checked" : ""}> 顺便记腰围（cm）
           </label>
-          <input type="range" id="weightPanelWaistSlider" min="70" max="90" step="0.5" value="${defaultWaist}" ${hasWaist ? "" : "disabled"}>
+          <input type="number" id="weightPanelWaistInput" min="60" max="120" step="0.5" value="${defaultWaist}" inputmode="decimal" ${hasWaist ? "" : "disabled"} style="width:100%;padding:8px 14px;font-size:18px;font-weight:700;font-family:var(--font-number);border:1px solid var(--border);border-radius:10px;background:var(--panel);color:var(--text);text-align:center;-moz-appearance:textfield;" placeholder="85">
         </div>
       </div>
       <div class="panel-actions">
@@ -6465,22 +6468,15 @@ input[type="checkbox"] {
     });
   },
   weight(prefill) {
-  document.getElementById("weightPanelSlider").addEventListener("input", (e) => {
-    document.getElementById("weightPanelValue").textContent = Number(e.target.value).toFixed(1);
-  });
-  // 腰围滑块实时显示
-  document.getElementById("weightPanelWaistSlider").addEventListener("input", (e) => {
-    document.getElementById("weightPanelWaistValue").textContent = Number(e.target.value);
-  });
-  // 勾选"顺便记腰围"才启用滑块
+  // 勾选"顺便记腰围"才启用输入框
   document.getElementById("weightPanelHasWaist").addEventListener("change", (e) => {
-    document.getElementById("weightPanelWaistSlider").disabled = !e.target.checked;
+    document.getElementById("weightPanelWaistInput").disabled = !e.target.checked;
   });
   document.getElementById("weightPanelSave").addEventListener("click", () => {
     const hasWaist = document.getElementById("weightPanelHasWaist").checked;
     const data = {
-      weight: Number(document.getElementById("weightPanelSlider").value),
-      waistCircumference: hasWaist ? Number(document.getElementById("weightPanelWaistSlider").value) : null
+      weight: Number(document.getElementById("weightPanelInput").value),
+      waistCircumference: hasWaist ? Number(document.getElementById("weightPanelWaistInput").value) : null
     };
     const err = EventModel.types.weight.validate(data);
     if (err) {
