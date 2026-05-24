@@ -1602,7 +1602,7 @@
   transform: translateY(-1px);
 }
 
-/* 白马熔断按钮（已移至右下角浮动按钮，capture-bar 内已移除）*/
+/* 白马校准按钮（已移至右下角浮动按钮，capture-bar 内已移除）*/
 /* .capture-pill.circuit-breaker 保留占位避免样式错误 */
 .capture-pill.circuit-breaker {
   background: linear-gradient(135deg, #1a1a2e, #16213e);
@@ -2527,7 +2527,7 @@ input[type="checkbox"] {
 }
 
 /* ============================================
-   🛡️ 白马熔断机制
+   🛡️ 白马校准系统
    ============================================ */
 
 /* 浮动盾牌按钮 */
@@ -2556,7 +2556,7 @@ input[type="checkbox"] {
   transform: translateY(0) scale(0.98);
 }
 
-/* 全屏熔断模态 */
+/* 全屏校准模态 */
 .circuit-breaker-modal {
   position: fixed;
   inset: 0;
@@ -5046,8 +5046,8 @@ input[type="checkbox"] {
     </section>
   </div>
 
-  <!-- ═══════════ 🛡️ 白马熔断机制 ═══════════ -->
-  <button class="circuit-breaker-btn" id="circuitBreakerBtn" type="button" aria-label="马夫上线 · 熔断冷静">🛡️</button>
+  <!-- ═══════════ 🛡️ 白马校准系统 ═══════════ -->
+  <button class="circuit-breaker-btn" id="circuitBreakerBtn" type="button" aria-label="马夫上线 · 白马校准">🛡️</button>
 
   <div class="circuit-breaker-modal" id="circuitBreakerModal" hidden>
     <!-- 阶段 1：呼吸锚定 -->
@@ -5124,7 +5124,7 @@ input[type="checkbox"] {
         <strong>不要用一个冲动的决定，把它们推倒。</strong>
       </div>
 
-      <!-- 效果反馈：让 Michael 给这次熔断打分，数据将沉淀为未来洞察 -->
+      <!-- 效果反馈：让 Michael 给这次校准打分，数据将沉淀为未来洞察 -->
       <div class="cb-effectiveness">
         <div class="cb-effectiveness-label">调用后，你感觉如何？<span class="cb-eff-hint">（可选，会沉淀为效果数据）</span></div>
         <div class="cb-effectiveness-options" id="cbEffectivenessOptions">
@@ -9626,7 +9626,7 @@ input[type="checkbox"] {
       init();
     })();
 
-    // ── 🛡️ 白马熔断机制 ──
+    // ── 🛡️ 白马校准系统 ──
     (() => {
       const CIRCUIT_KEY = "circuit_breaker_logs";
       const ACHIEVE_KEY = "achievements";
