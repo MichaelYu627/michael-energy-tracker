@@ -1602,7 +1602,8 @@
   transform: translateY(-1px);
 }
 
-/* 白马熔断按钮 · 特殊高亮 */
+/* 白马熔断按钮（已移至右下角浮动按钮，capture-bar 内已移除）*/
+/* .capture-pill.circuit-breaker 保留占位避免样式错误 */
 .capture-pill.circuit-breaker {
   background: linear-gradient(135deg, #1a1a2e, #16213e);
   color: #d4a843;
@@ -1616,124 +1617,7 @@
   box-shadow: 0 4px 16px rgba(212, 168, 67, 0.3);
 }
 
-/* 白马熔断全屏覆盖层 */
-.circuit-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 9999;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(160deg, #0a0a1a 0%, #1a1a2e 40%, #16213e 100%);
-  color: #e8e0d0;
-  padding: 32px 24px;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.35s ease;
-  overflow-y: auto;
-}
-.circuit-overlay.visible {
-  opacity: 1;
-  pointer-events: auto;
-}
-.circuit-overlay .co-shield {
-  font-size: 64px;
-  margin-bottom: 16px;
-  animation: shieldPulse 2s ease-in-out infinite;
-}
-@keyframes shieldPulse {
-  0%, 100% { transform: scale(1); opacity: 0.9; }
-  50% { transform: scale(1.08); opacity: 1; }
-}
-.circuit-overlay .co-title {
-  font-size: 26px;
-  font-weight: 800;
-  color: #d4a843;
-  text-align: center;
-  margin-bottom: 12px;
-  line-height: 1.4;
-}
-.circuit-overlay .co-message {
-  font-size: 18px;
-  text-align: center;
-  max-width: 480px;
-  line-height: 1.7;
-  margin-bottom: 24px;
-  color: #c8bfae;
-}
-.circuit-overlay .co-message strong {
-  color: #d4a843;
-}
-.circuit-overlay .co-trash-list {
-  display: flex;
-  gap: 12px;
-  margin-bottom: 28px;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-.circuit-overlay .co-trash-tag {
-  background: rgba(196, 69, 54, 0.15);
-  border: 1px solid rgba(196, 69, 54, 0.4);
-  color: #777;
-  padding: 6px 16px;
-  border-radius: 999px;
-  font-size: 13px;
-  text-decoration: line-through;
-  letter-spacing: 0.05em;
-}
-.circuit-overlay .co-breathe {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  border: 3px solid #d4a843;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 24px;
-  font-weight: 700;
-  color: #d4a843;
-  font-family: var(--font-number);
-  margin-bottom: 12px;
-  animation: breatheRing 4s ease-in-out infinite;
-}
-@keyframes breatheRing {
-  0%, 100% { transform: scale(1); border-color: #d4a843; }
-  50% { transform: scale(1.1); border-color: #f0d080; }
-}
-.circuit-overlay .co-breathe-label {
-  font-size: 13px;
-  color: #888;
-  margin-bottom: 28px;
-}
-.circuit-overlay .co-redirect {
-  background: rgba(212, 168, 67, 0.12);
-  border: 1px solid rgba(212, 168, 67, 0.3);
-  border-radius: 16px;
-  padding: 16px 24px;
-  max-width: 420px;
-  text-align: center;
-  margin-bottom: 32px;
-  font-size: 15px;
-  color: #d4a843;
-  line-height: 1.6;
-}
-.circuit-overlay .co-dismiss {
-  padding: 14px 40px;
-  border-radius: 999px;
-  border: 2px solid #d4a843;
-  background: transparent;
-  color: #d4a843;
-  font-size: 16px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  letter-spacing: 0.05em;
-}
-.circuit-overlay .co-dismiss:hover {
-  background: #d4a843;
-  color: #0a0a1a;
-}
+/* 旧版覆盖层已移除，统一使用 .circuit-breaker-modal */
 
 .capture-panel-container {
   min-height: 20px;
@@ -2713,52 +2597,123 @@ input[type="checkbox"] {
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* 阶段 1：呼吸 */
+/* 阶段 1：呼吸 · 升级版 */
+.cb-breath-wrap {
+  position: relative;
+  width: 220px;
+  height: 220px;
+  margin-bottom: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 .cb-breath-circle {
-  width: 180px;
-  height: 180px;
+  width: 160px;
+  height: 160px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(78,158,255,0.25) 0%, rgba(78,158,255,0.05) 70%, transparent 100%);
-  border: 2px solid rgba(78,158,255,0.4);
-  margin-bottom: 36px;
-  transition: transform 4s cubic-bezier(0.4, 0, 0.2, 1), background 0.8s, border-color 0.8s;
+  background: radial-gradient(circle, rgba(78,158,255,0.2) 0%, rgba(78,158,255,0.04) 60%, transparent 100%);
+  border: 2px solid rgba(78,158,255,0.35);
+  transition: transform 4s cubic-bezier(0.4, 0, 0.2, 1), background 1s, border-color 1s, box-shadow 1s;
+  transform: scale(0.55);
+  box-shadow: 0 0 30px rgba(78,158,255,0.05);
+  position: relative;
+  z-index: 2;
+}
+/* 外圈光环 */
+.cb-breath-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1px solid rgba(78,158,255,0.15);
+  transition: transform 4s cubic-bezier(0.4, 0, 0.2, 1), border-color 1s, opacity 1s;
   transform: scale(0.6);
+  opacity: 0.4;
+  z-index: 1;
+}
+/* 内圈倒计时数字（居中在圆内） */
+.cb-breath-inner-count {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 42px;
+  font-weight: 200;
+  color: rgba(255,255,255,0.25);
+  font-family: var(--font-number);
+  z-index: 3;
+  pointer-events: none;
+  transition: color 1s;
 }
 .cb-breath-circle.inhale {
   transform: scale(1);
-  background: radial-gradient(circle, rgba(78,158,255,0.4) 0%, rgba(78,158,255,0.1) 70%, transparent 100%);
-  border-color: rgba(78,158,255,0.7);
+  background: radial-gradient(circle, rgba(78,158,255,0.35) 0%, rgba(78,158,255,0.08) 60%, transparent 100%);
+  border-color: rgba(78,158,255,0.65);
+  box-shadow: 0 0 60px rgba(78,158,255,0.15), 0 0 120px rgba(78,158,255,0.05);
 }
+.cb-breath-circle.inhale ~ .cb-breath-ring {
+  transform: scale(1.15);
+  border-color: rgba(78,158,255,0.3);
+  opacity: 0.7;
+}
+.cb-breath-circle.inhale ~ .cb-breath-inner-count { color: rgba(78,158,255,0.5); }
 .cb-breath-circle.hold {
   transform: scale(1);
-  background: radial-gradient(circle, rgba(255,213,122,0.35) 0%, rgba(255,213,122,0.08) 70%, transparent 100%);
-  border-color: rgba(255,213,122,0.6);
+  background: radial-gradient(circle, rgba(255,213,122,0.3) 0%, rgba(255,213,122,0.06) 60%, transparent 100%);
+  border-color: rgba(255,213,122,0.55);
+  box-shadow: 0 0 60px rgba(255,213,122,0.12), 0 0 120px rgba(255,213,122,0.04);
 }
+.cb-breath-circle.hold ~ .cb-breath-ring {
+  transform: scale(1.15);
+  border-color: rgba(255,213,122,0.3);
+  opacity: 0.6;
+}
+.cb-breath-circle.hold ~ .cb-breath-inner-count { color: rgba(255,213,122,0.45); }
 .cb-breath-circle.exhale {
-  transform: scale(0.6);
-  background: radial-gradient(circle, rgba(78,158,255,0.2) 0%, rgba(78,158,255,0.04) 70%, transparent 100%);
-  border-color: rgba(78,158,255,0.3);
+  transform: scale(0.55);
+  background: radial-gradient(circle, rgba(78,158,255,0.15) 0%, rgba(78,158,255,0.03) 60%, transparent 100%);
+  border-color: rgba(78,158,255,0.25);
+  box-shadow: 0 0 20px rgba(78,158,255,0.03);
 }
+.cb-breath-circle.exhale ~ .cb-breath-ring {
+  transform: scale(0.65);
+  border-color: rgba(78,158,255,0.1);
+  opacity: 0.3;
+}
+.cb-breath-circle.exhale ~ .cb-breath-inner-count { color: rgba(255,255,255,0.18); }
 .cb-breath-text {
-  font-size: 32px;
+  font-size: 28px;
   font-weight: 300;
-  letter-spacing: 0.2em;
-  color: rgba(255,255,255,0.92);
-  margin-bottom: 16px;
-  transition: opacity 0.5s;
-  min-height: 40px;
+  letter-spacing: 0.25em;
+  color: rgba(255,255,255,0.88);
+  margin-bottom: 12px;
+  transition: opacity 0.5s, color 0.8s;
+  min-height: 36px;
 }
 .cb-breath-hint {
-  font-size: 14px;
-  color: rgba(255,255,255,0.5);
-  letter-spacing: 0.1em;
-  margin-bottom: 24px;
+  font-size: 13px;
+  color: rgba(255,255,255,0.4);
+  letter-spacing: 0.12em;
+  margin-bottom: 20px;
 }
 .cb-breath-counter {
-  font-size: 13px;
-  color: rgba(255,255,255,0.35);
+  font-size: 12px;
+  color: rgba(255,255,255,0.28);
   font-family: var(--font-number);
 }
+/* 完成后的圆圈 */
+.cb-breath-circle.done {
+  transform: scale(0.8);
+  background: radial-gradient(circle, rgba(78,255,140,0.25) 0%, rgba(78,255,140,0.04) 60%, transparent 100%);
+  border-color: rgba(78,255,140,0.5);
+  box-shadow: 0 0 50px rgba(78,255,140,0.1);
+}
+.cb-breath-circle.done ~ .cb-breath-ring {
+  transform: scale(0.95);
+  border-color: rgba(78,255,140,0.25);
+  opacity: 0.5;
+}
+.cb-breath-circle.done ~ .cb-breath-inner-count { color: rgba(78,255,140,0.5); font-size: 36px; }
 
 /* 阶段 2：问题 */
 .cb-question {
@@ -2907,6 +2862,23 @@ input[type="checkbox"] {
   color: #fff;
   font-family: var(--font-number);
   font-weight: 700;
+}
+.cb-achievement-block .ach-deals-label {
+  font-size: 11px;
+  color: rgba(255,213,122,0.7);
+  letter-spacing: 0.1em;
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+.cb-achievement-block .ach-deal-row {
+  font-size: 12px;
+  color: rgba(255,255,255,0.65);
+  line-height: 1.7;
+}
+.cb-achievement-block .ach-deal-row strong {
+  color: rgba(78,255,140,0.85);
+  font-size: 12px;
 }
 .cb-anchors {
   width: 100%;
@@ -4869,7 +4841,6 @@ input[type="checkbox"] {
       <button class="capture-pill" type="button" data-event-type="training">💪 训练</button>
       <button class="capture-pill" type="button" data-event-type="reflection">🌙 复盘</button>
       <button class="capture-pill" type="button" data-event-type="mood">💭 心情</button>
-      <button class="capture-pill circuit-breaker" type="button" id="circuitBreakerBtn">🛡️ 白马熔断</button>
     </div>
 
     <div class="capture-panel-container" id="capturePanelContainer"></div>
@@ -5081,10 +5052,14 @@ input[type="checkbox"] {
   <div class="circuit-breaker-modal" id="circuitBreakerModal" hidden>
     <!-- 阶段 1：呼吸锚定 -->
     <div class="cb-stage" data-stage="1" id="cbStage1">
-      <div class="cb-breath-circle" id="cbBreathCircle"></div>
+      <div class="cb-breath-wrap">
+        <div class="cb-breath-circle" id="cbBreathCircle"></div>
+        <div class="cb-breath-ring"></div>
+        <div class="cb-breath-inner-count" id="cbBreathInnerCount">12</div>
+      </div>
       <div class="cb-breath-text" id="cbBreathText">准备</div>
-      <div class="cb-breath-hint">跟着呼吸。什么都不用想。</div>
-      <div class="cb-breath-counter" id="cbBreathCounter">12 秒</div>
+      <div class="cb-breath-hint">跟着圆圈呼吸。什么都不用想。</div>
+      <div class="cb-breath-counter" id="cbBreathCounter">4 · 4 · 4 呼吸法</div>
     </div>
 
     <!-- 阶段 2：马夫三问 -->
@@ -9721,6 +9696,29 @@ input[type="checkbox"] {
         return Math.max(0, Math.min(100, total));
       }
 
+      // 从觅应看板拉实时业务数据
+      function getMiyingLiveData() {
+        const result = { totalRevenue: 0, monthlyIncome: 0, dealCount: 0, recentDeals: [] };
+        try {
+          const raw = localStorage.getItem("michael-miying-dashboard-v1");
+          if (!raw) return result;
+          const state = JSON.parse(raw);
+          if (state.metrics) {
+            result.totalRevenue = state.metrics.totalRevenue || 0;
+            result.monthlyIncome = state.metrics.monthlyIncome || 0;
+          }
+          if (Array.isArray(state.deals)) {
+            result.dealCount = state.deals.length;
+            // 最近5笔成交
+            result.recentDeals = state.deals
+              .slice()
+              .sort((a, b) => (b.date || "").localeCompare(a.date || ""))
+              .slice(0, 5);
+          }
+        } catch (err) {}
+        return result;
+      }
+
       // 从已有 localStorage 拉动态成就
       function getDynamicStats() {
         const stats = {};
@@ -9800,13 +9798,25 @@ input[type="checkbox"] {
           <div class="ach-row"><span>同龄水平</span><strong>前 1%</strong></div>
         </div>`);
 
-        // 💰 事业
-        html.push(`<div class="cb-achievement-block"><h3>💰 事业</h3>
-          <div class="ach-row"><span>觅应累计成交</span><strong>¥${fmtNumber(ach.total_revenue)}+</strong></div>
-          <div class="ach-row"><span>系统月收入</span><strong>~¥${fmtNumber(ach.monthly_system_income)}</strong></div>
-          <div class="ach-row"><span>AI 五系统</span><strong>已协同上线</strong></div>
-          <div class="ach-row"><span>行业积累</span><strong>${ach.years_in_industry} 年</strong></div>
-        </div>`);
+        // 💰 事业（实时从觅应看板拉数据）
+        const miying = getMiyingLiveData();
+        const liveRevenue = miying.totalRevenue || ach.total_revenue;
+        const liveMonthly = miying.monthlyIncome || ach.monthly_system_income;
+        const bizRows = [];
+        bizRows.push(`<div class="ach-row"><span>觅应累计成交</span><strong>¥${fmtNumber(liveRevenue)}+</strong></div>`);
+        bizRows.push(`<div class="ach-row"><span>系统月收入</span><strong>~¥${fmtNumber(liveMonthly)}</strong></div>`);
+        if (miying.dealCount) bizRows.push(`<div class="ach-row"><span>成交笔数</span><strong>${miying.dealCount} 笔</strong></div>`);
+        bizRows.push(`<div class="ach-row"><span>AI 五系统</span><strong>已协同上线</strong></div>`);
+        bizRows.push(`<div class="ach-row"><span>行业积累</span><strong>${ach.years_in_industry} 年</strong></div>`);
+        // 最近成交明细
+        if (miying.recentDeals.length) {
+          bizRows.push(`<div class="ach-deals-label">近期成交</div>`);
+          miying.recentDeals.forEach(d => {
+            const dateStr = d.date ? d.date.replace(/^\d{4}-/, "") : "";
+            bizRows.push(`<div class="ach-row ach-deal-row"><span>${dateStr} · ${d.source || ""}</span><strong>¥${fmtNumber(d.amount || 0)}</strong></div>`);
+          });
+        }
+        html.push(`<div class="cb-achievement-block"><h3>💰 事业</h3>${bizRows.join("")}</div>`);
 
         // 🧠 认知
         const cogRows = [];
@@ -9839,24 +9849,29 @@ input[type="checkbox"] {
         const circle = document.getElementById("cbBreathCircle");
         const text = document.getElementById("cbBreathText");
         const counter = document.getElementById("cbBreathCounter");
+        const innerCount = document.getElementById("cbBreathInnerCount");
         clearBreathTimers();
         const setPhase = (label, cls) => {
-          circle.classList.remove("inhale", "hold", "exhale");
+          circle.classList.remove("inhale", "hold", "exhale", "done");
           if (cls) circle.classList.add(cls);
           text.textContent = label;
         };
-        // 12 秒倒计时数字
+        // 12 秒倒计时 — 圆圈内显示大数字
         for (let s = 12; s >= 0; s--) {
           breathTimers.push(setTimeout(() => {
-            counter.textContent = `${s} 秒`;
+            innerCount.textContent = s || "✓";
+            // 底部显示当前阶段的 4 秒进度
+            const phase = s > 8 ? "吸气" : s > 4 ? "屏气" : "呼气";
+            const phaseRemain = s > 8 ? s - 8 : s > 4 ? s - 4 : s;
+            counter.textContent = s > 0 ? `${phase} · ${phaseRemain}s` : "完成";
           }, (12 - s) * 1000));
         }
-        // 0s 开始吸气，4s 屏气，8s 呼气，12s 结束
-        setPhase("吸气", "inhale");
-        breathTimers.push(setTimeout(() => setPhase("屏气", "hold"), 4000));
-        breathTimers.push(setTimeout(() => setPhase("呼气", "exhale"), 8000));
+        // 0s 吸气，4s 屏气，8s 呼气，12s 完成
+        setPhase("吸 气", "inhale");
+        breathTimers.push(setTimeout(() => setPhase("屏 气", "hold"), 4000));
+        breathTimers.push(setTimeout(() => setPhase("呼 气", "exhale"), 8000));
         breathTimers.push(setTimeout(() => {
-          setPhase("好", "");
+          setPhase("✓", "done");
           breathTimers.push(setTimeout(onDone, 800));
         }, 12000));
       }
@@ -10403,87 +10418,5 @@ input[type="checkbox"] {
     })();
   </script>
 
-  <!-- 白马熔断 · Circuit Breaker Overlay -->
-  <div class="circuit-overlay" id="circuitOverlay">
-    <div class="co-shield">🛡️</div>
-    <div class="co-title">白马熔断 · 马夫上线</div>
-    <div class="co-message">
-      白马的高能量（high-energy fuel）应该去<strong>锻造高质量的未来</strong>，<br>
-      而不是去<strong>烧垃圾</strong>。
-    </div>
-    <div class="co-trash-list">
-      <span class="co-trash-tag">垃圾 A</span>
-      <span class="co-trash-tag">垃圾 B</span>
-      <span class="co-trash-tag">垃圾 C</span>
-    </div>
-    <div class="co-breathe" id="coBreatheTimer">12</div>
-    <div class="co-breathe-label">深呼吸 · Breathe（呼吸锚定）</div>
-    <div class="co-message" style="font-size:15px; margin-bottom:16px; max-width:440px;">
-      这些都是系统漏洞的<strong>升级成本</strong>，不参与未来巨大的<strong>分红收益</strong>！<br>
-      感谢白马保护了我们，同时马夫会以<strong>更高维度</strong>的方式来碾压他们！<br>
-      人生宝贵，注意力极其珍贵，<strong>「三位一体」</strong>地去享受生命带来的馈赠！
-    </div>
-    <div class="co-redirect" style="background:rgba(31,122,92,0.12); border-color:rgba(31,122,92,0.3); color:#2d8f4e;">
-      💪 白马要烧垃圾？不如原地做 <strong style="font-size:22px;">30个俯卧撑</strong>！<br>
-      做完你就知道——你的白马有多强，那些垃圾有多不配。
-    </div>
-    <div class="co-redirect">
-      「这股能量可以用在哪里？」<br>
-      ——立刻转向当前最重要的一件事。<br>
-      <strong>Case closed. No open loops.</strong>
-    </div>
-    <button class="co-dismiss" id="coDismissBtn" type="button">✅ 马夫已上线 · 带宽归零</button>
-  </div>
-
-  <script>
-    // 白马熔断 Circuit Breaker logic
-    (function() {
-      const overlay = document.getElementById('circuitOverlay');
-      const breatheEl = document.getElementById('coBreatheTimer');
-      const dismissBtn = document.getElementById('coDismissBtn');
-      const triggerBtn = document.getElementById('circuitBreakerBtn');
-      let breatheInterval = null;
-
-      function startBreathe() {
-        let count = 12;
-        breatheEl.textContent = count;
-        if (breatheInterval) clearInterval(breatheInterval);
-        breatheInterval = setInterval(() => {
-          count--;
-          breatheEl.textContent = count;
-          if (count <= 0) {
-            clearInterval(breatheInterval);
-            breatheInterval = null;
-            breatheEl.textContent = '✓';
-          }
-        }, 1000);
-      }
-
-      function openOverlay() {
-        overlay.classList.add('visible');
-        document.body.style.overflow = 'hidden';
-        startBreathe();
-      }
-
-      function closeOverlay() {
-        overlay.classList.remove('visible');
-        document.body.style.overflow = '';
-        if (breatheInterval) {
-          clearInterval(breatheInterval);
-          breatheInterval = null;
-        }
-      }
-
-      if (triggerBtn) triggerBtn.addEventListener('click', openOverlay);
-      if (dismissBtn) dismissBtn.addEventListener('click', closeOverlay);
-
-      // ESC 也可关闭
-      document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && overlay.classList.contains('visible')) {
-          closeOverlay();
-        }
-      });
-    })();
-  </script>
 </body>
 </html>
