@@ -118,6 +118,51 @@
       letter-spacing: 0.06em;
     }
 
+    /* 四维根字诀 */
+    .xu-four-dims {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-top: 18px;
+      padding: 14px 12px;
+      border-radius: var(--radius-sm);
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .xu-dim {
+      text-align: center;
+      padding: 8px 4px;
+      border-radius: 10px;
+      transition: background 0.2s;
+    }
+    .xu-dim:hover {
+      background: rgba(255, 255, 255, 0.06);
+    }
+    .xu-dim-char {
+      font-size: 22px;
+      font-weight: 700;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+    .xu-dim:nth-child(1) .xu-dim-char { color: #47f4ff; }
+    .xu-dim:nth-child(2) .xu-dim-char { color: #7be495; }
+    .xu-dim:nth-child(3) .xu-dim-char { color: #ffc45b; }
+    .xu-dim:nth-child(4) .xu-dim-char { color: #ff8a8a; }
+    .xu-dim-line1 {
+      font-size: 12px;
+      color: rgba(232, 251, 255, 0.9);
+      font-weight: 600;
+      letter-spacing: 0.04em;
+    }
+    .xu-dim-line2 {
+      font-size: 11px;
+      color: rgba(232, 251, 255, 0.55);
+      margin-top: 2px;
+    }
+    @media (max-width: 480px) {
+      .xu-four-dims { grid-template-columns: repeat(2, 1fr); gap: 6px; }
+    }
+
     .hero-grid {
       position: relative;
       z-index: 1;
@@ -2530,6 +2575,176 @@ input[type="checkbox"] {
    🛡️ 白马校准系统
    ============================================ */
 
+/* 虚字浮动按钮 */
+.xu-guard-btn {
+  position: fixed;
+  left: 18px;
+  bottom: 18px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #5a1a1a, #2d0a0a) !important;
+  color: #ff8a8a !important;
+  border: 2px solid rgba(255,138,138,0.25) !important;
+  font-size: 24px !important;
+  font-weight: 800 !important;
+  padding: 0 !important;
+  cursor: pointer;
+  z-index: 9000;
+  box-shadow: 0 6px 20px rgba(90,26,26,0.5);
+  transition: transform 0.2s, box-shadow 0.2s;
+  font-family: var(--font-main);
+}
+.xu-guard-btn:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 8px 26px rgba(90,26,26,0.7);
+}
+.xu-guard-btn:active {
+  transform: translateY(0) scale(0.98);
+}
+.xu-guard-btn .xu-pulse {
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,138,138,0.3);
+  animation: xuPulse 2.5s ease-in-out infinite;
+}
+@keyframes xuPulse {
+  0%, 100% { opacity: 0.3; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.12); }
+}
+
+/* 虚协议模态 */
+.xu-guard-modal {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(ellipse at center, #1a0808 0%, #0a0303 100%);
+  z-index: 9999;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  color: #e8d4d4;
+  font-family: var(--font-main);
+}
+.xu-guard-inner {
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 40px 20px 60px;
+}
+.xu-guard-header {
+  text-align: center;
+  margin-bottom: 28px;
+}
+.xu-guard-header .xu-big-char {
+  font-size: 72px;
+  font-weight: 800;
+  color: #ff8a8a;
+  line-height: 1;
+  text-shadow: 0 0 40px rgba(255,138,138,0.3);
+}
+.xu-guard-header .xu-subtitle {
+  font-size: 14px;
+  color: rgba(232,212,212,0.6);
+  margin-top: 8px;
+  letter-spacing: 0.08em;
+}
+.xu-guard-section {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,138,138,0.12);
+  border-radius: 16px;
+  padding: 18px;
+  margin-bottom: 16px;
+}
+.xu-guard-section h3 {
+  margin: 0 0 12px;
+  font-size: 15px;
+  color: #ff8a8a;
+}
+.xu-guard-section .xu-signal {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 8px 0;
+  font-size: 13.5px;
+  line-height: 1.5;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+.xu-guard-section .xu-signal:last-child { border-bottom: none; }
+.xu-guard-section .xu-signal-icon {
+  flex-shrink: 0;
+  width: 20px;
+  text-align: center;
+  font-size: 14px;
+}
+.xu-guard-question {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 0;
+  font-size: 13.5px;
+  line-height: 1.6;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+.xu-guard-question:last-child { border-bottom: none; }
+.xu-guard-question .xu-q-num {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(255,138,138,0.15);
+  color: #ff8a8a;
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.xu-guard-verdict {
+  text-align: center;
+  padding: 16px;
+  margin-top: 4px;
+  background: rgba(255,138,138,0.08);
+  border-radius: 12px;
+  font-size: 13px;
+  color: rgba(232,212,212,0.8);
+  line-height: 1.6;
+}
+.xu-guard-verdict strong {
+  color: #ff8a8a;
+}
+.xu-guard-quote {
+  text-align: center;
+  font-style: italic;
+  font-size: 13px;
+  color: rgba(232,212,212,0.5);
+  padding: 14px 12px;
+  line-height: 1.7;
+}
+.xu-guard-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+.xu-guard-actions button {
+  flex: 1;
+  padding: 14px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: transform 0.15s;
+}
+.xu-guard-actions button:active { transform: scale(0.97); }
+.xu-guard-close-btn {
+  background: rgba(255,255,255,0.08) !important;
+  color: rgba(232,212,212,0.8) !important;
+}
+.xu-guard-anchor-btn {
+  background: linear-gradient(135deg, rgba(255,138,138,0.2), rgba(255,138,138,0.08)) !important;
+  color: #ff8a8a !important;
+  border: 1px solid rgba(255,138,138,0.2) !important;
+}
+
 /* 浮动盾牌按钮 */
 .circuit-breaker-btn {
   position: fixed;
@@ -4356,6 +4571,28 @@ input[type="checkbox"] {
               <span>每天多稳 1%，最后改变的不是某一天，而是你整个人生的能量轨迹。</span>
             </div>
           </div>
+          <div class="xu-four-dims">
+            <div class="xu-dim">
+              <div class="xu-dim-char">蓄</div>
+              <div class="xu-dim-line1">蓄而不散</div>
+              <div class="xu-dim-line2">蓄以固本</div>
+            </div>
+            <div class="xu-dim">
+              <div class="xu-dim-char">续</div>
+              <div class="xu-dim-line1">续而不断</div>
+              <div class="xu-dim-line2">续以生长</div>
+            </div>
+            <div class="xu-dim">
+              <div class="xu-dim-char">旭</div>
+              <div class="xu-dim-line1">旭而不急</div>
+              <div class="xu-dim-line2">旭以向上</div>
+            </div>
+            <div class="xu-dim">
+              <div class="xu-dim-char">虚</div>
+              <div class="xu-dim-line1">虚而不满</div>
+              <div class="xu-dim-line2">虚以防狂</div>
+            </div>
+          </div>
         </div>
         <div class="hero-visual">
           <div class="battery-constellation" aria-hidden="true">
@@ -5044,6 +5281,53 @@ input[type="checkbox"] {
         </details>
       </div>
     </section>
+  </div>
+
+  <!-- ═══════════ 虚 · 防过热按钮 ═══════════ -->
+  <button class="xu-guard-btn" id="xuGuardBtn" type="button" aria-label="虚 · 防过热协议">虚<span class="xu-pulse"></span></button>
+
+  <div class="xu-guard-modal" id="xuGuardModal" hidden>
+    <div class="xu-guard-inner">
+      <div class="xu-guard-header">
+        <div class="xu-big-char">虚</div>
+        <div class="xu-subtitle">虚而不满 · 虚以防狂 — 好状态不是拿来挥霍的</div>
+      </div>
+
+      <div class="xu-guard-section">
+        <h3>⚠️ 顺境触发信号</h3>
+        <div class="xu-signal"><span class="xu-signal-icon">📈</span><span>连续两个月收入超过预期</span></div>
+        <div class="xu-signal"><span class="xu-signal-icon">👏</span><span>有人开始主动赞美我的眼光和决策</span></div>
+        <div class="xu-signal"><span class="xu-signal-icon">⏳</span><span>我开始觉得"这次机会错过太可惜了"</span></div>
+        <div class="xu-signal"><span class="xu-signal-icon">🚀</span><span>我开始考虑扩张、增加新项目</span></div>
+      </div>
+
+      <div class="xu-guard-section">
+        <h3>🔍 虚的四问检查</h3>
+        <div class="xu-guard-question"><span class="xu-q-num">1</span><span>我是不是因为最近成功而高估自己？</span></div>
+        <div class="xu-guard-question"><span class="xu-q-num">2</span><span>我是不是低估了现金流和人际摩擦？</span></div>
+        <div class="xu-guard-question"><span class="xu-q-num">3</span><span>这件事是否增加刚性成本？</span></div>
+        <div class="xu-guard-question"><span class="xu-q-num">4</span><span>如果坏运来临，我还能不能不下牌桌？</span></div>
+        <div class="xu-guard-verdict">四个问题只要有<strong>两个答案不稳</strong>，就<strong>先不扩</strong>。</div>
+      </div>
+
+      <div class="xu-guard-section">
+        <h3>🛑 触发后执行</h3>
+        <div class="xu-signal"><span class="xu-signal-icon">1</span><span>回读 2024–2025 年的复盘笔记（锚定现实）</span></div>
+        <div class="xu-signal"><span class="xu-signal-icon">2</span><span>回读"虚"字的原始写作（2026-05-25 那段话）</span></div>
+        <div class="xu-signal"><span class="xu-signal-icon">3</span><span>问自己：这波收入里，运气占几成？</span></div>
+      </div>
+
+      <div class="xu-guard-quote">
+        "Success can be a more dangerous teacher than failure,<br>
+        because it disguises luck as skill, and cycle as permanence."<br><br>
+        猛禽在最高点时最安静。因为它们知道——风随时会变。
+      </div>
+
+      <div class="xu-guard-actions">
+        <button class="xu-guard-close-btn" id="xuGuardCloseBtn">我已冷静</button>
+        <button class="xu-guard-anchor-btn" id="xuGuardAnchorBtn">记录这一刻</button>
+      </div>
+    </div>
   </div>
 
   <!-- ═══════════ 🛡️ 白马校准系统 ═══════════ -->
@@ -9658,6 +9942,44 @@ input[type="checkbox"] {
       }
 
       init();
+    })();
+
+    // ── 虚 · 防过热协议 ──
+    (() => {
+      const XU_LOG_KEY = "xu_guard_logs";
+
+      function loadXuLogs() {
+        try { return JSON.parse(localStorage.getItem(XU_LOG_KEY) || "[]"); }
+        catch { return []; }
+      }
+      function appendXuLog(entry) {
+        const logs = loadXuLogs();
+        logs.push({ ...entry, timestamp: new Date().toISOString() });
+        localStorage.setItem(XU_LOG_KEY, JSON.stringify(logs));
+      }
+
+      function openXuGuard() {
+        const modal = document.getElementById("xuGuardModal");
+        modal.hidden = false;
+        document.body.style.overflow = "hidden";
+      }
+      function closeXuGuard() {
+        document.getElementById("xuGuardModal").hidden = true;
+        document.body.style.overflow = "";
+      }
+      function anchorXuMoment() {
+        const note = window.prompt("写下此刻让你兴奋/膨胀的事（可选）：", "");
+        if (note === null) return;
+        appendXuLog({ note: note.trim(), type: "anchor" });
+        closeXuGuard();
+      }
+
+      document.getElementById("xuGuardBtn").addEventListener("click", openXuGuard);
+      document.getElementById("xuGuardCloseBtn").addEventListener("click", () => {
+        appendXuLog({ type: "calm" });
+        closeXuGuard();
+      });
+      document.getElementById("xuGuardAnchorBtn").addEventListener("click", anchorXuMoment);
     })();
 
     // ── 🛡️ 白马校准系统 ──
