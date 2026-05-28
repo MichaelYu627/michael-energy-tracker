@@ -5516,6 +5516,11 @@ input[type="checkbox"] {
           { name: "level up-台阶宽距俯卧撑", volume: "20 个 x 1 组", rating: 8, note: "" },
           { name: "悬垂举腿", volume: "14 个 x 1 组", rating: 8, note: "" },
           { name: "拉伸", volume: "10 分钟", rating: 8, note: "" }
+        ],
+        // 补充训练（追加模式，可叠加在常用七项之上）
+        workoutSupplementTemplates: [
+          { name: "上斜引体向上", volume: "20 个 x 2 组", rating: 8, note: "" },
+          { name: "标准双腿深蹲", volume: "20 个 x 1 组", rating: 8, note: "" }
         ]
       };
 
@@ -6593,8 +6598,9 @@ input[type="checkbox"] {
       <div style="background:linear-gradient(135deg,rgba(209,123,31,0.10),rgba(196,69,54,0.08));border-radius:10px;padding:8px 14px;margin-bottom:12px;font-size:12.5px;line-height:1.6;color:var(--text);border-left:3px solid var(--accent-warm);">
         🔥 <strong>黎明热身不可跳过</strong> — 清晨机体刚刚苏醒，关节僵硬、体温偏低。<strong style="color:var(--accent-hot);">前5分钟动态热身</strong>（关节绕环→猫牛伸展→深蹲预备）是避免受伤的必须支撑结构。
       </div>
-      <div class="panel-actions" style="margin-bottom:12px">
+      <div class="panel-actions" style="margin-bottom:12px;flex-wrap:wrap;gap:6px">
         <button class="btn-secondary btn-slim" id="trainingLoadTemplatesBtn" type="button">一键导入常用七项</button>
+        <button class="btn-secondary btn-slim" id="trainingLoadSupplementBtn" type="button">+ 另外两项</button>
         <button class="btn-secondary btn-slim" id="trainingClearBtn" type="button">清空</button>
       </div>
       <div id="trainingItemsList" style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px">
@@ -6867,6 +6873,11 @@ input[type="checkbox"] {
   document.getElementById("trainingLoadTemplatesBtn").addEventListener("click", () => {
     list.innerHTML = "";
     CONFIG.workoutTemplates.forEach((tpl) => renderRow({ name: tpl.name, volume: tpl.volume, rating: tpl.rating, note: tpl.note }));
+  });
+
+  // 追加模式：不清空，直接在列表末尾加补充动作
+  document.getElementById("trainingLoadSupplementBtn").addEventListener("click", () => {
+    CONFIG.workoutSupplementTemplates.forEach((tpl) => renderRow({ name: tpl.name, volume: tpl.volume, rating: tpl.rating, note: tpl.note }));
   });
 
   document.getElementById("trainingClearBtn").addEventListener("click", () => {
