@@ -3368,7 +3368,7 @@ input[type="checkbox"] {
 /* ===== 健康预管理 · TMD / 用眼 / 评分趋势 ===== */
 
 /* TMD 下颌关节 */
-.health-tmd, .health-eye, .health-trend {
+.health-tmd, .health-eye, .health-trend, .health-training {
   margin-top: 8px;
   background: var(--panel-strong);
   border: 1px solid var(--line);
@@ -3377,7 +3377,8 @@ input[type="checkbox"] {
 }
 .health-tmd > summary,
 .health-eye > summary,
-.health-trend > summary {
+.health-trend > summary,
+.health-training > summary {
   list-style: none;
   cursor: pointer;
   padding: 14px 16px;
@@ -3391,10 +3392,12 @@ input[type="checkbox"] {
 }
 .health-tmd > summary::-webkit-details-marker,
 .health-eye > summary::-webkit-details-marker,
-.health-trend > summary::-webkit-details-marker { display: none; }
+.health-trend > summary::-webkit-details-marker,
+.health-training > summary::-webkit-details-marker { display: none; }
 .health-tmd > summary::after,
 .health-eye > summary::after,
-.health-trend > summary::after {
+.health-trend > summary::after,
+.health-training > summary::after {
   content: "▾";
   margin-left: auto;
   color: var(--muted);
@@ -3403,7 +3406,80 @@ input[type="checkbox"] {
 }
 .health-tmd[open] > summary::after,
 .health-eye[open] > summary::after,
-.health-trend[open] > summary::after { transform: rotate(180deg); }
+.health-trend[open] > summary::after,
+.health-training[open] > summary::after { transform: rotate(180deg); }
+
+/* 训练进度 sparkline grid */
+.health-training-body { padding: 12px 16px 14px; }
+.tp-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+@media (min-width: 540px) {
+  .tp-grid { grid-template-columns: repeat(3, 1fr); }
+}
+.tp-card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.tp-name {
+  font-size: 12.5px;
+  color: var(--text);
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.tp-spark {
+  line-height: 0;
+  height: 30px;
+  display: flex;
+  align-items: center;
+}
+.tp-spark svg { width: 100%; height: 100%; }
+.tp-meta {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font-size: 11px;
+}
+.tp-current {
+  font-family: var(--font-number);
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--text);
+  line-height: 1;
+}
+.tp-arrow { font-weight: 700; font-size: 14px; }
+.tp-arrow.up { color: var(--accent); }
+.tp-arrow.down { color: var(--accent-warm); }
+.tp-arrow.flat { color: var(--muted); }
+.tp-delta { color: var(--muted); font-family: var(--font-number); font-size: 11px; }
+.tp-data-count {
+  font-size: 10px;
+  color: var(--muted);
+  margin-top: 0;
+}
+.tp-empty {
+  color: var(--muted);
+  font-size: 11px;
+  text-align: center;
+  padding: 6px;
+}
+.tp-footer {
+  font-size: 11px;
+  color: var(--muted);
+  text-align: center;
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px dashed var(--line);
+}
 
 .tmd-body { padding: 0 16px 14px; font-size: 13px; line-height: 1.7; color: var(--text); }
 .tmd-body > div { margin-top: 10px; }
@@ -4996,6 +5072,15 @@ input[type="checkbox"] {
               <li>屏幕亮度适中，避免暗室看屏幕</li>
             </ul>
           </div>
+        </div>
+      </details>
+
+      <!-- ───── 训练进度 ───── -->
+      <details class="health-training">
+        <summary>💪 训练进度</summary>
+        <div class="health-training-body">
+          <div class="tp-grid" id="trainingProgressGrid"></div>
+          <div class="tp-footer">基于历史 workoutItems 自动计算 · 总次数 = 首数 × 组数 · 不含拉伸</div>
         </div>
       </details>
 
@@ -8063,6 +8148,10 @@ input[type="checkbox"] {
             window.LoopEngine?.refreshPlateauCard?.();
             window.LoopEngine?.checkMilestones?.();
           }
+          // 训练事件 → 刷新训练进度 sparkline
+          if (event.eventType === "training") {
+            window.TrainingProgress?.refresh?.();
+          }
           return true;
         },
 
@@ -10935,6 +11024,123 @@ input[type="checkbox"] {
       bindMilestoneEvents();
       bindPlateauEvents();
       renderPlateauCard();
+    })();
+
+    // ════════════════════════════════════════════════════════════
+    //  训练进度 sparkline grid （从 state.entries.workoutItems 派生）
+    //  暴露 window.TrainingProgress.refresh() 给 applyEvent("training") 调
+    // ════════════════════════════════════════════════════════════
+    (() => {
+      const ENTRIES_KEY = "michael-energy-tracker-v1";
+      // 9 个力量动作（拉伸是时间型，不画）
+      const TRACKED_ACTIONS = [
+        "单腿深蹲", "合桥", "标准引体向上", "靠墙倒立",
+        "level up-台阶宽距俯卧撑", "悬垂举腿",
+        "上斜引体向上", "标准双腿深蹲", "双腿提踵"
+      ];
+
+      // 解析 "50 个 x 1 组" → 50, "20 个 x 2 组" → 40
+      function parseVolumeTotal(s) {
+        if (!s || /分钟/.test(s)) return null;
+        const reps = parseInt(s, 10);
+        if (!Number.isFinite(reps) || reps <= 0) return null;
+        const m = String(s).match(/[x×*]\s*(\d+)\s*组/i);
+        const sets = m ? Math.max(1, parseInt(m[1], 10)) : 1;
+        return reps * sets;
+      }
+
+      function collectHistory(actionName) {
+        let entries = [];
+        try { entries = JSON.parse(localStorage.getItem(ENTRIES_KEY) || "[]"); } catch {}
+        const data = [];
+        entries.forEach((e) => {
+          if (!Array.isArray(e.workoutItems)) return;
+          e.workoutItems.forEach((item) => {
+            if (item && item.name === actionName) {
+              const total = parseVolumeTotal(item.volume);
+              if (total !== null) data.push({ date: e.date, total });
+            }
+          });
+        });
+        return data.sort((a, b) => a.date.localeCompare(b.date));
+      }
+
+      function renderSparkline(history, w = 100, h = 30) {
+        if (!history.length) {
+          return `<svg viewBox="0 0 ${w} ${h}"><text x="${w/2}" y="${h/2+3}" font-size="9" fill="rgba(110,110,98,0.5)" text-anchor="middle">无数据</text></svg>`;
+        }
+        if (history.length === 1) {
+          return `<svg viewBox="0 0 ${w} ${h}"><circle cx="${w/2}" cy="${h/2}" r="3" fill="#3a7bd5"/></svg>`;
+        }
+        const vals = history.map((h) => h.total);
+        const max = Math.max(...vals);
+        const min = Math.min(...vals);
+        const range = max - min || 1;
+        const padding = 3;
+        const innerW = w - padding * 2;
+        const innerH = h - padding * 2;
+        const pts = history.map((h, i) => {
+          const x = padding + (i / (history.length - 1)) * innerW;
+          const y = padding + innerH - ((h.total - min) / range) * innerH;
+          return [x, y];
+        });
+        const trendUp = history[history.length - 1].total > history[0].total;
+        const trendFlat = history[history.length - 1].total === history[0].total;
+        const color = trendFlat ? "#999" : (trendUp ? "#2dab88" : "#d17b1f");
+        const polyline = pts.map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`).join(" ");
+        const lastPt = pts[pts.length - 1];
+        return `<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none">
+          <polyline points="${polyline}" fill="none" stroke="${color}" stroke-width="1.5" stroke-linejoin="round"/>
+          <circle cx="${lastPt[0].toFixed(1)}" cy="${lastPt[1].toFixed(1)}" r="2.5" fill="${color}"/>
+        </svg>`;
+      }
+
+      function renderTrainingProgress() {
+        const grid = document.getElementById("trainingProgressGrid");
+        if (!grid) return;
+        const cards = TRACKED_ACTIONS.map((name) => {
+          const hist = collectHistory(name);
+          if (!hist.length) {
+            return `
+              <div class="tp-card">
+                <div class="tp-name" title="${name}">${name}</div>
+                <div class="tp-spark">${renderSparkline([])}</div>
+                <div class="tp-empty">还没记过</div>
+              </div>`;
+          }
+          const latest = hist[hist.length - 1].total;
+          const first = hist[0].total;
+          const delta = latest - first;
+          const deltaPct = first > 0 ? Math.round((delta / first) * 100) : null;
+          const arrowCls = delta > 0 ? "up" : delta < 0 ? "down" : "flat";
+          const arrowChar = delta > 0 ? "↑" : delta < 0 ? "↓" : "→";
+          const deltaStr = hist.length >= 2 && deltaPct !== null
+            ? `<span class="tp-delta">${delta > 0 ? "+" : ""}${deltaPct}%</span>`
+            : "";
+          return `
+            <div class="tp-card">
+              <div class="tp-name" title="${name}">${name}</div>
+              <div class="tp-spark">${renderSparkline(hist)}</div>
+              <div class="tp-meta">
+                <span class="tp-current">${latest}</span>
+                <span class="tp-arrow ${arrowCls}">${arrowChar}</span>
+                ${deltaStr}
+              </div>
+              <div class="tp-data-count">${hist.length} 次 · 起 ${first}</div>
+            </div>`;
+        }).join("");
+        grid.innerHTML = cards;
+      }
+
+      // 暴露给主 IIFE 的 applyEvent("training") 调
+      window.TrainingProgress = { refresh: renderTrainingProgress };
+
+      // 初次渲染（等 DOM 就绪）
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", renderTrainingProgress);
+      } else {
+        setTimeout(renderTrainingProgress, 50);
+      }
     })();
   </script>
 
