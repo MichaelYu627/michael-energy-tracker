@@ -6223,60 +6223,9 @@ input[type="checkbox"] {
         },
 
         getDefaultSeedEntries() {
-          const year = new Date().getFullYear();
-          return [
-            { date: `${year}-04-17`, sleepScore: 96, bedtime: "22:00", wakeTime: "05:20", wakeups: 0, energy: 10, weight: 68.1, exercised: false, cooked: false, healthyFood: true, ateOut: false, deepWorkTasks: 1, adminTasks: 1, morningEnergy: 9, afternoonEnergy: 8, eveningEnergy: 8, mood: "太爽了", dailyStory: "一整天都很轻快，处理事情非常顺，晚上整个人像满电一样。", workoutItems: [] },
-            {
-              date: `${year}-04-18`,
-              sleepScore: 47,
-              bedtime: "00:30",
-              wakeTime: "06:00",
-              wakeups: 1,
-              energy: 3,
-              weight: 68.8,
-              exercised: true,
-              cooked: true,
-              healthyFood: false,
-              ateOut: true,
-              deepWorkTasks: 0,
-              adminTasks: 2,
-              morningEnergy: 3,
-              afternoonEnergy: 4,
-              eveningEnergy: 5,
-              mood: "提不起劲",
-              dailyStory: "白天明显有点拖，晚上还是硬撑着练了两项，算是没让节奏彻底掉下去。",
-              workoutItems: [
-                { name: "标准引体向上", volume: "10 个 x 1 组", rating: 6, note: "今天发力感偏散，先把动作做完整。" },
-                { name: "拉伸", volume: "10 分钟", rating: 7, note: "训练后身体稍微舒展开一点。" }
-              ]
-            },
-            { date: `${year}-04-19`, sleepScore: 75, bedtime: "22:00", wakeTime: "06:00", wakeups: 1, energy: 7, weight: 68.4, exercised: false, cooked: true, healthyFood: true, ateOut: false, deepWorkTasks: 1, adminTasks: 1, morningEnergy: 8, afternoonEnergy: 7, eveningEnergy: 6, mood: "神清气爽", dailyStory: "今天脑子很清楚，事情推进得比预期顺，整体状态在回正。", workoutItems: [] },
-            {
-              date: `${year}-04-20`,
-              sleepScore: 74,
-              bedtime: "21:30",
-              wakeTime: "05:00",
-              wakeups: 3,
-              energy: 7,
-              weight: 68.0,
-              exercised: true,
-              cooked: true,
-              healthyFood: true,
-              ateOut: false,
-              deepWorkTasks: 1,
-              adminTasks: 2,
-              morningEnergy: 7,
-              afternoonEnergy: 6,
-              eveningEnergy: 8,
-              mood: "充实",
-              dailyStory: "白天安排得比较满，但完成度不错，训练做完后感觉身体和精神都比较扎实。",
-              workoutItems: [
-                { name: "level up-台阶宽距俯卧撑", volume: "20 个 x 1 组", rating: 8, note: "胸和手臂发力很顺。" },
-                { name: "悬垂举腿", volume: "14 个 x 1 组", rating: 7, note: "下放时继续慢一点会更稳。" }
-              ]
-            },
-            { date: `${year}-04-21`, sleepScore: 80, bedtime: "22:00", wakeTime: "06:00", wakeups: 0, energy: 8, weight: 67.9, exercised: false, cooked: true, healthyFood: true, ateOut: false, deepWorkTasks: 1, adminTasks: 1, morningEnergy: 8, afternoonEnergy: 6, eveningEnergy: 7, mood: "稳定", dailyStory: "节奏比较稳，虽然没有训练，但吃饭和作息都守住了，整天推进感不错。", workoutItems: [] }
-          ].map((entry) => this.normalize(entry));
+          // 清空 4 月 67-68kg 演示 seed（2026-05-28 清理）
+          // 新用户/清缓存后从空状态开始，UI 已有"还没有记录"占位提示
+          return [];
         },
 
         dedupe(entries) {
@@ -8591,10 +8540,50 @@ input[type="checkbox"] {
         localStorage.setItem(WEIGHT_MERGE_MIGRATION_KEY, "done");
       }
 
+      // ── 一次性清掉 4 月 67-68kg 假 seed + 把 5/10 体重从 83.9 改成 84.3 ──
+      // 签名检测：mood/dailyStory/weight 同时匹配 seed 才删，避免误杀
+      const SEED_CLEANUP_KEY = "michael-energy-tracker-seed-cleanup-v1";
+      const APRIL_SEED_SIGNATURES = {
+        "2026-04-17": { weight: 68.1, mood: "太爽了" },
+        "2026-04-18": { weight: 68.8, mood: "提不起劲" },
+        "2026-04-19": { weight: 68.4, mood: "神清气爽" },
+        "2026-04-20": { weight: 68.0, mood: "充实" },
+        "2026-04-21": { weight: 67.9, mood: "稳定" }
+      };
+      function cleanupAprilSeedAndFixMay10() {
+        if (localStorage.getItem(SEED_CLEANUP_KEY) === "done") return;
+        let removed = 0, fixed = 0;
+        const next = state.entries
+          .filter((e) => {
+            const sig = APRIL_SEED_SIGNATURES[e.date];
+            if (!sig) return true;
+            // 同时匹配体重 + mood 才删（避免用户真的在这些日期记过别的）
+            if (e.weight === sig.weight && e.mood === sig.mood) {
+              removed += 1;
+              return false;
+            }
+            return true;
+          })
+          .map((e) => {
+            // 5/10 体重从 83.9 → 84.3（仅当当前是 83.9 这个 seed 签名值）
+            if (e.date === "2026-05-10" && e.weight === 83.9) {
+              fixed += 1;
+              return { ...e, weight: 84.3 };
+            }
+            return e;
+          });
+        if (removed + fixed > 0) {
+          state.entries = StorageService.saveEntries(next);
+          console.log(`[migration] 数据清理：删除 ${removed} 条 4 月 seed，修正 ${fixed} 条 5/10 体重`);
+        }
+        localStorage.setItem(SEED_CLEANUP_KEY, "done");
+      }
+
       function initialize() {
         state.entries = StorageService.ensureSeedData();
         migrateWorkoutNames();
         migrateWeightRecordsIntoEntries();
+        cleanupAprilSeedAndFixMay10();
         // 清理"非今日且已推"的事件：今日已推的保留供时间线展示，跨日后丢弃
         SyncQueue.cleanOldPushed(DateUtils.getTodayISO());
         bindEvents();
