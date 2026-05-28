@@ -1865,9 +1865,53 @@ input[type="checkbox"] {
   width: auto !important;
 }
 .training-item-row input.tr-rating {
-  /* rating 固定宽度，不参与 flex 拉伸 */
+  /* rating 固定宽度，不参与 flex 拉伸（保留以防老入口；新 UI 用 .tr-rating-stepper）*/
   flex: 0 0 60px !important;
   width: 60px !important;
+}
+
+/* rating 步进器：起步 8，左右 ±1 按钮，0-10 范围 */
+.tr-rating-stepper {
+  flex: 0 0 auto !important;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(0, 0, 0, 0.04);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 2px;
+}
+.tr-rating-stepper .tr-rating-btn {
+  flex: 0 0 28px;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: var(--panel);
+  color: var(--text);
+  font-size: 18px;
+  font-weight: 700;
+  font-family: var(--font-number);
+  cursor: pointer;
+  line-height: 1;
+  user-select: none;
+}
+.tr-rating-stepper .tr-rating-btn:active {
+  background: var(--accent-warm);
+  color: #fff;
+}
+.tr-rating-stepper .tr-rating-btn[disabled] {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+.tr-rating-stepper .tr-rating-val {
+  min-width: 26px;
+  text-align: center;
+  font-family: var(--font-number);
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--text);
 }
 .training-item-row button[data-action="remove-tr-item"] {
   /* 防止 × 按钮被拉伸，保持内容大小 */
@@ -5509,18 +5553,17 @@ input[type="checkbox"] {
         chartDays: 30,
         weeklyDays: 7,
         workoutTemplates: [
+          // 全部 rating 起步 8（中性），用户当天按 +/- 调整
           { name: "单腿深蹲", volume: "20 个 x 1 组", rating: 8, note: "" },
-          { name: "合桥", volume: "35 个 x 1 组", rating: 9, note: "" },
-          { name: "标准引体向上", volume: "11 个 x 1 组", rating: 9, note: "" },
-          { name: "靠墙倒立", volume: "12 个 x 1 组", rating: 7, note: "" },
+          { name: "合桥", volume: "35 个 x 1 组", rating: 8, note: "" },
+          { name: "标准引体向上", volume: "11 个 x 1 组", rating: 8, note: "" },
+          { name: "靠墙倒立", volume: "12 个 x 1 组", rating: 8, note: "" },
           { name: "level up-台阶宽距俯卧撑", volume: "20 个 x 1 组", rating: 8, note: "" },
           { name: "悬垂举腿", volume: "14 个 x 1 组", rating: 8, note: "" },
-          { name: "拉伸", volume: "10 分钟", rating: 8, note: "" }
-        ],
-        // 补充训练（追加模式，可叠加在常用七项之上）
-        workoutSupplementTemplates: [
           { name: "上斜引体向上", volume: "20 个 x 2 组", rating: 8, note: "" },
-          { name: "标准双腿深蹲", volume: "20 个 x 1 组", rating: 8, note: "" }
+          { name: "标准双腿深蹲", volume: "20 个 x 1 组", rating: 8, note: "" },
+          { name: "双腿提踵", volume: "60 个 x 2 组", rating: 8, note: "" },
+          { name: "拉伸", volume: "10 分钟", rating: 8, note: "" } // 收尾固定最后
         ]
       };
 
@@ -6599,19 +6642,24 @@ input[type="checkbox"] {
         🔥 <strong>黎明热身不可跳过</strong> — 清晨机体刚刚苏醒，关节僵硬、体温偏低。<strong style="color:var(--accent-hot);">前5分钟动态热身</strong>（关节绕环→猫牛伸展→深蹲预备）是避免受伤的必须支撑结构。
       </div>
       <div class="panel-actions" style="margin-bottom:12px;flex-wrap:wrap;gap:6px">
-        <button class="btn-secondary btn-slim" id="trainingLoadTemplatesBtn" type="button">一键导入常用七项</button>
-        <button class="btn-secondary btn-slim" id="trainingLoadSupplementBtn" type="button">+ 另外两项</button>
+        <button class="btn-secondary btn-slim" id="trainingLoadTemplatesBtn" type="button">一键导入常用十项</button>
         <button class="btn-secondary btn-slim" id="trainingClearBtn" type="button">清空</button>
       </div>
       <div id="trainingItemsList" style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px">
-        ${existingItems.map((it, idx) => `
+        ${existingItems.map((it, idx) => {
+          const r = Number.isFinite(Number(it.rating)) ? Math.max(0, Math.min(10, Number(it.rating))) : 8;
+          return `
           <div class="training-item-row" data-idx="${idx}" style="display:flex;gap:6px;align-items:center">
             <input type="text" class="tr-name" value="${it.name || ""}" placeholder="动作" style="flex:1">
             <input type="text" class="tr-volume" value="${it.volume || ""}" placeholder="组数" style="flex:1">
-            <input type="number" class="tr-rating" value="${it.rating || 8}" min="0" max="10" style="width:60px">
+            <div class="tr-rating-stepper" data-rating="${r}" aria-label="自我感觉 ${r} 分">
+              <button type="button" class="tr-rating-btn" data-delta="-1" aria-label="减分"${r <= 0 ? " disabled" : ""}>−</button>
+              <span class="tr-rating-val">${r}</span>
+              <button type="button" class="tr-rating-btn" data-delta="1" aria-label="加分"${r >= 10 ? " disabled" : ""}>+</button>
+            </div>
             <button class="btn-warning btn-slim" type="button" data-action="remove-tr-item">×</button>
-          </div>
-        `).join("")}
+          </div>`;
+        }).join("")}
       </div>
       <button class="btn-secondary btn-slim" id="trainingAddItemBtn" type="button" style="margin-bottom:12px">+ 添加动作</button>
       <div class="panel-actions">
@@ -6861,10 +6909,15 @@ input[type="checkbox"] {
     const row = document.createElement("div");
     row.className = "training-item-row";
     row.style.cssText = "display:flex;gap:6px;align-items:center";
+    const r = Number.isFinite(Number(item.rating)) ? Math.max(0, Math.min(10, Number(item.rating))) : 8;
     row.innerHTML = `
       <input type="text" class="tr-name" value="${item.name || ""}" placeholder="动作" style="flex:1">
       <input type="text" class="tr-volume" value="${item.volume || ""}" placeholder="组数" style="flex:1">
-      <input type="number" class="tr-rating" value="${item.rating || 8}" min="0" max="10" style="width:60px">
+      <div class="tr-rating-stepper" data-rating="${r}" aria-label="自我感觉 ${r} 分">
+        <button type="button" class="tr-rating-btn" data-delta="-1" aria-label="减分"${r <= 0 ? " disabled" : ""}>−</button>
+        <span class="tr-rating-val">${r}</span>
+        <button type="button" class="tr-rating-btn" data-delta="1" aria-label="加分"${r >= 10 ? " disabled" : ""}>+</button>
+      </div>
       <button class="btn-warning btn-slim" type="button" data-action="remove-tr-item">×</button>
     `;
     list.appendChild(row);
@@ -6873,11 +6926,6 @@ input[type="checkbox"] {
   document.getElementById("trainingLoadTemplatesBtn").addEventListener("click", () => {
     list.innerHTML = "";
     CONFIG.workoutTemplates.forEach((tpl) => renderRow({ name: tpl.name, volume: tpl.volume, rating: tpl.rating, note: tpl.note }));
-  });
-
-  // 追加模式：不清空，直接在列表末尾加补充动作
-  document.getElementById("trainingLoadSupplementBtn").addEventListener("click", () => {
-    CONFIG.workoutSupplementTemplates.forEach((tpl) => renderRow({ name: tpl.name, volume: tpl.volume, rating: tpl.rating, note: tpl.note }));
   });
 
   document.getElementById("trainingClearBtn").addEventListener("click", () => {
@@ -6889,9 +6937,25 @@ input[type="checkbox"] {
   });
 
   list.addEventListener("click", (event) => {
-    const btn = event.target.closest("[data-action='remove-tr-item']");
-    if (!btn) return;
-    btn.parentElement.remove();
+    // 删除行
+    const delBtn = event.target.closest("[data-action='remove-tr-item']");
+    if (delBtn) { delBtn.parentElement.remove(); return; }
+    // rating 步进器 +/-
+    const stepBtn = event.target.closest(".tr-rating-btn");
+    if (stepBtn && !stepBtn.disabled) {
+      const stepper = stepBtn.closest(".tr-rating-stepper");
+      const delta = Number(stepBtn.dataset.delta) || 0;
+      const current = Number(stepper.dataset.rating) || 8;
+      const next = Math.max(0, Math.min(10, current + delta));
+      stepper.dataset.rating = next;
+      stepper.setAttribute("aria-label", `自我感觉 ${next} 分`);
+      stepper.querySelector(".tr-rating-val").textContent = next;
+      // 边界按钮 disabled
+      const minus = stepper.querySelector("[data-delta='-1']");
+      const plus = stepper.querySelector("[data-delta='1']");
+      if (minus) minus.disabled = (next <= 0);
+      if (plus) plus.disabled = (next >= 10);
+    }
   });
 
   document.getElementById("trainingPanelSave").addEventListener("click", () => {
@@ -6899,7 +6963,7 @@ input[type="checkbox"] {
     const workoutItems = Array.from(rows).map((row) => ({
       name: row.querySelector(".tr-name").value.trim(),
       volume: row.querySelector(".tr-volume").value.trim(),
-      rating: Number(row.querySelector(".tr-rating").value) || 0,
+      rating: Number(row.querySelector(".tr-rating-stepper")?.dataset.rating ?? row.querySelector(".tr-rating")?.value ?? 8),
       note: ""
     })).filter((it) => it.name);
 
