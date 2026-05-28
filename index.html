@@ -6495,6 +6495,18 @@ input[type="checkbox"] {
         }
       };
 
+      // 时间 → 餐次（5 段简洁版）。输入 "HH:MM"，返回餐次中文名
+      // 00:00-10:30 早餐 / 10:30-14:00 午餐 / 14:00-16:00 加餐 / 16:00- 晚餐
+      function mealTypeFromTime(timeStr) {
+        const m = String(timeStr || "").match(/^(\d{1,2}):(\d{2})/);
+        if (!m) return "午餐";
+        const minutes = Number(m[1]) * 60 + Number(m[2]);
+        if (minutes < 10 * 60 + 30) return "早餐";   // < 10:30
+        if (minutes < 14 * 60) return "午餐";          // 10:30–14:00
+        if (minutes < 16 * 60) return "加餐";          // 14:00–16:00
+        return "晚餐";                                  // ≥ 16:00
+      }
+
       // 每个事件类型的面板渲染器：输入 prefill（可空）→ 返回 HTML 字符串
       const PanelRenderers = {
   sleep(prefill) {
@@ -6637,6 +6649,8 @@ input[type="checkbox"] {
   meal(prefill) {
   const p = prefill?.data || {};
   const time = prefill?.time || DateUtils.getCurrentTimeString();
+  // 餐次默认值：prefill 有就用 prefill，否则按时间自动推断
+  const defaultType = p.type || mealTypeFromTime(time);
   return `
     <div class="capture-panel" data-panel-type="meal">
       <h3>🍱 记一餐</h3>
@@ -6648,12 +6662,12 @@ input[type="checkbox"] {
         <div class="field" style="flex:1">
           <label>餐次</label>
           <select id="mealPanelType">
-            <option value="早餐" ${p.type === "早餐" ? "selected" : ""}>早餐</option>
-            <option value="上午餐" ${p.type === "上午餐" ? "selected" : ""}>上午餐</option>
-            <option value="午餐" ${!p.type || p.type === "午餐" ? "selected" : ""}>午餐</option>
-            <option value="加餐" ${p.type === "加餐" ? "selected" : ""}>加餐</option>
-            <option value="晚餐" ${p.type === "晚餐" ? "selected" : ""}>晚餐</option>
-            <option value="其他" ${p.type === "其他" ? "selected" : ""}>其他</option>
+            <option value="早餐" ${defaultType === "早餐" ? "selected" : ""}>早餐</option>
+            <option value="上午餐" ${defaultType === "上午餐" ? "selected" : ""}>上午餐</option>
+            <option value="午餐" ${defaultType === "午餐" ? "selected" : ""}>午餐</option>
+            <option value="加餐" ${defaultType === "加餐" ? "selected" : ""}>加餐</option>
+            <option value="晚餐" ${defaultType === "晚餐" ? "selected" : ""}>晚餐</option>
+            <option value="其他" ${defaultType === "其他" ? "selected" : ""}>其他</option>
           </select>
         </div>
       </div>
@@ -6938,6 +6952,20 @@ input[type="checkbox"] {
   });
 },
   meal(prefill) {
+  // 智能同步：改时间自动跟随餐次；一旦用户手动选过餐次就停止自动改
+  const timeEl = document.getElementById("mealPanelTime");
+  const typeEl = document.getElementById("mealPanelType");
+  let typeManuallySet = false;
+  if (typeEl) {
+    typeEl.addEventListener("change", () => { typeManuallySet = true; });
+  }
+  if (timeEl && typeEl) {
+    timeEl.addEventListener("input", () => {
+      if (typeManuallySet) return;
+      typeEl.value = mealTypeFromTime(timeEl.value);
+    });
+  }
+
   document.getElementById("mealPanelSave").addEventListener("click", () => {
     const data = {
       time: document.getElementById("mealPanelTime").value,
