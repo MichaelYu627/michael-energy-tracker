@@ -4674,7 +4674,7 @@ input[type="checkbox"] {
       </div>
 
       <!-- 加分项 -->
-      <details class="health-items-section" open id="healthAddSection">
+      <details class="health-items-section" id="healthAddSection">
         <summary>
           ✅ 加分项 <span class="group-sum add" id="healthAddSum">+0</span>
         </summary>
@@ -4690,7 +4690,7 @@ input[type="checkbox"] {
       </details>
 
       <!-- ───── 体重 × 尿酸 联合管理 ───── -->
-      <details class="health-combined" open id="healthCombined">
+      <details class="health-combined" id="healthCombined">
         <summary>
           📊 体重 × 尿酸
           <span class="health-combined-target" id="healthCombinedTarget">83.2 → 80 kg · 566 → 420</span>
@@ -4853,7 +4853,7 @@ input[type="checkbox"] {
       </details>
 
       <!-- ───── TMD 下颌关节 ───── -->
-      <details class="health-tmd" open>
+      <details class="health-tmd">
         <summary>🦷 TMD 下颌关节 · 保守管理</summary>
         <div class="tmd-body">
 
@@ -4936,7 +4936,7 @@ input[type="checkbox"] {
       </details>
 
       <!-- ───── 用眼健康 25/10 ───── -->
-      <details class="health-eye" open>
+      <details class="health-eye">
         <summary>👀 用眼健康 · 25/10 节律 <span class="eye-meta" id="eyeMeta">今日 0 轮</span></summary>
         <div class="eye-body">
           <div class="eye-timer">
@@ -4956,7 +4956,7 @@ input[type="checkbox"] {
       </details>
 
       <!-- ───── 评分趋势 ───── -->
-      <details class="health-trend" open>
+      <details class="health-trend">
         <summary>📈 评分趋势</summary>
         <div class="trend-body">
           <div class="trend-toggle" id="trendToggle">
@@ -5442,6 +5442,53 @@ input[type="checkbox"] {
   </div>
 
   <script>
+    // ════════════════════════════════════════════════════════════════
+    //  全局北京时间工具 (Asia/Shanghai)
+    //  无论用户设备时区如何，所有"今天/本周"判定都以北京时间为准
+    //  IIFE 模块通过 window.BJ.* 调用
+    // ════════════════════════════════════════════════════════════════
+    window.BJ = (() => {
+      const TZ = "Asia/Shanghai";
+      const isoFmt = new Intl.DateTimeFormat("en-CA", { timeZone: TZ, year: "numeric", month: "2-digit", day: "2-digit" });
+      const hourFmt = new Intl.DateTimeFormat("en-US", { timeZone: TZ, hour: "2-digit", hour12: false });
+      const wdFmt = new Intl.DateTimeFormat("en-US", { timeZone: TZ, weekday: "short" });
+      const WDAY = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
+
+      // 北京当前的 YYYY-MM-DD
+      function todayISO(d = new Date()) { return isoFmt.format(d); }
+      // 北京当前小时（0-23 整数）
+      function todayHour(d = new Date()) { return parseInt(hourFmt.format(d), 10) % 24; }
+      // 北京当前星期（0=日, 1=一, ..., 6=六）
+      function dayOfWeek(d = new Date()) { return WDAY[wdFmt.format(d)]; }
+      // 任意 ISO 字符串 → 北京视角的星期（用 UTC 中午解析，避免边界）
+      function dayOfWeekFromISO(iso) {
+        const d = new Date(iso + "T04:00:00Z"); // 北京 12:00
+        return dayOfWeek(d);
+      }
+      // 给定 ISO 字符串 + 增减天数 → 新的 ISO（纯字符串运算）
+      function addDaysISO(iso, n) {
+        const d = new Date(iso + "T04:00:00Z");
+        d.setUTCDate(d.getUTCDate() + n);
+        return isoFmt.format(d);
+      }
+      // 北京时间的本周一 ISO（参考日默认今天）
+      function thisMondayISO(refISO) {
+        const baseISO = refISO || todayISO();
+        const dow = dayOfWeekFromISO(baseISO); // 0=日,1=一
+        const diff = dow === 0 ? -6 : 1 - dow;
+        return addDaysISO(baseISO, diff);
+      }
+      // 两个 ISO 字符串相隔的天数（b - a，可能为负）
+      function diffDays(aISO, bISO) {
+        const a = new Date(aISO + "T04:00:00Z");
+        const b = new Date(bISO + "T04:00:00Z");
+        return Math.round((b - a) / 86400000);
+      }
+      return { TZ, todayISO, todayHour, dayOfWeek, dayOfWeekFromISO, addDaysISO, thisMondayISO, diffDays };
+    })();
+  </script>
+
+  <script>
     (() => {
       // 统一配置项，后续迁移到小程序时可以直接抽成独立配置文件。
       const CONFIG = {
@@ -5524,32 +5571,35 @@ input[type="checkbox"] {
       const DAY_BOUNDARY_HOUR = 2; // 凌晨2点换日——早起者在5点看到的已经是新的一天
 
       const DateUtils = {
-        /** 返回"有效日期"：凌晨 0:00-1:59 仍算前一天 */
+        /** 返回"有效日期 ISO"：凌晨 0:00-1:59 仍算前一天（全部走北京时间）*/
         getEffectiveDate() {
-          const now = new Date();
-          if (now.getHours() < DAY_BOUNDARY_HOUR) {
-            const shifted = new Date(now);
-            shifted.setDate(shifted.getDate() - 1);
-            return shifted;
+          // 仅保留兼容：返回 Date 对象给少量调用方
+          const todayISO = window.BJ.todayISO();
+          const hour = window.BJ.todayHour();
+          if (hour < DAY_BOUNDARY_HOUR) {
+            return new Date(window.BJ.addDaysISO(todayISO, -1) + "T04:00:00Z");
           }
-          return now;
+          return new Date(todayISO + "T04:00:00Z");
         },
 
         getTodayISO() {
-          return this.dateToISO(this.getEffectiveDate());
+          // 北京时间 + 凌晨 2 点边界
+          const todayISO = window.BJ.todayISO();
+          const hour = window.BJ.todayHour();
+          return hour < DAY_BOUNDARY_HOUR ? window.BJ.addDaysISO(todayISO, -1) : todayISO;
         },
 
         getCurrentTimeString() {
-          const now = new Date();
-          const hour = String(now.getHours()).padStart(2, "0");
-          const minute = String(now.getMinutes()).padStart(2, "0");
-          return `${hour}:${minute}`;
+          // 北京时间 HH:MM
+          const fmt = new Intl.DateTimeFormat("en-GB", {
+            timeZone: "Asia/Shanghai", hour: "2-digit", minute: "2-digit", hour12: false
+          });
+          return fmt.format(new Date());
         },
 
         dateToISO(date) {
-          const month = String(date.getMonth() + 1).padStart(2, "0");
-          const day = String(date.getDate()).padStart(2, "0");
-          return `${date.getFullYear()}-${month}-${day}`;
+          // 仍按本地（兼容老调用），但任何"求今天"的入口都已走 BJ
+          return window.BJ.todayISO(date);
         },
 
         parseDate(dateString) {
@@ -6131,6 +6181,7 @@ input[type="checkbox"] {
             morningThoughts: String(raw.morningThoughts || "").trim(),
             morningPlan: String(raw.morningPlan || "").trim(),
             waistCircumference: this.normalizeNullableNumber(raw.waistCircumference),
+            weightNote: String(raw.weightNote || "").trim(),
             dailySteps: this.normalizeNullableNumber(raw.dailySteps),
             microEvolution: String(raw.microEvolution || "").trim(),
             workoutItems
@@ -7982,6 +8033,12 @@ input[type="checkbox"] {
           UI.render(state.entries);
           UI.renderTodayTimeline();
           UI.renderPendingCapsule();
+          // 体重事件 → 通知 体重×尿酸 panel 重渲染 + 触发里程碑检测
+          if (event.eventType === "weight") {
+            window.HealthCombined?.refresh?.();
+            window.LoopEngine?.refreshPlateauCard?.();
+            window.LoopEngine?.checkMilestones?.();
+          }
           return true;
         },
 
@@ -8490,9 +8547,54 @@ input[type="checkbox"] {
         localStorage.setItem(WORKOUT_NAME_MIGRATION_KEY, "done");
       }
 
+      // ── 体重×尿酸 weight_records 一次性合并到 state.entries（统一存储）──
+      const WEIGHT_MERGE_MIGRATION_KEY = "michael-energy-tracker-weight-merge-v1";
+      function migrateWeightRecordsIntoEntries() {
+        if (localStorage.getItem(WEIGHT_MERGE_MIGRATION_KEY) === "done") return;
+        let weightRecs = [];
+        try { weightRecs = JSON.parse(localStorage.getItem("weight_records") || "[]"); } catch {}
+        if (!Array.isArray(weightRecs) || weightRecs.length === 0) {
+          localStorage.setItem(WEIGHT_MERGE_MIGRATION_KEY, "done");
+          return;
+        }
+        const entryMap = new Map(state.entries.map((e) => [e.date, e]));
+        let added = 0, filled = 0;
+        weightRecs.forEach((rec) => {
+          if (!rec || !rec.date) return;
+          const existing = entryMap.get(rec.date);
+          if (existing) {
+            // entries 已存在该日 → 只补齐缺失字段（entries 为准）
+            const patch = {};
+            if ((existing.weight == null || existing.weight === 0) && Number.isFinite(rec.weight)) patch.weight = rec.weight;
+            if (existing.waistCircumference == null && Number.isFinite(rec.waist)) patch.waistCircumference = rec.waist;
+            if (!existing.weightNote && rec.note) patch.weightNote = rec.note;
+            if (Object.keys(patch).length) {
+              entryMap.set(rec.date, { ...existing, ...patch });
+              filled += 1;
+            }
+          } else {
+            // entries 缺这天 → 新建一条仅含体重的薄记录（normalize 会补齐其他默认字段）
+            const newEntry = EntryModel.normalize({
+              date: rec.date,
+              weight: Number.isFinite(rec.weight) ? rec.weight : null,
+              waistCircumference: Number.isFinite(rec.waist) ? rec.waist : null,
+              weightNote: rec.note || ""
+            });
+            entryMap.set(rec.date, newEntry);
+            added += 1;
+          }
+        });
+        if (added + filled > 0) {
+          state.entries = StorageService.saveEntries([...entryMap.values()]);
+          console.log(`[migration] 体重数据合并：新增 ${added} 条，补齐 ${filled} 条`);
+        }
+        localStorage.setItem(WEIGHT_MERGE_MIGRATION_KEY, "done");
+      }
+
       function initialize() {
         state.entries = StorageService.ensureSeedData();
         migrateWorkoutNames();
+        migrateWeightRecordsIntoEntries();
         // 清理"非今日且已推"的事件：今日已推的保留供时间线展示，跨日后丢弃
         SyncQueue.cleanOldPushed(DateUtils.getTodayISO());
         bindEvents();
@@ -8508,17 +8610,16 @@ input[type="checkbox"] {
 
     // ── 健康预管理系统 V2 · 今日评分 ──
     (() => {
-      const DAY_BOUNDARY = 2; // 凌晨2点换日
+      const DAY_BOUNDARY = 2; // 凌晨2点换日（北京时间）
       function _effectiveDate() {
-        const now = new Date();
-        if (now.getHours() < DAY_BOUNDARY) {
-          const d = new Date(now); d.setDate(d.getDate() - 1); return d;
-        }
-        return now;
+        // 仅保留兼容：返回 Date 对象
+        return new Date(_effectiveISO() + "T04:00:00Z");
       }
-      function _dateISO(d) {
-        return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+      function _effectiveISO() {
+        const t = window.BJ.todayISO();
+        return window.BJ.todayHour() < DAY_BOUNDARY ? window.BJ.addDaysISO(t, -1) : t;
       }
+      function _dateISO(d) { return window.BJ.todayISO(d); }
 
       const SCORE_KEY = "health_scores";
 
@@ -8570,7 +8671,7 @@ input[type="checkbox"] {
         { min: 0,  tier: "D", name: "警告",       text: "警告——身体在扣分，明天必须调整" }
       ];
 
-      function todayISO() { return _dateISO(_effectiveDate()); }
+      function todayISO() { return _effectiveISO(); }
 
       function loadAll() {
         try {
@@ -8849,30 +8950,34 @@ input[type="checkbox"] {
 
       // ════════ 体重 × 尿酸 联合管理 ════════
 
-      const WEIGHT_KEY = "weight_records";
+      const ENTRIES_KEY = "michael-energy-tracker-v1"; // 与主 IIFE 的 CONFIG.storageKey 一致
       const URIC_KEY = "uric_acid_records";
       const URIC_TARGET = 420;
       const WEIGHT_TARGET = 80;
 
+      // 从 state.entries 派生 weight 视图：只读，结构同原 weight_records
       function loadWeights() {
-        try {
-          const raw = localStorage.getItem(WEIGHT_KEY);
-          if (raw) return JSON.parse(raw);
-        } catch (err) {}
-        // 首次：种 PRD 给的 7 条
-        const seed = [
-          { date: "2026-05-10", weight: 83.9, waist: null, note: "" },
-          { date: "2026-05-11", weight: 83.5, waist: null, note: "慢食首日" },
-          { date: "2026-05-12", weight: 84.0, waist: null, note: "牛排反弹" },
-          { date: "2026-05-13", weight: 83.1, waist: 88, note: "" },
-          { date: "2026-05-14", weight: 83.1, waist: 88, note: "" },
-          { date: "2026-05-15", weight: 83.5, waist: null, note: "" },
-          { date: "2026-05-16", weight: 83.2, waist: 87.5, note: "苯溴马隆首日" }
-        ];
-        localStorage.setItem(WEIGHT_KEY, JSON.stringify(seed));
-        return seed;
+        let entries = [];
+        try { entries = JSON.parse(localStorage.getItem(ENTRIES_KEY) || "[]"); } catch {}
+        return entries
+          .filter((e) => e && e.date && Number.isFinite(Number(e.weight)) && Number(e.weight) > 0)
+          .map((e) => ({
+            date: e.date,
+            weight: Number(e.weight),
+            waist: Number.isFinite(Number(e.waistCircumference)) ? Number(e.waistCircumference) : null,
+            note: e.weightNote || ""
+          }));
       }
-      function saveWeights(arr) { localStorage.setItem(WEIGHT_KEY, JSON.stringify(arr)); }
+      // 写回 state.entries（删除时用）—— 删除某日的体重/腰围字段
+      function clearWeightOnDate(date) {
+        let entries = [];
+        try { entries = JSON.parse(localStorage.getItem(ENTRIES_KEY) || "[]"); } catch {}
+        const next = entries.map((e) => {
+          if (e.date !== date) return e;
+          return { ...e, weight: null, waistCircumference: null, weightNote: "" };
+        });
+        localStorage.setItem(ENTRIES_KEY, JSON.stringify(next));
+      }
 
       function loadUric() {
         try {
@@ -9100,55 +9205,73 @@ input[type="checkbox"] {
         renderCombinedChart();
       }
 
-      // 添加记录：6 字段 prompt 序列
-      function addRecordFlow() {
-        const date = window.prompt("日期 (YYYY-MM-DD)", todayISO());
+      // 体重/腰围 → 跳转到顶部「记体重」面板（统一入口）
+      // 尿酸 → 还保留本地 prompt 流，因为没有等价的 capture 入口
+      function jumpToWeightCapture() {
+        // 触发主 IIFE 的 PanelManager.open("weight")
+        const btn = document.querySelector("[data-event-type='weight']");
+        if (btn) {
+          btn.click();
+          // 滚动到表单
+          setTimeout(() => {
+            document.getElementById("weightPanelInput")?.scrollIntoView({ behavior: "smooth", block: "center" });
+            document.getElementById("weightPanelInput")?.focus();
+          }, 100);
+        } else {
+          window.alert("找不到「记体重」入口，请到顶部「快速捕获」点击 ⚖️ 记体重");
+        }
+      }
+
+      // 添加尿酸记录（独立流程，复查时才用）
+      function addUricFlow() {
+        const date = window.prompt("尿酸复查日期 (YYYY-MM-DD)", todayISO());
         if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) return;
-        const wStr = window.prompt("体重 kg（必填）");
-        if (wStr === null) return;
-        const weight = Number(wStr);
-        if (!Number.isFinite(weight) || weight <= 0) {
-          window.alert("体重需要是正数");
+        const uricStr = window.prompt("尿酸 μmol/L");
+        if (uricStr === null) return;
+        const uricValue = Number(uricStr);
+        if (!Number.isFinite(uricValue) || uricValue <= 0) {
+          window.alert("尿酸值需要是正数");
           return;
         }
-        const waistStr = window.prompt("腰围 cm（选填，留空跳过）", "");
-        const waist = waistStr === "" || waistStr === null ? null : Number(waistStr);
-        const uricStr = window.prompt("尿酸 μmol/L（选填，复查时才填）", "");
-        const uricValue = uricStr === "" || uricStr === null ? null : Number(uricStr);
         const medication = window.prompt("用药情况（选填）", "") || "";
         const note = window.prompt("备注（选填）", "") || "";
 
-        // 写体重记录（按日期 upsert）
-        const weights = loadWeights().filter((w) => w.date !== date);
-        weights.push({ date, weight, waist: Number.isFinite(waist) ? waist : null, note });
-        saveWeights(weights);
+        // 体重从 state.entries 同日记录里取（如果有）
+        const sameDayWeight = loadWeights().find((w) => w.date === date);
+        const weight = sameDayWeight ? sameDayWeight.weight : null;
 
-        // 如果填了尿酸值，写尿酸记录（upsert）
-        if (Number.isFinite(uricValue) && uricValue > 0) {
-          const uric = loadUric().filter((u) => u.date !== date);
-          uric.push({ date, value: uricValue, weight, medication, note });
-          saveUric(uric);
-        }
+        const uric = loadUric().filter((u) => u.date !== date);
+        uric.push({ date, value: uricValue, weight, medication, note });
+        saveUric(uric);
 
         renderCombined();
-
-        // 增强回路引擎：新记录 → 检测里程碑 + 重算平台期卡片
         if (window.LoopEngine) {
           window.LoopEngine.refreshPlateauCard();
           window.LoopEngine.checkMilestones();
         }
       }
 
-      // 删除记录
+      // 删除：分别针对体重 / 尿酸；目前 UI 删除按钮删整行（含两者）
       function deleteRecord(date) {
         if (!window.confirm(`确定删除 ${fmtShortDate(date)} 的记录吗？（体重和尿酸都会清掉）`)) return;
-        saveWeights(loadWeights().filter((w) => w.date !== date));
+        clearWeightOnDate(date);
         saveUric(loadUric().filter((u) => u.date !== date));
         renderCombined();
+        // 通知主 IIFE 重渲染（体重数据变了）
+        window.dispatchEvent(new CustomEvent("entries-changed"));
       }
 
       function bindCombinedEvents() {
-        document.getElementById("healthAddRecordBtn").addEventListener("click", addRecordFlow);
+        const addBtn = document.getElementById("healthAddRecordBtn");
+        if (addBtn) {
+          addBtn.textContent = "📝 去记体重 / 尿酸";
+          addBtn.addEventListener("click", () => {
+            // 用户选择：体重 or 尿酸？
+            const choice = window.confirm("点「确定」去记体重和腰围\n点「取消」记尿酸（复查时）");
+            if (choice) jumpToWeightCapture();
+            else addUricFlow();
+          });
+        }
         document.getElementById("healthRecordsBody").addEventListener("click", (e) => {
           const btn = e.target.closest("[data-action='delete-health-record']");
           if (!btn) return;
@@ -9156,7 +9279,13 @@ input[type="checkbox"] {
           if (!row) return;
           deleteRecord(row.dataset.recordDate);
         });
+
+        // 监听其它 IIFE 通知体重数据已变化（记体重保存后）
+        window.addEventListener("entries-changed", () => renderCombined());
       }
+
+      // 暴露刷新 hook 给主 IIFE applyEvent("weight") 调用
+      window.HealthCombined = { refresh: () => renderCombined() };
 
       // ── 评分模块初始化（Commit 2 误删了 init，这里补回来）──
       renderItems(loadToday());
@@ -9319,11 +9448,10 @@ input[type="checkbox"] {
 
       function renderTrend() {
         const all = loadAll();
-        const today = new Date();
+        const todayISO = window.BJ.todayISO();
         const dates = [];
         for (let i = trendRange - 1; i >= 0; i--) {
-          const d = new Date(today); d.setDate(today.getDate() - i);
-          dates.push(d.toISOString().slice(0, 10));
+          dates.push(window.BJ.addDaysISO(todayISO, -i));
         }
         const series = dates.map((d) => {
           if (all[d]) return computeScore(all[d]).total;
@@ -9598,33 +9726,20 @@ input[type="checkbox"] {
       function makeId(prefix) {
         return `${prefix}-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
       }
-      // 本地时区安全的 YYYY-MM-DD（避免 toISOString 的 UTC 偏移在 CST 把日期算少一天）
-      function localISO(d) {
-        const y = d.getFullYear();
-        const m = String(d.getMonth() + 1).padStart(2, "0");
-        const dd = String(d.getDate()).padStart(2, "0");
-        return `${y}-${m}-${dd}`;
-      }
+      // 全部走北京时间（window.BJ），避免依赖浏览器本地时区
+      function localISO(d) { return window.BJ.todayISO(d); }
       function getMondayISO(date) {
-        const d = new Date(date);
-        const day = d.getDay() || 7;
-        d.setDate(d.getDate() - (day - 1));
-        d.setHours(0, 0, 0, 0);
-        return localISO(d);
+        const refISO = date ? window.BJ.todayISO(date) : window.BJ.todayISO();
+        return window.BJ.thisMondayISO(refISO);
       }
       function getWeekDates() {
-        const today = new Date();
-        const monday = new Date(getMondayISO(today) + "T00:00:00");
-        return Array.from({ length: 7 }, (_, i) => {
-          const d = new Date(monday);
-          d.setDate(monday.getDate() + i);
-          return localISO(d);
-        });
+        const monday = window.BJ.thisMondayISO();
+        return Array.from({ length: 7 }, (_, i) => window.BJ.addDaysISO(monday, i));
       }
       function todayISO() {
-        const now = new Date();
-        const d = now.getHours() < 2 ? (function(){ const x = new Date(now); x.setDate(x.getDate()-1); return x; })() : now;
-        return localISO(d);
+        // 凌晨 2 点边界仍然使用，但用北京时间
+        const t = window.BJ.todayISO();
+        return window.BJ.todayHour() < 2 ? window.BJ.addDaysISO(t, -1) : t;
       }
       function fmtShortDate(iso) {
         const [, mm, dd] = iso.split("-");
@@ -9866,55 +9981,27 @@ input[type="checkbox"] {
       const WEEK_KEY = "miying_week_reviewed_v1"; // 存上次复盘的周一 ISO
       const WEEK_DAYS_ZH = ["日", "一", "二", "三", "四", "五", "六"];
 
-      // 本地时区安全的日期格式化（避免 toISOString 的 UTC 偏移导致少一天）
-      function fmtLocalISO(d) {
-        const y = d.getFullYear();
-        const m = String(d.getMonth() + 1).padStart(2, "0");
-        const dd = String(d.getDate()).padStart(2, "0");
-        return `${y}-${m}-${dd}`;
-      }
-
-      function todayDate() {
-        const d = new Date();
-        d.setHours(0, 0, 0, 0);
-        return d;
-      }
-
-      // 取 d 所在自然周的周一（Date 对象，零时）
-      function getMonday(d) {
-        const dt = new Date(d);
-        dt.setHours(0, 0, 0, 0);
-        const day = dt.getDay(); // 0=日, 1=一, ..., 6=六
-        const diff = day === 0 ? -6 : 1 - day;
-        dt.setDate(dt.getDate() + diff);
-        return dt;
-      }
-
-      function addDays(date, n) {
-        const d = new Date(date);
-        d.setDate(d.getDate() + n);
-        return d;
-      }
-
-      function fmtMDDay(d) {
-        return `${d.getMonth() + 1}/${d.getDate()}(${WEEK_DAYS_ZH[d.getDay()]})`;
+      // 全部走北京时间（window.BJ），周一-周日按 Asia/Shanghai 对齐
+      function fmtMDDay(iso) {
+        const [, m, dd] = iso.split("-");
+        const dow = window.BJ.dayOfWeekFromISO(iso);
+        return `${Number(m)}/${Number(dd)}(${WEEK_DAYS_ZH[dow]})`;
       }
 
       function renderCycle() {
-        const today = todayDate();
-        const monday = getMonday(today);
-        const sunday = addDays(monday, 6);
-        const dayNo = ((today.getDay() + 6) % 7) + 1; // 周一=1, 周日=7
+        const todayISO = window.BJ.todayISO();
+        const mondayISO = window.BJ.thisMondayISO(todayISO);
+        const sundayISO = window.BJ.addDaysISO(mondayISO, 6);
+        const dayNo = window.BJ.diffDays(mondayISO, todayISO) + 1; // 周一=1, 周日=7
         const isSunday = dayNo === 7;
 
-        const mondayISO = fmtLocalISO(monday);
         const reviewedISO = localStorage.getItem(WEEK_KEY) || "";
         const reviewedThisWeek = reviewedISO === mondayISO;
         const needReview = isSunday && !reviewedThisWeek;
 
         const datesEl = document.getElementById("miyingCycleDates");
         const dayEl = document.getElementById("miyingCycleDay");
-        if (datesEl) datesEl.textContent = `${fmtMDDay(monday)} - ${fmtMDDay(sunday)}`;
+        if (datesEl) datesEl.textContent = `${fmtMDDay(mondayISO)} - ${fmtMDDay(sundayISO)}`;
         if (dayEl) {
           dayEl.textContent = `第 ${dayNo} 天 / 7`;
           dayEl.classList.toggle("overdue", needReview);
@@ -9928,8 +10015,8 @@ input[type="checkbox"] {
         const btn = document.getElementById("miyingCycleResetBtn");
         if (!btn) return;
         btn.addEventListener("click", () => {
-          const monday = getMonday(todayDate());
-          localStorage.setItem(WEEK_KEY, fmtLocalISO(monday));
+          const mondayISO = window.BJ.thisMondayISO();
+          localStorage.setItem(WEEK_KEY, mondayISO);
           renderCycle();
         });
       }
@@ -10091,8 +10178,15 @@ input[type="checkbox"] {
         } catch (err) {}
 
         try {
-          const weights = JSON.parse(localStorage.getItem("weight_records") || "[]")
-            .slice()
+          // 统一存储：从 state.entries 派生 weight 列表
+          const entries = JSON.parse(localStorage.getItem("michael-energy-tracker-v1") || "[]");
+          const weights = entries
+            .filter((e) => e && e.date && Number.isFinite(Number(e.weight)) && Number(e.weight) > 0)
+            .map((e) => ({
+              date: e.date,
+              weight: Number(e.weight),
+              waist: Number.isFinite(Number(e.waistCircumference)) ? Number(e.waistCircumference) : null
+            }))
             .sort((a, b) => a.date.localeCompare(b.date));
           if (weights.length) {
             stats.weightStart = weights[0].weight;
@@ -10468,7 +10562,22 @@ input[type="checkbox"] {
         map[id] = { note, ts: new Date().toISOString() };
         localStorage.setItem(NOTES_KEY, JSON.stringify(map));
       }
+      // 统一存储后：从 state.entries 派生（兼容老调用方）
       function loadWeightRecords() {
+        try {
+          const entries = JSON.parse(localStorage.getItem("michael-energy-tracker-v1") || "[]");
+          return entries
+            .filter((e) => e && e.date && Number.isFinite(Number(e.weight)) && Number(e.weight) > 0)
+            .map((e) => ({
+              date: e.date,
+              weight: Number(e.weight),
+              waist: Number.isFinite(Number(e.waistCircumference)) ? Number(e.waistCircumference) : null,
+              note: e.weightNote || ""
+            }));
+        } catch { return []; }
+      }
+      // 旧路径（已弃用，保留以防）：从 weight_records 直接读
+      function loadWeightRecordsLegacy() {
         try { return JSON.parse(localStorage.getItem("weight_records") || "[]"); }
         catch { return []; }
       }
@@ -10503,12 +10612,7 @@ input[type="checkbox"] {
         return Math.max(0, Math.min(100, total));
       }
 
-      function localISO(d) {
-        const y = d.getFullYear();
-        const m = String(d.getMonth() + 1).padStart(2, "0");
-        const dd = String(d.getDate()).padStart(2, "0");
-        return `${y}-${m}-${dd}`;
-      }
+      function localISO(d) { return window.BJ.todayISO(d); }
 
       // ── 里程碑规则表 ────────────────────────────────────────────
       const MILESTONES = [
