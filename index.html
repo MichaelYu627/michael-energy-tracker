@@ -6547,6 +6547,10 @@ input[type="checkbox"] {
             <input type="time" id="sleepPanelWakeTime" value="${p.wakeTime || today.wakeTime || '06:00'}">
           </div>
         </div>
+        <div id="sleepDipAnchor" style="display:${(p.sleepScore ?? today.sleepScore ?? 80) < 70 ? 'block' : 'none'};background:linear-gradient(135deg,rgba(58,123,213,0.08),rgba(58,123,213,0.04));border-radius:12px;padding:12px 16px;margin-top:10px;font-size:13.5px;line-height:1.7;color:var(--text);border-left:3px solid #3a7bd5;">
+          🌊 <strong>低谷不是高峰的反义词，低谷是高峰的供应商。</strong><br>
+          马夫的骄傲全来自于<strong style="color:var(--accent);">黑马的状态</strong>和<strong style="color:var(--accent-warm);">白马的动能</strong>，要重视黑马的反馈和白马的稳定！
+        </div>
         <div id="sleepLowScoreAnchor" style="display:${(p.sleepScore ?? today.sleepScore ?? 80) < 60 ? 'block' : 'none'};background:linear-gradient(135deg,rgba(31,122,92,0.08),rgba(209,123,31,0.08));border-radius:12px;padding:12px 16px;margin-top:10px;font-size:13.5px;line-height:1.7;color:var(--text);border-left:3px solid var(--accent-warm);">
           🐴 这是<strong>黑马好好休息</strong>的时间段。你已经足够强了，肯定是哪个环节出了问题，世界拥有巨大的随机性。<br>
           不过放心，<strong style="color:var(--accent);">白马和马夫都在</strong>，Jarvis 会用稳稳的提前结构稳稳地托住。趁机让黑马好好休息。
@@ -6862,8 +6866,12 @@ input[type="checkbox"] {
   sleep(prefill) {
     document.getElementById("sleepPanelScore").addEventListener("input", (e) => {
       document.getElementById("sleepPanelScoreValue").textContent = e.target.value;
-      const anchor = document.getElementById("sleepLowScoreAnchor");
-      if (anchor) anchor.style.display = Number(e.target.value) < 60 ? "block" : "none";
+      const score = Number(e.target.value);
+      // 心智锚 (< 70) 与 行动锚 (< 60) 分层显示
+      const dipAnchor = document.getElementById("sleepDipAnchor");
+      const lowAnchor = document.getElementById("sleepLowScoreAnchor");
+      if (dipAnchor) dipAnchor.style.display = score < 70 ? "block" : "none";
+      if (lowAnchor) lowAnchor.style.display = score < 60 ? "block" : "none";
     });
     document.getElementById("sleepPanelWakingEnergy").addEventListener("input", (e) => {
       document.getElementById("sleepPanelWakingEnergyValue").textContent = e.target.value;
