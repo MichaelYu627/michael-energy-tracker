@@ -349,6 +349,70 @@
       color: #ffc45b;
     }
 
+    /* 灵魂索引：宣言下方的导航 pills，把诗化文字"翻译"到具体模块 */
+    .manifesto-index {
+      margin-top: 14px;
+      padding: 12px 0 0;
+      border-top: 1px dashed rgba(255, 255, 255, 0.1);
+    }
+    .mi-title {
+      font-size: 10.5px;
+      letter-spacing: 0.12em;
+      color: rgba(232, 251, 255, 0.45);
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+    .mi-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .mi-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: rgba(232, 251, 255, 0.88);
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      font-family: inherit;
+      white-space: nowrap;
+    }
+    .mi-pill:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 196, 91, 0.4);
+      color: #fff;
+      transform: translateY(-1px);
+    }
+    .mi-pill:active { transform: translateY(0); }
+    .mi-pill .mi-arrow {
+      color: rgba(232, 251, 255, 0.4);
+      margin: 0 2px;
+      font-size: 11px;
+    }
+    .mi-pill .mi-target {
+      color: rgba(255, 196, 91, 0.88);
+      font-weight: 600;
+    }
+    @media (max-width: 480px) {
+      .mi-pill { font-size: 11.5px; padding: 5px 8px; }
+    }
+
+    /* 索引跳转目标：1.6s 金光脉冲提示"这就是你点的那里" */
+    @keyframes manifestoTargetPulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(255, 196, 91, 0); }
+      30%      { box-shadow: 0 0 0 6px rgba(255, 196, 91, 0.35); }
+      60%      { box-shadow: 0 0 0 10px rgba(255, 196, 91, 0.18); }
+    }
+    .manifesto-target-pulse {
+      animation: manifestoTargetPulse 1.6s ease-out;
+      border-radius: 12px;
+    }
+
     .hero-meta {
       display: flex;
       flex-wrap: wrap;
@@ -4836,6 +4900,30 @@ input[type="checkbox"] {
             不是把自己活成一块流动的电池。<br><br>
             这是一套<strong>「长生种」操作系统</strong> —— 让<strong>严谨的逻辑链</strong>、<strong>客观的物理定律</strong>与<strong>主观的感知</strong>三者融合，<strong>与时间为友，与随机共舞</strong>。好事来时加固结构，坏事来时不被击穿。
           </p>
+          <!-- 灵魂索引：宣言→实现 一键直达 -->
+          <div class="manifesto-index" role="navigation" aria-label="灵魂索引">
+            <div class="mi-title">↓ 灵 魂 索 引 · 点 击 跳 到 对 应 模 块</div>
+            <div class="mi-pills">
+              <button class="mi-pill" type="button" data-mi-target="#miyingCycle">
+                ⏳ 与时间为友 <span class="mi-arrow">→</span><span class="mi-target">觅应周期</span>
+              </button>
+              <button class="mi-pill" type="button" data-mi-target="#lpPlateauCard" data-mi-expand="#healthCombined">
+                🌊 与随机共舞 <span class="mi-arrow">→</span><span class="mi-target">平台期守护</span>
+              </button>
+              <button class="mi-pill" type="button" data-mi-target="#circuitBreakerBtn">
+                🛡️ 不被击穿 <span class="mi-arrow">→</span><span class="mi-target">白马校准</span>
+              </button>
+              <button class="mi-pill" type="button" data-mi-target="#trainingProgressGrid" data-mi-expand=".health-training">
+                💪 加固结构 <span class="mi-arrow">→</span><span class="mi-target">训练进度</span>
+              </button>
+              <button class="mi-pill" type="button" data-mi-target="[data-event-type='sleep']">
+                🧠 主观感知 <span class="mi-arrow">→</span><span class="mi-target">起床能量</span>
+              </button>
+              <button class="mi-pill" type="button" data-mi-target="#growthMeter">
+                ⚛️ 物理定律 <span class="mi-arrow">→</span><span class="mi-target">能量公式</span>
+              </button>
+            </div>
+          </div>
           <div class="hero-meta">
             <span id="heroDateLabel">今天</span>
             <span>能量守恒</span>
@@ -11392,6 +11480,58 @@ input[type="checkbox"] {
       } else {
         setTimeout(renderTrainingProgress, 50);
       }
+    })();
+
+    // ════════════════════════════════════════════════════════════
+    //  灵魂索引：宣言 pill → 跳转到 app 内对应模块
+    //  · 智能展开折叠父容器
+    //  · 平滑滚动到目标 + 1.6s 金光脉冲提示
+    // ════════════════════════════════════════════════════════════
+    (() => {
+      function expandAncestorDetails(el) {
+        // 沿 DOM 上行打开所有 <details>，确保 target 可见
+        let p = el?.parentElement;
+        while (p) {
+          if (p.tagName === "DETAILS" && !p.open) p.open = true;
+          p = p.parentElement;
+        }
+      }
+      function pulseTarget(el) {
+        if (!el) return;
+        el.classList.add("manifesto-target-pulse");
+        setTimeout(() => el.classList.remove("manifesto-target-pulse"), 1700);
+      }
+      document.addEventListener("click", (e) => {
+        const btn = e.target.closest(".mi-pill[data-mi-target]");
+        if (!btn) return;
+        e.preventDefault();
+        const targetSel = btn.dataset.miTarget;
+        const expandSel = btn.dataset.miExpand;
+        // 先展开父折叠（如果指定了）
+        if (expandSel) {
+          document.querySelectorAll(expandSel).forEach((d) => {
+            if (d.tagName === "DETAILS") d.open = true;
+          });
+        }
+        const el = document.querySelector(targetSel);
+        if (!el) {
+          console.warn("[manifesto-index] target not found:", targetSel);
+          return;
+        }
+        // 再展开 target 自己的所有 details 祖先
+        expandAncestorDetails(el);
+        // 浮动按钮 (#circuitBreakerBtn / #xuGuardBtn) position:fixed —— 不能 scroll，直接 pulse
+        const styles = window.getComputedStyle(el);
+        if (styles.position === "fixed") {
+          pulseTarget(el);
+          return;
+        }
+        // 等一帧让 details 展开生效再 scroll
+        setTimeout(() => {
+          el.scrollIntoView({ behavior: "smooth", block: "center" });
+          setTimeout(() => pulseTarget(el), 500);
+        }, 60);
+      });
     })();
   </script>
 
