@@ -163,7 +163,68 @@
       .xu-four-dims { grid-template-columns: repeat(2, 1fr); gap: 6px; }
     }
 
-    /* 母公式（道→术→器 三层心法之"术"层）*/
+    /* 法层：黑马/白马/马夫/Jarvis 四元角色模型（道→法→术→器 之"法"层）*/
+    .four-roles {
+      margin-top: 14px;
+      padding: 12px 14px;
+      border-radius: var(--radius-sm);
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .fr-title {
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      color: rgba(232, 251, 255, 0.55);
+      margin-bottom: 10px;
+      font-weight: 600;
+    }
+    .fr-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+    .fr-role {
+      padding: 8px 6px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      text-align: center;
+      transition: transform 0.2s;
+    }
+    .fr-role:hover { transform: translateY(-1px); background: rgba(255,255,255,0.06); }
+    .fr-emoji { font-size: 20px; line-height: 1; margin-bottom: 4px; }
+    .fr-name {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      margin-bottom: 2px;
+    }
+    .fr-axis {
+      font-size: 10px;
+      color: rgba(232, 251, 255, 0.55);
+      margin-bottom: 4px;
+      letter-spacing: 0.05em;
+    }
+    .fr-desc {
+      font-size: 10.5px;
+      line-height: 1.4;
+      color: rgba(232, 251, 255, 0.78);
+    }
+    /* 四角色色谱（沿用现有 anchor 文案的约定）*/
+    .fr-role.black-horse .fr-name { color: #7be495; }      /* 黑马 = 绿 · 能量 / 身体 */
+    .fr-role.white-horse .fr-name { color: #ffc45b; }      /* 白马 = 暖橙金 · 动能 / 累积 */
+    .fr-role.coachman   .fr-name { color: #ff8a8a; }       /* 马夫 = 暖珊瑚 · 决策 / 当下 */
+    .fr-role.jarvis     .fr-name { color: #47f4ff; }       /* Jarvis = 冷青 · 系统 / 外部 */
+    .fr-role.black-horse { border-left: 2px solid rgba(123,228,149,0.5); }
+    .fr-role.white-horse { border-left: 2px solid rgba(255,196,91,0.5); }
+    .fr-role.coachman   { border-left: 2px solid rgba(255,138,138,0.5); }
+    .fr-role.jarvis     { border-left: 2px solid rgba(71,244,255,0.5); }
+    @media (max-width: 600px) {
+      .fr-grid { grid-template-columns: repeat(2, 1fr); gap: 6px; }
+      .fr-desc { font-size: 11px; }
+    }
+
+    /* 母公式（道→法→术→器 四层心法之"术"层）*/
     .mother-formula {
       margin-top: 14px;
       padding: 14px 16px;
@@ -4802,7 +4863,38 @@ input[type="checkbox"] {
             </div>
           </div>
 
-          <!-- 母公式：道→术→器 中的"术"层 · 贯穿能量追踪 + 健康预管理两大架构 -->
+          <!-- 法层：黑马/白马/马夫/Jarvis 四元角色模型 · 道→法→术→器 之"法"层 -->
+          <div class="four-roles" role="region" aria-label="四元角色模型">
+            <div class="fr-title">🪐 法 · 四 元 角 色 模 型</div>
+            <div class="fr-grid">
+              <div class="fr-role black-horse">
+                <div class="fr-emoji">🐴</div>
+                <div class="fr-name">黑马</div>
+                <div class="fr-axis">能量 · 输出</div>
+                <div class="fr-desc">身体状态<br>生理反应</div>
+              </div>
+              <div class="fr-role white-horse">
+                <div class="fr-emoji">🏇</div>
+                <div class="fr-name">白马</div>
+                <div class="fr-axis">动能 · 累积</div>
+                <div class="fr-desc">习惯惯性<br>可积资本</div>
+              </div>
+              <div class="fr-role coachman">
+                <div class="fr-emoji">🎩</div>
+                <div class="fr-name">马夫</div>
+                <div class="fr-axis">决策 · 当下</div>
+                <div class="fr-desc">理性选择者<br>做选择的"你"</div>
+              </div>
+              <div class="fr-role jarvis">
+                <div class="fr-emoji">🤖</div>
+                <div class="fr-name">Jarvis</div>
+                <div class="fr-axis">系统 · 兜底</div>
+                <div class="fr-desc">外部支持<br>提前结构</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 母公式：道→法→术→器 中的"术"层 · 贯穿能量追踪 + 健康预管理两大架构 -->
           <div class="mother-formula" role="region" aria-label="母公式">
             <div class="mf-title">📜 母 公 式 · 运 技 操 作 系 统</div>
             <div class="mf-couplet">"可控者勤，不可控者静；能积者守，难积者轻"</div>
