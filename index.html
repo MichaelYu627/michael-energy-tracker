@@ -336,6 +336,19 @@
       line-height: 1.7;
     }
 
+    /* 灵魂宣言：双段排版，关键词加重 */
+    .hero-manifesto {
+      max-width: 700px;
+    }
+    .hero-manifesto strong {
+      color: rgba(255, 255, 255, 0.98);
+      font-weight: 700;
+    }
+    .hero-manifesto strong:first-of-type {
+      /* 「长生种」操作系统 — 主体概念，金色高亮 */
+      color: #ffc45b;
+    }
+
     .hero-meta {
       display: flex;
       flex-wrap: wrap;
@@ -4819,7 +4832,10 @@ input[type="checkbox"] {
         <div class="hero-copy">
           <div class="hero-badge">每日健康与能量管理仪表盘</div>
           <h1>Michael 能量追踪器</h1>
-          <p>把自己活成一块会流动的电池。你每天做的睡眠、饮食、训练、工作与情绪处理，都会改变今天的电量结构，而结构会慢慢决定整条河流的方向。</p>
+          <p class="hero-manifesto">
+            不是把自己活成一块流动的电池。<br><br>
+            这是一套<strong>「长生种」操作系统</strong> —— 让<strong>严谨的逻辑链</strong>、<strong>客观的物理定律</strong>与<strong>主观的感知</strong>三者融合，<strong>与时间为友，与随机共舞</strong>。好事来时加固结构，坏事来时不被击穿。
+          </p>
           <div class="hero-meta">
             <span id="heroDateLabel">今天</span>
             <span>能量守恒</span>
