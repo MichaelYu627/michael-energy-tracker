@@ -163,6 +163,94 @@
       .xu-four-dims { grid-template-columns: repeat(2, 1fr); gap: 6px; }
     }
 
+    /* 母公式（道→术→器 三层心法之"术"层）*/
+    .mother-formula {
+      margin-top: 14px;
+      padding: 14px 16px;
+      border-radius: var(--radius-sm);
+      background: linear-gradient(135deg, rgba(255,196,91,0.08), rgba(123,228,149,0.04));
+      border: 1px solid rgba(255,196,91,0.18);
+    }
+    .mf-title {
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      color: rgba(232, 251, 255, 0.55);
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+    .mf-couplet {
+      font-size: 14px;
+      line-height: 1.7;
+      color: rgba(232, 251, 255, 0.95);
+      font-weight: 600;
+      margin-bottom: 12px;
+      letter-spacing: 0.02em;
+    }
+    .mf-rules {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    .mf-rule {
+      padding: 8px 10px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      font-size: 11.5px;
+      line-height: 1.5;
+    }
+    .mf-rule-num {
+      display: inline-block;
+      width: 16px; height: 16px;
+      border-radius: 50%;
+      background: rgba(255,196,91,0.22);
+      color: #ffc45b;
+      text-align: center;
+      font-size: 10px; font-weight: 700;
+      line-height: 16px;
+      margin-right: 5px;
+    }
+    .mf-rule strong { color: rgba(232,251,255,0.95); font-weight: 700; }
+    .mf-rule-1 strong { color: #7be495; } /* 可控-绿 */
+    .mf-rule-2 strong { color: #47f4ff; } /* 不可控-青 */
+    .mf-rule-3 strong { color: #ffc45b; } /* 复盘-金 */
+    @media (max-width: 600px) {
+      .mf-rules { grid-template-columns: 1fr; gap: 6px; }
+      .mf-rule { font-size: 12px; }
+    }
+
+    /* 可控/不可控 视觉词汇（贯穿全 app）*/
+    .ctrl-badge {
+      display: inline-block;
+      font-size: 10px;
+      padding: 1px 6px;
+      border-radius: 999px;
+      letter-spacing: 0.05em;
+      font-weight: 600;
+      vertical-align: middle;
+      margin-left: 6px;
+      line-height: 1.5;
+    }
+    .ctrl-badge.input {
+      background: rgba(123, 228, 149, 0.15);
+      color: #2dab88;
+      border: 1px solid rgba(123, 228, 149, 0.35);
+    }
+    .ctrl-badge.output {
+      background: rgba(71, 244, 255, 0.12);
+      color: #2898a3;
+      border: 1px solid rgba(71, 244, 255, 0.3);
+    }
+    /* 在深色背景上的版本（cb-* 区域、hero）*/
+    .dark-bg .ctrl-badge.input,
+    [class*="cb-"] .ctrl-badge.input {
+      color: #7be495; background: rgba(123,228,149,0.18); border-color: rgba(123,228,149,0.4);
+    }
+    .dark-bg .ctrl-badge.output,
+    [class*="cb-"] .ctrl-badge.output {
+      color: #47f4ff; background: rgba(71,244,255,0.15); border-color: rgba(71,244,255,0.35);
+    }
+
     .hero-grid {
       position: relative;
       z-index: 1;
@@ -4713,6 +4801,17 @@ input[type="checkbox"] {
               <div class="xu-dim-line2">虚以防狂</div>
             </div>
           </div>
+
+          <!-- 母公式：道→术→器 中的"术"层 · 贯穿能量追踪 + 健康预管理两大架构 -->
+          <div class="mother-formula" role="region" aria-label="母公式">
+            <div class="mf-title">📜 母 公 式 · 运 技 操 作 系 统</div>
+            <div class="mf-couplet">"可控者勤，不可控者静；能积者守，难积者轻"</div>
+            <div class="mf-rules">
+              <div class="mf-rule mf-rule-1"><span class="mf-rule-num">1</span><strong>可控处</strong>尽技能</div>
+              <div class="mf-rule mf-rule-2"><span class="mf-rule-num">2</span><strong>不可控处</strong>留冗余</div>
+              <div class="mf-rule mf-rule-3"><span class="mf-rule-num">3</span>结果出现后<br>只<strong>复盘变量</strong>，不审判自己</div>
+            </div>
+          </div>
         </div>
         <div class="hero-visual">
           <div class="battery-constellation" aria-hidden="true">
@@ -4796,7 +4895,7 @@ input[type="checkbox"] {
       <!-- 加分项 -->
       <details class="health-items-section" id="healthAddSection">
         <summary>
-          ✅ 加分项 <span class="group-sum add" id="healthAddSum">+0</span>
+          ✅ 加分项 <span class="ctrl-badge input">可控 · 输入</span><span class="group-sum add" id="healthAddSum">+0</span>
         </summary>
         <div id="healthAddItems"></div>
       </details>
@@ -4804,7 +4903,7 @@ input[type="checkbox"] {
       <!-- 扣分项 -->
       <details class="health-items-section" id="healthSubSection">
         <summary>
-          ❌ 扣分项 <span class="group-sum sub" id="healthSubSum">-0</span>
+          ❌ 扣分项 <span class="ctrl-badge input">可控 · 输入</span><span class="group-sum sub" id="healthSubSum">-0</span>
         </summary>
         <div id="healthSubItems"></div>
       </details>
@@ -4812,7 +4911,7 @@ input[type="checkbox"] {
       <!-- ───── 体重 × 尿酸 联合管理 ───── -->
       <details class="health-combined" id="healthCombined">
         <summary>
-          📊 体重 × 尿酸
+          📊 体重 × 尿酸 <span class="ctrl-badge output">不可控 · 输出</span>
           <span class="health-combined-target" id="healthCombinedTarget">83.2 → 80 kg · 566 → 420</span>
         </summary>
         <div class="health-combined-body">
@@ -4842,7 +4941,7 @@ input[type="checkbox"] {
                 <li>午后间歇步行 30 分钟</li>
                 <li>检查睡眠分（&lt;80 → 系统出力下降）</li>
               </ul>
-              <div class="lp-plateau-footer">谷底也是数据。平台期也是数据。波浪终将抬升。</div>
+              <div class="lp-plateau-footer">不可控的<strong>输出</strong>在波动（留冗余），可控的<strong>输入</strong>在累积（尽技能）。谷底也是数据，平台期也是数据 —— 只复盘变量，不审判自己。</div>
               <button class="lp-plateau-btn" id="lpPlateauBtn" type="button">我知道了 · 继续信任系统</button>
             </div>
 
@@ -5077,7 +5176,7 @@ input[type="checkbox"] {
 
       <!-- ───── 训练进度 ───── -->
       <details class="health-training">
-        <summary>💪 训练进度</summary>
+        <summary>💪 训练进度 <span class="ctrl-badge input">可控 · 输入</span></summary>
         <div class="health-training-body">
           <div class="tp-grid" id="trainingProgressGrid"></div>
           <div class="tp-footer">基于历史 workoutItems 自动计算 · 总次数 = 首数 × 组数 · 不含拉伸</div>
@@ -5086,7 +5185,7 @@ input[type="checkbox"] {
 
       <!-- ───── 评分趋势 ───── -->
       <details class="health-trend">
-        <summary>📈 评分趋势</summary>
+        <summary>📈 评分趋势 <span class="ctrl-badge output">不可控 · 输出</span></summary>
         <div class="trend-body">
           <div class="trend-toggle" id="trendToggle">
             <button data-range="7" class="active" type="button">7 天</button>
@@ -6558,8 +6657,8 @@ input[type="checkbox"] {
           马夫的骄傲全来自于<strong style="color:var(--accent);">黑马的状态</strong>和<strong style="color:var(--accent-warm);">白马的动能</strong>，要重视黑马的反馈和白马的稳定！
         </div>
         <div id="sleepLowScoreAnchor" style="display:${(p.sleepScore ?? today.sleepScore ?? 80) < 60 ? 'block' : 'none'};background:linear-gradient(135deg,rgba(31,122,92,0.08),rgba(209,123,31,0.08));border-radius:12px;padding:12px 16px;margin-top:10px;font-size:13.5px;line-height:1.7;color:var(--text);border-left:3px solid var(--accent-warm);">
-          🐴 这是<strong>黑马好好休息</strong>的时间段。你已经足够强了，肯定是哪个环节出了问题，世界拥有巨大的随机性。<br>
-          不过放心，<strong style="color:var(--accent);">白马和马夫都在</strong>，Jarvis 会用稳稳的提前结构稳稳地托住。趁机让黑马好好休息。
+          🐴 这是<strong>黑马好好休息</strong>的时间段（输出变量低 ≠ 你失败）。你已经足够强了，肯定是哪个变量出了问题 —— <strong>只复盘变量，不审判自己</strong>。<br>
+          不过放心，<strong style="color:var(--accent);">白马和马夫都在</strong>（可控处尽技能）；不可控处 Jarvis 用稳稳的提前结构留够冗余。趁机让黑马好好休息。
         </div>
         <div class="panel-actions">
           <button class="btn-primary" id="sleepPanelSave" type="button">💾 保存</button>
@@ -10833,7 +10932,7 @@ input[type="checkbox"] {
         },
         {
           id: "waist_milestone_3",
-          msg: "腰围-3cm。每一厘米都是慢食×训练×睡眠的系统产出。河床在改道。",
+          msg: "腰围-3cm（输出变量）。每一厘米都是可控的输入累积出来的：慢食×训练×睡眠。能积者守 —— 河床在改道。",
           detect({ weights }) {
             const w = weights
               .filter((r) => Number.isFinite(Number(r.waist)) && Number(r.waist) > 0)
