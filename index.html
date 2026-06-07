@@ -4787,6 +4787,57 @@ input[type="checkbox"] {
 }
 
 /* 平台期守护卡片 */
+/* 滋养模式护栏（80.9kg 突破后 weight ≤ 81 显示）*/
+.nourish-mode-guard {
+  margin-top: 14px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(123,228,149,0.10), rgba(255,196,91,0.06));
+  border: 1px solid rgba(123,228,149,0.3);
+  border-left: 3px solid #7be495;
+  color: var(--text);
+  font-size: 13px;
+  line-height: 1.65;
+}
+.nourish-mode-guard[hidden] { display: none !important; }
+.nourish-mode-guard h4 {
+  margin: 0 0 8px;
+  font-size: 15px;
+  color: var(--text);
+  font-weight: 700;
+}
+.nm-intro {
+  margin-bottom: 12px;
+  padding: 8px 10px;
+  background: rgba(255,255,255,0.4);
+  border-radius: 8px;
+  font-size: 12.5px;
+}
+.nm-intro strong { color: #2dab88; }
+.nm-rules {
+  margin: 0;
+  padding-left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.nm-rules li { font-size: 12.5px; line-height: 1.65; }
+.nm-rules li strong { color: #2dab88; font-weight: 700; }
+.nm-rules li em {
+  color: var(--accent-warm);
+  font-style: normal;
+  font-weight: 600;
+}
+.nm-footer {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px dashed rgba(123,228,149,0.3);
+  font-size: 11.5px;
+  color: var(--muted);
+  text-align: center;
+  letter-spacing: 0.03em;
+}
+
 .lp-plateau-card {
   margin-top: 14px;
   padding: 14px 16px;
@@ -5125,6 +5176,27 @@ input[type="checkbox"] {
               <span style="color:#3a7bd5;">●</span> 体重 ·
               <span style="color:#d17b1f;">●</span> 尿酸 ·
               <span style="color:rgba(110,110,98,0.7);">—— —— ——</span> 腰围
+            </div>
+
+            <!-- 突破 81kg 后的"滋养模式"护栏（weight ≤ 81 时显示，防止反弹到剥夺模式）-->
+            <div class="nourish-mode-guard" id="nourishModeGuard" hidden>
+              <h4>🌿 滋养模式 · 三条护栏</h4>
+              <div class="nm-intro">已突破 81kg —— 现在最该做的，是<strong>信任身体的智慧</strong>，不是再加把劲。</div>
+              <ol class="nm-rules">
+                <li>
+                  <strong>信任并继续</strong> · 不要因体重新低就下意识"再加把劲"（进一步节食/疯狂运动）。
+                  那会把系统推回"对抗模式"。继续执行当前饮食协议即可。
+                </li>
+                <li>
+                  <strong>为波动预留空间</strong> · 体重会有正常波动（如高强度训练后）。略有回升时用"虚"的心态：
+                  这只是<em>泊松过程的一个随机毛刺</em>，腰围趋势/体感/饮食结构不变 → 无需在意。
+                </li>
+                <li>
+                  <strong>深化「本味」探索</strong> · 主动用香料、香草、天然发酵调味品（无糖酱油、醋）
+                  提升食物层次感，让"健康餐"愉悦度上新台阶。系统更坚固、更愉悦。
+                </li>
+              </ol>
+              <div class="nm-footer">滋养模式 ≠ 剥夺模式。低炎症饮食 × 正念进食 × 身心合一 = 可持续。</div>
             </div>
 
             <!-- 平台期守护者卡片（嵌入趋势图下方，非弹窗）-->
@@ -8481,10 +8553,11 @@ input[type="checkbox"] {
           UI.render(state.entries);
           UI.renderTodayTimeline();
           UI.renderPendingCapsule();
-          // 体重事件 → 通知 体重×尿酸 panel 重渲染 + 触发里程碑检测
+          // 体重事件 → 通知 体重×尿酸 panel 重渲染 + 触发里程碑检测 + 滋养护栏
           if (event.eventType === "weight") {
             window.HealthCombined?.refresh?.();
             window.LoopEngine?.refreshPlateauCard?.();
+            window.LoopEngine?.refreshNourishGuard?.();
             window.LoopEngine?.checkMilestones?.();
           }
           // 训练事件 → 刷新训练进度 sparkline
@@ -11149,6 +11222,15 @@ input[type="checkbox"] {
           }
         },
         {
+          id: "weight_81_breakthrough",
+          msg: "达成80.9kg。验证「滋养模式」优于「剥夺模式」。关键：低炎症饮食、正念进食、身心合一。",
+          detect({ weights }) {
+            if (!weights.length) return false;
+            const latest = weights.slice().sort((a, b) => a.date.localeCompare(b.date)).pop();
+            return Number(latest.weight) <= 81;
+          }
+        },
+        {
           id: "weight_80",
           msg: "80kg。从84.3到这里，不是节食的胜利——是结构的胜利。",
           detect({ weights }) {
@@ -11346,11 +11428,24 @@ input[type="checkbox"] {
         }
       }
 
+      // 滋养模式护栏：latest weight ≤ 81 时显示三准则
+      function refreshNourishGuard() {
+        const guard = document.getElementById("nourishModeGuard");
+        if (!guard) return;
+        const weights = loadWeightRecords()
+          .filter((w) => Number.isFinite(Number(w.weight)) && Number(w.weight) > 0)
+          .sort((a, b) => a.date.localeCompare(b.date));
+        if (!weights.length) { guard.hidden = true; return; }
+        const latest = Number(weights[weights.length - 1].weight);
+        guard.hidden = !(latest <= 81);
+      }
+
       // ── 全局对外暴露 ─────────────────────────────────────────────
       window.LoopEngine = {
         checkMilestones,
         showMealMindfulness,
         refreshPlateauCard: renderPlateauCard,
+        refreshNourishGuard,
         // 测试 helper（可在 console 调用）
         _debug: {
           resetMilestones: () => localStorage.removeItem(MILESTONE_KEY),
@@ -11363,6 +11458,7 @@ input[type="checkbox"] {
       bindMilestoneEvents();
       bindPlateauEvents();
       renderPlateauCard();
+      refreshNourishGuard();
     })();
 
     // ════════════════════════════════════════════════════════════
