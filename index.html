@@ -9155,11 +9155,45 @@ input[type="checkbox"] {
         localStorage.setItem(SEED_CLEANUP_KEY, "done");
       }
 
+      // ── 一次性写入 2026-06-06 = 80.9kg 突破日（带签名保护，不覆盖用户既有数据）──
+      const CELEBRATION_806_KEY = "michael-energy-tracker-celebration-806-v1";
+      const CELEBRATION_806_DATE = "2026-06-06";
+      const CELEBRATION_806_WEIGHT = 80.9;
+      const CELEBRATION_806_NOTE = "达成80.9kg，验证'滋养模式'优于'剥夺模式'。关键：低炎症饮食、正念进食、身心合一。";
+      function writeCelebration806() {
+        if (localStorage.getItem(CELEBRATION_806_KEY) === "done") return;
+        const idx = state.entries.findIndex((e) => e.date === CELEBRATION_806_DATE);
+        if (idx >= 0) {
+          const existing = state.entries[idx];
+          // 签名保护：只有当 weight 缺失或为 0（即用户没记过）才写入
+          if (existing.weight && existing.weight > 0) {
+            console.log("[celebration-806] 已有真实体重记录，不覆盖");
+            localStorage.setItem(CELEBRATION_806_KEY, "done");
+            return;
+          }
+          const patched = { ...existing, weight: CELEBRATION_806_WEIGHT, weightNote: CELEBRATION_806_NOTE };
+          state.entries = StorageService.saveEntries(
+            state.entries.map((e, i) => (i === idx ? patched : e))
+          );
+        } else {
+          // 新建薄记录
+          const newEntry = EntryModel.normalize({
+            date: CELEBRATION_806_DATE,
+            weight: CELEBRATION_806_WEIGHT,
+            weightNote: CELEBRATION_806_NOTE
+          });
+          state.entries = StorageService.saveEntries([...state.entries, newEntry]);
+        }
+        console.log(`[celebration-806] 写入 ${CELEBRATION_806_DATE} = ${CELEBRATION_806_WEIGHT}kg`);
+        localStorage.setItem(CELEBRATION_806_KEY, "done");
+      }
+
       function initialize() {
         state.entries = StorageService.ensureSeedData();
         migrateWorkoutNames();
         migrateWeightRecordsIntoEntries();
         cleanupAprilSeedAndFixMay10();
+        writeCelebration806();
         // 清理"非今日且已推"的事件：今日已推的保留供时间线展示，跨日后丢弃
         SyncQueue.cleanOldPushed(DateUtils.getTodayISO());
         bindEvents();
@@ -11459,6 +11493,8 @@ input[type="checkbox"] {
       bindPlateauEvents();
       renderPlateauCard();
       refreshNourishGuard();
+      // 启动时跑一次 milestone 检测：捕获 migration 写入或跨设备同步的新数据
+      checkMilestones();
     })();
 
     // ════════════════════════════════════════════════════════════
