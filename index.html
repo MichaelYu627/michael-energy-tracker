@@ -6011,10 +6011,11 @@ input[type="checkbox"] {
           { name: "标准引体向上", volume: "12 个 x 1 组", rating: 8, note: "" },
           { name: "靠墙倒立", volume: "24 个 x 1 组", rating: 8, note: "" },
           { name: "level up-台阶宽距俯卧撑", volume: "24 个 x 1 组", rating: 8, note: "" },
+          { name: "折刀俯卧撑", volume: "20 个 x 1 组", rating: 8, note: "" },
           { name: "悬垂举腿", volume: "16 个 x 1 组", rating: 8, note: "" },
           { name: "上斜引体向上", volume: "20 个 x 2 组", rating: 8, note: "" },
           { name: "标准双腿深蹲", volume: "20 个 x 1 组", rating: 8, note: "" },
-          { name: "双腿提踵", volume: "60 个 x 2 组", rating: 8, note: "" },
+          { name: "单腿提踵", volume: "60 个 x 2 组", rating: 8, note: "" },
           { name: "拉伸", volume: "10 分钟", rating: 8, note: "" } // 收尾固定最后
         ]
       };
@@ -7118,7 +7119,7 @@ input[type="checkbox"] {
         🔥 <strong>黎明热身不可跳过</strong> — 清晨机体刚刚苏醒，关节僵硬、体温偏低。<strong style="color:var(--accent-hot);">前5分钟动态热身</strong>（关节绕环→猫牛伸展→深蹲预备）是避免受伤的必须支撑结构。
       </div>
       <div class="panel-actions" style="margin-bottom:12px;flex-wrap:wrap;gap:6px">
-        <button class="btn-secondary btn-slim" id="trainingLoadTemplatesBtn" type="button">一键导入常用十项</button>
+        <button class="btn-secondary btn-slim" id="trainingLoadTemplatesBtn" type="button">一键导入常用十一项</button>
         <button class="btn-secondary btn-slim" id="trainingClearBtn" type="button">清空</button>
       </div>
       <div id="trainingItemsList" style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px">
@@ -9045,10 +9046,12 @@ input[type="checkbox"] {
       }
 
       // ── 训练动作名一次性迁移（preset 升级后回填旧记录，幂等）──
-      const WORKOUT_NAME_MIGRATION_KEY = "michael-energy-tracker-workout-name-migration-v1";
+      // 每次新增 rename 规则就 bump version 并 reset flag
+      const WORKOUT_NAME_MIGRATION_KEY = "michael-energy-tracker-workout-name-migration-v2";
       const WORKOUT_RENAME_MAP = {
         "宽距引体向上": "标准引体向上",
-        "窄距俯卧撑": "level up-台阶宽距俯卧撑"
+        "窄距俯卧撑": "level up-台阶宽距俯卧撑",
+        "双腿提踵": "单腿提踵"
       };
       function migrateWorkoutNames() {
         if (localStorage.getItem(WORKOUT_NAME_MIGRATION_KEY) === "done") return;
@@ -11503,11 +11506,11 @@ input[type="checkbox"] {
     // ════════════════════════════════════════════════════════════
     (() => {
       const ENTRIES_KEY = "michael-energy-tracker-v1";
-      // 9 个力量动作（拉伸是时间型，不画）
+      // 10 个力量动作（拉伸是时间型，不画）
       const TRACKED_ACTIONS = [
         "单腿深蹲", "合桥", "标准引体向上", "靠墙倒立",
-        "level up-台阶宽距俯卧撑", "悬垂举腿",
-        "上斜引体向上", "标准双腿深蹲", "双腿提踵"
+        "level up-台阶宽距俯卧撑", "折刀俯卧撑", "悬垂举腿",
+        "上斜引体向上", "标准双腿深蹲", "单腿提踵"
       ];
 
       // 解析 "50 个 x 1 组" → 50, "20 个 x 2 组" → 40
