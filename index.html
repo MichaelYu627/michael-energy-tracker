@@ -5158,8 +5158,8 @@ input[type="checkbox"] {
       <!-- ───── 体重 × 尿酸 联合管理 ───── -->
       <details class="health-combined" id="healthCombined">
         <summary>
-          📊 体重 × 尿酸 <span class="ctrl-badge output">不可控 · 输出</span>
-          <span class="health-combined-target" id="healthCombinedTarget">83.2 → 80 kg · 566 → 420</span>
+          📊 体重 × 血糖 × 尿酸 <span class="ctrl-badge output">不可控 · 输出</span>
+          <span class="health-combined-target" id="healthCombinedTarget">83.2 → 80 kg · 5.5 mmol/L · 566 → 420</span>
         </summary>
         <div class="health-combined-body">
 
@@ -5174,6 +5174,7 @@ input[type="checkbox"] {
             </div>
             <div class="health-chart-meta">
               <span style="color:#3a7bd5;">●</span> 体重 ·
+              <span style="color:#c62828;">●</span> 血糖 ·
               <span style="color:#d17b1f;">●</span> 尿酸 ·
               <span style="color:rgba(110,110,98,0.7);">—— —— ——</span> 腰围
             </div>
@@ -5221,6 +5222,7 @@ input[type="checkbox"] {
                     <th>日期</th>
                     <th class="num">体重</th>
                     <th class="num">腰围</th>
+                    <th class="num">血糖</th>
                     <th class="num">尿酸</th>
                     <th>用药</th>
                     <th>备注</th>
@@ -5569,6 +5571,8 @@ input[type="checkbox"] {
       <button class="capture-pill" type="button" data-event-type="sleep">😴 睡眠</button>
       <button class="capture-pill" type="button" data-event-type="morningNote">☕ 晨间笔记</button>
       <button class="capture-pill" type="button" data-event-type="weight">⚖️ 体重</button>
+      <button class="capture-pill" type="button" data-event-type="bloodGlucose">🩸 血糖</button>
+      <button class="capture-pill" type="button" data-event-type="uric">🧪 尿酸</button>
       <button class="capture-pill" type="button" data-event-type="meal">🍱 餐食</button>
       <button class="capture-pill" type="button" data-event-type="recovery">🛋 补能</button>
       <button class="capture-pill" type="button" data-event-type="training">💪 训练</button>
@@ -6556,6 +6560,78 @@ input[type="checkbox"] {
               if (d.note) lines.push(`- ${d.note}`);
               return lines.join("\n");
             }
+          },
+
+          bloodGlucose: {
+            emoji: "🩸",
+            label: "血糖",
+            mode: "overwrite",
+            validate(data) {
+              if (typeof data.value !== "number" || data.value < 1 || data.value > 35) {
+                return "血糖需要在 1-35 mmol/L 之间";
+              }
+              return "";
+            },
+            applyToEntry(entry, data) {
+              return EntryModel.normalize({
+                ...entry,
+                bloodGlucose: data.value,
+                bloodGlucoseType: data.type || "随机",
+                bloodGlucoseTime: data.time || "",
+                bloodGlucoseNote: data.note || ""
+              });
+            },
+            toMarkdown(event) {
+              const d = event.data;
+              const lines = [`### 🩸 血糖 ${event.time}`, `- ${d.value} mmol/L`, `- 类型：${d.type || "随机"}`];
+              // 范围解读
+              const v = d.value;
+              const t = d.type;
+              let interp = "";
+              if (t === "空腹") {
+                interp = v < 6.1 ? "✅ 正常 (<6.1)" : v < 7.0 ? "⚠️ 偏高 (6.1-7.0)" : "🚨 糖尿病范围 (≥7.0)";
+              } else if (t === "餐后2h") {
+                interp = v < 7.8 ? "✅ 正常 (<7.8)" : v < 11.1 ? "⚠️ 偏高 (7.8-11.1)" : "🚨 糖尿病范围 (≥11.1)";
+              } else {
+                interp = v < 11.1 ? "✅ 正常范围内 (<11.1)" : "🚨 异常高 (≥11.1)";
+              }
+              lines.push(`- 解读：${interp}`);
+              if (d.note) lines.push(`- 备注：${d.note}`);
+              return lines.join("\n");
+            }
+          },
+
+          uric: {
+            emoji: "🧪",
+            label: "尿酸",
+            mode: "overwrite",
+            validate(data) {
+              if (typeof data.value !== "number" || data.value < 50 || data.value > 1500) {
+                return "尿酸需要在 50-1500 μmol/L 之间";
+              }
+              return "";
+            },
+            applyToEntry(entry, data) {
+              return EntryModel.normalize({
+                ...entry,
+                uricAcid: data.value,
+                uricMedication: data.medication || "",
+                uricNote: data.note || ""
+              });
+            },
+            toMarkdown(event) {
+              const d = event.data;
+              const lines = [`### 🧪 尿酸 ${event.time}`, `- ${d.value} μmol/L`];
+              // 范围解读（男性）
+              const v = d.value;
+              const interp = v <= 420 ? "✅ 目标范围内 (≤420)"
+                          : v <= 480 ? "⚠️ 偏高 (420-480)"
+                          : "🚨 高尿酸 (>480)";
+              lines.push(`- 解读：${interp}`);
+              if (d.medication) lines.push(`- 用药：${d.medication}`);
+              if (d.note) lines.push(`- 备注：${d.note}`);
+              return lines.join("\n");
+            }
           }
         },
 
@@ -6683,6 +6759,15 @@ input[type="checkbox"] {
             morningPlan: String(raw.morningPlan || "").trim(),
             waistCircumference: this.normalizeNullableNumber(raw.waistCircumference),
             weightNote: String(raw.weightNote || "").trim(),
+            // 血糖 mmol/L + 类型(空腹/餐后2h/随机) + 备注
+            bloodGlucose: this.normalizeNullableNumber(raw.bloodGlucose),
+            bloodGlucoseType: String(raw.bloodGlucoseType || "").trim(),
+            bloodGlucoseTime: String(raw.bloodGlucoseTime || "").trim(),
+            bloodGlucoseNote: String(raw.bloodGlucoseNote || "").trim(),
+            // 尿酸 μmol/L + 用药 + 备注（之前在独立 uric_acid_records，现统一）
+            uricAcid: this.normalizeNullableNumber(raw.uricAcid),
+            uricMedication: String(raw.uricMedication || "").trim(),
+            uricNote: String(raw.uricNote || "").trim(),
             dailySteps: this.normalizeNullableNumber(raw.dailySteps),
             microEvolution: String(raw.microEvolution || "").trim(),
             workoutItems
@@ -6875,6 +6960,19 @@ input[type="checkbox"] {
         return "晚餐";                                  // ≥ 16:00
       }
 
+      // 时间 → 血糖类型（基于常见三餐节律）
+      // 03:00-08:00 空腹 / 09:00-11:00 早餐后2h / 13:30-16:00 午餐后2h / 19:30-22:00 晚餐后2h / 其余随机
+      function glucoseTypeFromTime(timeStr) {
+        const m = String(timeStr || "").match(/^(\d{1,2}):(\d{2})/);
+        if (!m) return "随机";
+        const t = Number(m[1]) * 60 + Number(m[2]);
+        if (t >= 3 * 60 && t < 8 * 60) return "空腹";
+        if (t >= 9 * 60 && t < 11 * 60) return "餐后2h";
+        if (t >= 13 * 60 + 30 && t < 16 * 60) return "餐后2h";
+        if (t >= 19 * 60 + 30 && t < 22 * 60) return "餐后2h";
+        return "随机";
+      }
+
       // 每个事件类型的面板渲染器：输入 prefill（可空）→ 返回 HTML 字符串
       const PanelRenderers = {
   sleep(prefill) {
@@ -7024,6 +7122,92 @@ input[type="checkbox"] {
     </div>
   `;
 },
+
+  bloodGlucose(prefill) {
+    const p = prefill?.data || {};
+    const today = state.entries.find((e) => e.date === DateUtils.getTodayISO()) || {};
+    const time = prefill?.time || DateUtils.getCurrentTimeString();
+    const defaultValue = p.value ?? today.bloodGlucose ?? 5.5;
+    const defaultType = p.type || glucoseTypeFromTime(time);
+    return `
+    <div class="capture-panel" data-panel-type="bloodGlucose">
+      <h3>🩸 记血糖</h3>
+      <div style="background:linear-gradient(135deg,rgba(220,53,69,0.06),rgba(220,53,69,0.02));border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:12px;line-height:1.6;color:var(--muted);border-left:3px solid #c62828;">
+        参考范围 · 空腹 &lt;6.1 / 餐后2h &lt;7.8 / 随机 &lt;11.1 mmol/L
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>时间</label>
+          <input type="time" id="bgPanelTime" value="${time}">
+        </div>
+        <div class="field" style="flex:1">
+          <label>类型（按时间自动推断）</label>
+          <select id="bgPanelType">
+            <option value="空腹" ${defaultType === "空腹" ? "selected" : ""}>空腹</option>
+            <option value="餐后2h" ${defaultType === "餐后2h" ? "selected" : ""}>餐后2h</option>
+            <option value="随机" ${defaultType === "随机" ? "selected" : ""}>随机</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label>血糖值（mmol/L）</label>
+        <input type="number" id="bgPanelValue" min="1" max="35" step="0.1" value="${defaultValue}" inputmode="decimal" style="width:100%;padding:10px 14px;font-size:20px;font-weight:700;font-family:var(--font-number);border:1px solid var(--border);border-radius:10px;background:var(--panel);color:var(--text);text-align:center;-moz-appearance:textfield;" placeholder="5.5">
+      </div>
+      <div class="field">
+        <label>备注（选填）</label>
+        <input type="text" id="bgPanelNote" placeholder="例如：早餐前测，状态良好" value="${p.note || ""}">
+      </div>
+      <div class="panel-actions">
+        <button class="btn-primary" id="bgPanelSave" type="button">💾 保存</button>
+        <label class="immediate-push-check">
+          <input type="checkbox" id="bgPanelImmediate"> 立刻推到 Obsidian
+        </label>
+      </div>
+      <div class="panel-error" id="bgPanelError" style="color:#c62828;font-size:12px;margin-top:8px"></div>
+    </div>
+  `;
+},
+
+  uric(prefill) {
+    const p = prefill?.data || {};
+    const today = state.entries.find((e) => e.date === DateUtils.getTodayISO()) || {};
+    const time = prefill?.time || DateUtils.getCurrentTimeString();
+    const defaultValue = p.value ?? today.uricAcid ?? 420;
+    return `
+    <div class="capture-panel" data-panel-type="uric">
+      <h3>🧪 记尿酸</h3>
+      <div style="background:linear-gradient(135deg,rgba(123,228,149,0.06),rgba(123,228,149,0.02));border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:12px;line-height:1.6;color:var(--muted);border-left:3px solid #2dab88;">
+        目标范围 · ≤420 μmol/L · 苯溴马隆 25mg/天 + 饮水 ≥ 2500ml
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>时间</label>
+          <input type="time" id="uricPanelTime" value="${time}">
+        </div>
+        <div class="field" style="flex:1">
+          <label>尿酸（μmol/L）</label>
+          <input type="number" id="uricPanelValue" min="50" max="1500" step="1" value="${defaultValue}" inputmode="decimal" style="width:100%;padding:10px 14px;font-size:20px;font-weight:700;font-family:var(--font-number);border:1px solid var(--border);border-radius:10px;background:var(--panel);color:var(--text);text-align:center;-moz-appearance:textfield;" placeholder="420">
+        </div>
+      </div>
+      <div class="field">
+        <label>用药（选填）</label>
+        <input type="text" id="uricPanelMed" placeholder="例如：苯溴马隆 25mg" value="${p.medication || today.uricMedication || ""}">
+      </div>
+      <div class="field">
+        <label>备注（选填）</label>
+        <input type="text" id="uricPanelNote" placeholder="例如：复查，下降明显" value="${p.note || ""}">
+      </div>
+      <div class="panel-actions">
+        <button class="btn-primary" id="uricPanelSave" type="button">💾 保存</button>
+        <label class="immediate-push-check">
+          <input type="checkbox" id="uricPanelImmediate"> 立刻推到 Obsidian
+        </label>
+      </div>
+      <div class="panel-error" id="uricPanelError" style="color:#c62828;font-size:12px;margin-top:8px"></div>
+    </div>
+  `;
+},
+
   meal(prefill) {
   const p = prefill?.data || {};
   const time = prefill?.time || DateUtils.getCurrentTimeString();
@@ -7335,6 +7519,68 @@ input[type="checkbox"] {
     PanelManager.close();
   });
 },
+
+  bloodGlucose(prefill) {
+    // 智能同步：改时间自动跟随类型；一旦用户手动选过就停止
+    const timeEl = document.getElementById("bgPanelTime");
+    const typeEl = document.getElementById("bgPanelType");
+    let typeManuallySet = false;
+    if (typeEl) typeEl.addEventListener("change", () => { typeManuallySet = true; });
+    if (timeEl && typeEl) {
+      timeEl.addEventListener("input", () => {
+        if (typeManuallySet) return;
+        typeEl.value = glucoseTypeFromTime(timeEl.value);
+      });
+    }
+    document.getElementById("bgPanelSave").addEventListener("click", () => {
+      const data = {
+        time: document.getElementById("bgPanelTime").value,
+        type: document.getElementById("bgPanelType").value,
+        value: Number(document.getElementById("bgPanelValue").value),
+        note: document.getElementById("bgPanelNote").value.trim()
+      };
+      const err = EventModel.types.bloodGlucose.validate(data);
+      if (err) {
+        document.getElementById("bgPanelError").textContent = err;
+        return;
+      }
+      const event = prefill
+        ? { ...prefill, time: data.time, data, capturedAt: Date.now() }
+        : EventModel.buildQueueItem("bloodGlucose", DateUtils.getTodayISO(), data.time, data);
+      App.applyEvent(event);
+      if (document.getElementById("bgPanelImmediate").checked) {
+        App.pushEventsToObsidian([event]);
+      }
+      UI.showStatus(`已保存：🩸 ${data.value} mmol/L (${data.type})`);
+      PanelManager.close();
+    });
+  },
+
+  uric(prefill) {
+    document.getElementById("uricPanelSave").addEventListener("click", () => {
+      const data = {
+        time: document.getElementById("uricPanelTime").value,
+        value: Number(document.getElementById("uricPanelValue").value),
+        medication: document.getElementById("uricPanelMed").value.trim(),
+        note: document.getElementById("uricPanelNote").value.trim()
+      };
+      const err = EventModel.types.uric.validate(data);
+      if (err) {
+        document.getElementById("uricPanelError").textContent = err;
+        return;
+      }
+      const event = prefill
+        ? { ...prefill, time: data.time, data, capturedAt: Date.now() }
+        : EventModel.buildQueueItem("uric", DateUtils.getTodayISO(), data.time, data);
+      App.applyEvent(event);
+      if (document.getElementById("uricPanelImmediate").checked) {
+        App.pushEventsToObsidian([event]);
+      }
+      UI.showStatus(`已保存：🧪 ${data.value} μmol/L`);
+      PanelManager.close();
+    });
+  },
+
   meal(prefill) {
   // 智能同步：改时间自动跟随餐次；一旦用户手动选过餐次就停止自动改
   const timeEl = document.getElementById("mealPanelTime");
@@ -8561,6 +8807,11 @@ input[type="checkbox"] {
             window.LoopEngine?.refreshNourishGuard?.();
             window.LoopEngine?.checkMilestones?.();
           }
+          // 血糖/尿酸 → 刷 panel + 检 milestones（如 uric_acid_400）
+          if (event.eventType === "bloodGlucose" || event.eventType === "uric") {
+            window.HealthCombined?.refresh?.();
+            window.LoopEngine?.checkMilestones?.();
+          }
           // 训练事件 → 刷新训练进度 sparkline
           if (event.eventType === "training") {
             window.TrainingProgress?.refresh?.();
@@ -9191,10 +9442,55 @@ input[type="checkbox"] {
         localStorage.setItem(CELEBRATION_806_KEY, "done");
       }
 
+      // ── 一次性合并 uric_acid_records → state.entries（统一存储）──
+      const URIC_MERGE_MIGRATION_KEY = "michael-energy-tracker-uric-merge-v1";
+      function migrateUricRecordsIntoEntries() {
+        if (localStorage.getItem(URIC_MERGE_MIGRATION_KEY) === "done") return;
+        let uricRecs = [];
+        try { uricRecs = JSON.parse(localStorage.getItem("uric_acid_records") || "[]"); } catch {}
+        if (!Array.isArray(uricRecs) || uricRecs.length === 0) {
+          localStorage.setItem(URIC_MERGE_MIGRATION_KEY, "done");
+          return;
+        }
+        const entryMap = new Map(state.entries.map((e) => [e.date, e]));
+        let added = 0, filled = 0;
+        uricRecs.forEach((rec) => {
+          if (!rec || !rec.date) return;
+          const v = rec.value ?? rec.uricAcid;
+          if (!Number.isFinite(Number(v))) return;
+          const existing = entryMap.get(rec.date);
+          if (existing) {
+            const patch = {};
+            if (existing.uricAcid == null && Number.isFinite(Number(v))) patch.uricAcid = Number(v);
+            if (!existing.uricMedication && rec.medication) patch.uricMedication = rec.medication;
+            if (!existing.uricNote && rec.note) patch.uricNote = rec.note;
+            if (Object.keys(patch).length) {
+              entryMap.set(rec.date, { ...existing, ...patch });
+              filled += 1;
+            }
+          } else {
+            const newEntry = EntryModel.normalize({
+              date: rec.date,
+              uricAcid: Number(v),
+              uricMedication: rec.medication || "",
+              uricNote: rec.note || ""
+            });
+            entryMap.set(rec.date, newEntry);
+            added += 1;
+          }
+        });
+        if (added + filled > 0) {
+          state.entries = StorageService.saveEntries([...entryMap.values()]);
+          console.log(`[migration] 尿酸数据合并：新增 ${added} 条，补齐 ${filled} 条`);
+        }
+        localStorage.setItem(URIC_MERGE_MIGRATION_KEY, "done");
+      }
+
       function initialize() {
         state.entries = StorageService.ensureSeedData();
         migrateWorkoutNames();
         migrateWeightRecordsIntoEntries();
+        migrateUricRecordsIntoEntries();
         cleanupAprilSeedAndFixMay10();
         writeCelebration806();
         // 清理"非今日且已推"的事件：今日已推的保留供时间线展示，跨日后丢弃
@@ -9581,28 +9877,46 @@ input[type="checkbox"] {
         localStorage.setItem(ENTRIES_KEY, JSON.stringify(next));
       }
 
+      // 从 state.entries 派生：尿酸视图
       function loadUric() {
-        try {
-          const raw = localStorage.getItem(URIC_KEY);
-          if (raw) {
-            const parsed = JSON.parse(raw);
-            // 兼容老结构（uricAcid → value）
-            return parsed.map((r) => ({
-              date: r.date,
-              value: r.value ?? r.uricAcid,
-              weight: r.weight ?? null,
-              medication: r.medication ?? "",
-              note: r.note ?? ""
-            }));
-          }
-        } catch (err) {}
-        const seed = [
-          { date: "2026-05-15", value: 566.57, weight: 83.5, medication: "苯溴马隆 25mg 启动", note: "基线" }
-        ];
-        localStorage.setItem(URIC_KEY, JSON.stringify(seed));
-        return seed;
+        let entries = [];
+        try { entries = JSON.parse(localStorage.getItem(ENTRIES_KEY) || "[]"); } catch {}
+        return entries
+          .filter((e) => e && e.date && Number.isFinite(Number(e.uricAcid)) && Number(e.uricAcid) > 0)
+          .map((e) => ({
+            date: e.date,
+            value: Number(e.uricAcid),
+            weight: Number.isFinite(Number(e.weight)) ? Number(e.weight) : null,
+            medication: e.uricMedication || "",
+            note: e.uricNote || ""
+          }));
       }
-      function saveUric(arr) { localStorage.setItem(URIC_KEY, JSON.stringify(arr)); }
+      // 从 state.entries 派生：血糖视图
+      function loadGlucose() {
+        let entries = [];
+        try { entries = JSON.parse(localStorage.getItem(ENTRIES_KEY) || "[]"); } catch {}
+        return entries
+          .filter((e) => e && e.date && Number.isFinite(Number(e.bloodGlucose)) && Number(e.bloodGlucose) > 0)
+          .map((e) => ({
+            date: e.date,
+            value: Number(e.bloodGlucose),
+            type: e.bloodGlucoseType || "随机",
+            note: e.bloodGlucoseNote || ""
+          }));
+      }
+      // 清尿酸字段（删除时）
+      function clearUricOnDate(date) {
+        let entries = [];
+        try { entries = JSON.parse(localStorage.getItem(ENTRIES_KEY) || "[]"); } catch {}
+        const next = entries.map((e) =>
+          e.date !== date ? e : { ...e, uricAcid: null, uricMedication: "", uricNote: "" }
+        );
+        localStorage.setItem(ENTRIES_KEY, JSON.stringify(next));
+      }
+      // 旧 saveUric 已废弃，留个 stub 避免 break 其他引用
+      function saveUric(_arr) {
+        console.warn("[deprecated] saveUric called — 尿酸数据已迁到 entries，请走 EventModel.types.uric");
+      }
 
       let chartInstance = null;
 
@@ -9619,9 +9933,12 @@ input[type="checkbox"] {
         const latestU = uric[uric.length - 1];
         const tgt = document.getElementById("healthCombinedTarget");
         if (!tgt) return;
+        const glucose = loadGlucose().slice().sort((a, b) => a.date.localeCompare(b.date));
+        const latestG = glucose[glucose.length - 1];
         const wPart = latestW ? `${latestW.weight.toFixed(1)} → ${WEIGHT_TARGET} kg` : `-- → ${WEIGHT_TARGET} kg`;
+        const gPart = latestG ? `${latestG.value.toFixed(1)} mmol/L` : `-- mmol/L`;
         const uPart = latestU ? `${latestU.value.toFixed(0)} → ${URIC_TARGET}` : `-- → ${URIC_TARGET}`;
-        tgt.textContent = `${wPart} · ${uPart}`;
+        tgt.textContent = `${wPart} · ${gPart} · ${uPart}`;
       }
 
       function renderRecordsTable() {
@@ -9629,23 +9946,34 @@ input[type="checkbox"] {
         if (!tbody) return;
         const weights = loadWeights();
         const uric = loadUric();
+        const glucose = loadGlucose();
         // 按日期合并
-        const dates = [...new Set([...weights.map((w) => w.date), ...uric.map((u) => u.date)])].sort().reverse();
+        const dates = [...new Set([...weights.map((w) => w.date), ...uric.map((u) => u.date), ...glucose.map((g) => g.date)])].sort().reverse();
         if (!dates.length) {
-          tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:10px">还没有记录</td></tr>`;
+          tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:10px">还没有记录</td></tr>`;
           return;
         }
         tbody.innerHTML = dates.map((d) => {
           const w = weights.find((x) => x.date === d);
           const u = uric.find((x) => x.date === d);
-          const note = (u && u.note) || (w && w.note) || "";
+          const g = glucose.find((x) => x.date === d);
+          const note = (u && u.note) || (g && g.note) || (w && w.note) || "";
           const med = (u && u.medication) || "";
           const uCls = u && u.value <= URIC_TARGET ? "uric-value ok" : "uric-value";
+          // 血糖阈值判断（简化：按类型）
+          let gCls = "";
+          if (g) {
+            const t = g.type, v = g.value;
+            const ok = (t === "空腹" && v < 6.1) || (t === "餐后2h" && v < 7.8) || (t === "随机" && v < 11.1);
+            gCls = ok ? "uric-value ok" : "uric-value";
+          }
+          const gLabel = g ? `${g.value.toFixed(1)}<span style="font-size:9px;color:var(--muted);margin-left:2px">${g.type === "空腹" ? "空" : g.type === "餐后2h" ? "餐" : "随"}</span>` : "—";
           return `
             <tr data-record-date="${d}">
               <td>${fmtShortDate(d)}</td>
               <td class="num weight-value">${w ? w.weight.toFixed(1) : "—"}</td>
               <td class="num">${w && w.waist ? w.waist : "—"}</td>
+              <td class="num ${gCls}">${gLabel}</td>
               <td class="num ${u ? uCls : ""}">${u ? u.value.toFixed(1) : "—"}</td>
               <td>${med ? escapeHtml(med) : "—"}</td>
               <td>${escapeHtml(note)}</td>
@@ -9665,7 +9993,8 @@ input[type="checkbox"] {
         if (!canvas) return;
         const weights = loadWeights().slice().sort((a, b) => a.date.localeCompare(b.date));
         const uric = loadUric().slice().sort((a, b) => a.date.localeCompare(b.date));
-        const labels = [...new Set([...weights.map((w) => w.date), ...uric.map((u) => u.date)])].sort();
+        const glucose = loadGlucose().slice().sort((a, b) => a.date.localeCompare(b.date));
+        const labels = [...new Set([...weights.map((w) => w.date), ...uric.map((u) => u.date), ...glucose.map((g) => g.date)])].sort();
 
         const weightSeries = labels.map((d) => {
           const w = weights.find((x) => x.date === d);
@@ -9678,6 +10007,10 @@ input[type="checkbox"] {
         const uricSeries = labels.map((d) => {
           const u = uric.find((x) => x.date === d);
           return u ? u.value : null;
+        });
+        const glucoseSeries = labels.map((d) => {
+          const g = glucose.find((x) => x.date === d);
+          return g ? g.value : null;
         });
 
         if (chartInstance) chartInstance.destroy();
@@ -9718,6 +10051,17 @@ input[type="checkbox"] {
                 pointRadius: 3,
                 pointBackgroundColor: "rgba(110,110,98,0.65)",
                 spanGaps: true
+              },
+              {
+                label: "血糖 mmol/L",
+                data: glucoseSeries,
+                yAxisID: "yGlucose",
+                borderColor: "#c62828",
+                backgroundColor: "rgba(198,40,40,0.08)",
+                pointBackgroundColor: "#c62828",
+                pointRadius: 4,
+                tension: 0.25,
+                spanGaps: true
               }
             ]
           },
@@ -9750,6 +10094,12 @@ input[type="checkbox"] {
                 position: "right",
                 ticks: { color: "#d17b1f", font: { size: 10 } },
                 title: { display: true, text: "μmol/L", color: "#d17b1f", font: { size: 10 } },
+                grid: { display: false }
+              },
+              yGlucose: {
+                type: "linear",
+                position: "right",
+                display: false, // 共用尿酸右侧位置但不再画第三条轴，避免拥挤；血糖值仅 tooltip 显示数值
                 grid: { display: false }
               },
               x: {
@@ -9824,54 +10174,46 @@ input[type="checkbox"] {
         }
       }
 
-      // 添加尿酸记录（独立流程，复查时才用）
-      function addUricFlow() {
-        const date = window.prompt("尿酸复查日期 (YYYY-MM-DD)", todayISO());
-        if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) return;
-        const uricStr = window.prompt("尿酸 μmol/L");
-        if (uricStr === null) return;
-        const uricValue = Number(uricStr);
-        if (!Number.isFinite(uricValue) || uricValue <= 0) {
-          window.alert("尿酸值需要是正数");
-          return;
-        }
-        const medication = window.prompt("用药情况（选填）", "") || "";
-        const note = window.prompt("备注（选填）", "") || "";
-
-        // 体重从 state.entries 同日记录里取（如果有）
-        const sameDayWeight = loadWeights().find((w) => w.date === date);
-        const weight = sameDayWeight ? sameDayWeight.weight : null;
-
-        const uric = loadUric().filter((u) => u.date !== date);
-        uric.push({ date, value: uricValue, weight, medication, note });
-        saveUric(uric);
-
-        renderCombined();
-        if (window.LoopEngine) {
-          window.LoopEngine.refreshPlateauCard();
-          window.LoopEngine.checkMilestones();
-        }
+      // 跳转到 capture-bar 的对应按钮（统一入口路径）
+      function jumpToCapture(eventType) {
+        const btn = document.querySelector(`[data-event-type='${eventType}']`);
+        if (!btn) return;
+        btn.click();
+        setTimeout(() => {
+          const firstInput = document.querySelector(`[data-panel-type='${eventType}'] input, [data-panel-type='${eventType}'] select`);
+          firstInput?.scrollIntoView({ behavior: "smooth", block: "center" });
+          firstInput?.focus();
+        }, 100);
       }
 
-      // 删除：分别针对体重 / 尿酸；目前 UI 删除按钮删整行（含两者）
+      // 删除：清整行（体重 + 血糖 + 尿酸 字段）
+      function clearGlucoseOnDate(date) {
+        let entries = [];
+        try { entries = JSON.parse(localStorage.getItem(ENTRIES_KEY) || "[]"); } catch {}
+        const next = entries.map((e) =>
+          e.date !== date ? e : { ...e, bloodGlucose: null, bloodGlucoseType: "", bloodGlucoseTime: "", bloodGlucoseNote: "" }
+        );
+        localStorage.setItem(ENTRIES_KEY, JSON.stringify(next));
+      }
       function deleteRecord(date) {
-        if (!window.confirm(`确定删除 ${fmtShortDate(date)} 的记录吗？（体重和尿酸都会清掉）`)) return;
+        if (!window.confirm(`确定删除 ${fmtShortDate(date)} 的记录吗？（体重 + 血糖 + 尿酸 都会清掉）`)) return;
         clearWeightOnDate(date);
-        saveUric(loadUric().filter((u) => u.date !== date));
+        clearGlucoseOnDate(date);
+        clearUricOnDate(date);
         renderCombined();
-        // 通知主 IIFE 重渲染（体重数据变了）
         window.dispatchEvent(new CustomEvent("entries-changed"));
       }
 
       function bindCombinedEvents() {
         const addBtn = document.getElementById("healthAddRecordBtn");
         if (addBtn) {
-          addBtn.textContent = "📝 去记体重 / 尿酸";
+          addBtn.textContent = "📝 去记体重 / 血糖 / 尿酸";
           addBtn.addEventListener("click", () => {
-            // 用户选择：体重 or 尿酸？
-            const choice = window.confirm("点「确定」去记体重和腰围\n点「取消」记尿酸（复查时）");
-            if (choice) jumpToWeightCapture();
-            else addUricFlow();
+            // 用户三选一
+            const choice = window.prompt("记什么？输入：1=体重 2=血糖 3=尿酸", "1");
+            if (choice === "1") jumpToCapture("weight");
+            else if (choice === "2") jumpToCapture("bloodGlucose");
+            else if (choice === "3") jumpToCapture("uric");
           });
         }
         document.getElementById("healthRecordsBody").addEventListener("click", (e) => {
@@ -11183,9 +11525,20 @@ input[type="checkbox"] {
         try { return JSON.parse(localStorage.getItem("weight_records") || "[]"); }
         catch { return []; }
       }
+      // 统一存储后：从 state.entries 派生（兼容老调用方）
       function loadUricRecords() {
-        try { return JSON.parse(localStorage.getItem("uric_acid_records") || "[]"); }
-        catch { return []; }
+        try {
+          const entries = JSON.parse(localStorage.getItem("michael-energy-tracker-v1") || "[]");
+          return entries
+            .filter((e) => e && e.date && Number.isFinite(Number(e.uricAcid)) && Number(e.uricAcid) > 0)
+            .map((e) => ({
+              date: e.date,
+              value: Number(e.uricAcid),
+              weight: Number.isFinite(Number(e.weight)) ? Number(e.weight) : null,
+              medication: e.uricMedication || "",
+              note: e.uricNote || ""
+            }));
+        } catch { return []; }
       }
       function loadHealthScores() {
         try { return JSON.parse(localStorage.getItem("health_scores") || "{}"); }
