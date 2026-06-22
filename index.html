@@ -2718,6 +2718,217 @@ input[type="checkbox"] {
 }
 
 /* 今日明细条 */
+/* 🎯 技 · 习惯技能树 */
+.skill-tree-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+@media (min-width: 540px) {
+  .skill-tree-grid { grid-template-columns: repeat(3, 1fr); }
+}
+.skill-card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 8px 10px;
+  position: relative;
+  overflow: hidden;
+}
+.skill-card-head {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+.skill-emoji { font-size: 16px; line-height: 1; }
+.skill-name {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text);
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.skill-lv {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 2px;
+  font-family: var(--font-number);
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--accent);
+  background: rgba(45,171,136,0.1);
+  padding: 1px 6px;
+  border-radius: 6px;
+  border: 1px solid rgba(45,171,136,0.25);
+}
+.skill-lv.lv-0 { color: var(--muted); background: rgba(110,110,98,0.08); border-color: rgba(110,110,98,0.2); }
+.skill-lv.lv-high { color: #b87f00; background: rgba(255,196,91,0.12); border-color: rgba(255,196,91,0.35); }
+.skill-lv-num { font-size: 13px; }
+.skill-lv-tag { font-size: 9px; opacity: 0.7; }
+.skill-bar {
+  height: 5px;
+  background: rgba(89, 73, 45, 0.1);
+  border-radius: 999px;
+  overflow: hidden;
+  margin-top: 4px;
+}
+.skill-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #2dab88, #6fcd9f);
+  border-radius: 999px;
+  transition: width 0.4s;
+}
+.skill-meta {
+  font-size: 10px;
+  color: var(--muted);
+  margin-top: 3px;
+  display: flex;
+  justify-content: space-between;
+}
+.skill-meta-count {
+  font-family: var(--font-number);
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* 🩺 HP Bar (游戏化血条) */
+.hp-bar-wrap {
+  margin-top: 12px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+}
+.hp-bar-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  margin-bottom: 6px;
+  color: var(--muted);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+.hp-bar-num {
+  font-family: var(--font-number);
+  font-weight: 700;
+  color: var(--text);
+}
+.hp-bar-num strong {
+  font-size: 16px;
+  color: var(--text);
+}
+.hp-bar-track {
+  position: relative;
+  height: 14px;
+  background: rgba(89, 73, 45, 0.1);
+  border-radius: 999px;
+  overflow: hidden;
+  border: 1px solid rgba(89, 73, 45, 0.15);
+}
+.hp-bar-fill {
+  position: absolute;
+  inset: 0;
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1), background 0.4s;
+  background: linear-gradient(90deg, #2dab88, #6fcd9f);
+  box-shadow: 0 0 8px rgba(45, 171, 136, 0.4);
+}
+.hp-bar-fill.hp-yellow {
+  background: linear-gradient(90deg, #d4a017, #ffc45b);
+  box-shadow: 0 0 8px rgba(255, 196, 91, 0.4);
+}
+.hp-bar-fill.hp-red {
+  background: linear-gradient(90deg, #b04030, #d76060);
+  box-shadow: 0 0 10px rgba(198, 40, 40, 0.5);
+}
+.hp-bar-fill.hp-critical {
+  animation: hpPulse 1s ease-in-out infinite;
+}
+@keyframes hpPulse {
+  0%, 100% { box-shadow: 0 0 10px rgba(198, 40, 40, 0.5); opacity: 1; }
+  50%      { box-shadow: 0 0 18px rgba(255, 50, 50, 0.85); opacity: 0.92; }
+}
+/* <40 裂纹特效（横向虚线叠加）*/
+.hp-bar-cracks {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  background-image:
+    repeating-linear-gradient(105deg, transparent 0 8px, rgba(0,0,0,0.4) 8px 9px),
+    repeating-linear-gradient(75deg, transparent 0 12px, rgba(0,0,0,0.3) 12px 13px);
+  transition: opacity 0.3s;
+}
+.hp-bar-cracks.show { opacity: 1; }
+
+/* 🟢🔴 Buff / Debuff Strip */
+.buffs-wrap {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.buffs-section {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid var(--line);
+  font-size: 11.5px;
+}
+.buffs-positive { border-left: 3px solid #2dab88; }
+.buffs-negative { border-left: 3px solid #c62828; }
+.buffs-label {
+  flex-shrink: 0;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--text);
+  padding-top: 2px;
+  font-size: 10.5px;
+}
+.buffs-chips {
+  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.buffs-chips .empty {
+  color: var(--muted);
+  font-size: 10.5px;
+  font-style: italic;
+}
+.buff-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 10.5px;
+  font-weight: 600;
+  font-family: var(--font-number);
+}
+.buff-chip.add {
+  background: rgba(45, 171, 136, 0.12);
+  color: #1f7a5c;
+  border: 1px solid rgba(45, 171, 136, 0.3);
+}
+.buff-chip.sub {
+  background: rgba(198, 40, 40, 0.1);
+  color: #b04030;
+  border: 1px solid rgba(198, 40, 40, 0.3);
+}
+.buff-chip-sign {
+  font-family: var(--font-number);
+  font-weight: 700;
+}
+
 .health-detail-bar {
   margin-top: 12px;
   padding: 10px 14px;
@@ -5296,9 +5507,28 @@ input[type="checkbox"] {
         </div>
       </div>
 
-      <!-- 今日明细 -->
-      <div class="health-detail-bar" id="healthDetailBar">
-        <span class="empty">今日还没勾选任何行为</span>
+      <!-- HP Bar 血条（游戏化主视觉）-->
+      <div class="hp-bar-wrap" id="hpBarWrap">
+        <div class="hp-bar-label">
+          <span class="hp-label-text">🩺 HP</span>
+          <span class="hp-bar-num"><strong id="hpBarNum">60</strong> / 100</span>
+        </div>
+        <div class="hp-bar-track">
+          <div class="hp-bar-fill" id="hpBarFill" style="width:60%"></div>
+          <div class="hp-bar-cracks" id="hpBarCracks"></div>
+        </div>
+      </div>
+
+      <!-- Buff / Debuff 状态栏（今日行为的游戏化呈现） -->
+      <div class="buffs-wrap" id="buffsWrap">
+        <div class="buffs-section buffs-positive">
+          <span class="buffs-label">🟢 BUFF</span>
+          <div class="buffs-chips" id="buffsActive"><span class="empty">勾选加分项激活</span></div>
+        </div>
+        <div class="buffs-section buffs-negative">
+          <span class="buffs-label">🔴 DEBUFF</span>
+          <div class="buffs-chips" id="debuffsActive"><span class="empty">勾选扣分项激活</span></div>
+        </div>
       </div>
 
       <!-- 加分项 -->
@@ -5612,6 +5842,15 @@ input[type="checkbox"] {
         <div class="health-training-body">
           <div class="tp-grid" id="trainingProgressGrid"></div>
           <div class="tp-footer">基于历史 workoutItems 自动计算 · 总次数 = 首数 × 组数 · 不含拉伸</div>
+        </div>
+      </details>
+
+      <!-- ───── 技 · 习惯技能树 ───── -->
+      <details class="health-training">
+        <summary>🎯 技 · 习惯技能树 <span class="ctrl-badge input">可控 · 累积</span></summary>
+        <div class="health-training-body">
+          <div class="skill-tree-grid" id="skillTreeGrid"></div>
+          <div class="tp-footer">每次勾选加分项 = 经验 +1 · LV 阈值 [1·3·7·15·30·60·120·250·500]</div>
         </div>
       </details>
 
@@ -9924,16 +10163,53 @@ input[type="checkbox"] {
         document.getElementById("healthAddSum").textContent = "+" + addSum;
         document.getElementById("healthSubSum").textContent = "-" + subSum;
 
-        // 今日明细
+        // 今日明细（保留，兼容老 UI）
         const bar = document.getElementById("healthDetailBar");
-        if (!details.length) {
-          bar.innerHTML = `<span class="empty">今日还没勾选任何行为</span>`;
-        } else {
-          bar.innerHTML = details.map((d) => {
-            const sign = d.sign === "add" ? "+" : "-";
-            return `<span class="health-chip ${d.sign}">${d.label.length > 8 ? d.label.slice(0, 8) + "…" : d.label} ${sign}${d.value}</span>`;
-          }).join("");
+        if (bar) {
+          if (!details.length) {
+            bar.innerHTML = `<span class="empty">今日还没勾选任何行为</span>`;
+          } else {
+            bar.innerHTML = details.map((d) => {
+              const sign = d.sign === "add" ? "+" : "-";
+              return `<span class="health-chip ${d.sign}">${d.label.length > 8 ? d.label.slice(0, 8) + "…" : d.label} ${sign}${d.value}</span>`;
+            }).join("");
+          }
         }
+
+        // 🩺 HP Bar 同步
+        const hpFill = document.getElementById("hpBarFill");
+        const hpNum = document.getElementById("hpBarNum");
+        const hpCracks = document.getElementById("hpBarCracks");
+        if (hpFill && hpNum) {
+          hpNum.textContent = String(total);
+          hpFill.style.width = Math.max(0, Math.min(100, total)) + "%";
+          hpFill.classList.remove("hp-yellow", "hp-red", "hp-critical");
+          if (total < 40) {
+            hpFill.classList.add("hp-red", "hp-critical");
+          } else if (total < 60) {
+            hpFill.classList.add("hp-red");
+          } else if (total < 80) {
+            hpFill.classList.add("hp-yellow");
+          }
+          if (hpCracks) hpCracks.classList.toggle("show", total < 40);
+        }
+
+        // 🟢🔴 Buff / Debuff strip 同步
+        const buffsEl = document.getElementById("buffsActive");
+        const debuffsEl = document.getElementById("debuffsActive");
+        if (buffsEl && debuffsEl) {
+          const buffs = details.filter((d) => d.sign === "add");
+          const debuffs = details.filter((d) => d.sign === "sub");
+          buffsEl.innerHTML = buffs.length
+            ? buffs.map((d) => `<span class="buff-chip add">${d.label}<span class="buff-chip-sign"> +${d.value}</span></span>`).join("")
+            : `<span class="empty">勾选加分项激活</span>`;
+          debuffsEl.innerHTML = debuffs.length
+            ? debuffs.map((d) => `<span class="buff-chip sub">${d.label}<span class="buff-chip-sign"> -${d.value}</span></span>`).join("")
+            : `<span class="empty">勾选扣分项激活</span>`;
+        }
+
+        // 🎯 技能树同步（勾选加分项后 LV / 进度可能变化）
+        if (typeof renderSkillTree === "function") renderSkillTree();
 
         // 睡眠分数自动显示在数字框右侧
         const sleepScoreEl = document.getElementById("healthSleepScore");
@@ -10393,9 +10669,79 @@ input[type="checkbox"] {
       // 暴露刷新 hook 给主 IIFE applyEvent("weight") 调用
       window.HealthCombined = { refresh: () => renderCombined() };
 
+      // ════════ 🎯 技 · 习惯技能树 ════════
+      const SKILL_EMOJI = {
+        sleepSop: "🛌", slowEating: "🍽️", waterBeforeMeal: "💧",
+        avoidRed: "🛡️", cookedOnce: "👨‍🍳", water2500: "🚰",
+        lemonWater: "🍋", milk: "🥛", workout: "💪",
+        eye2510: "👁️", medicationTaken: "💊", horseQuestion: "🎩",
+        tmdExercise: "🦷"
+      };
+      const SKILL_SHORT_NAME = {
+        sleepSop: "睡前 SOP", slowEating: "慢食", waterBeforeMeal: "餐前水",
+        avoidRed: "避红灯", cookedOnce: "自做饭", water2500: "饮水 2.5L",
+        lemonWater: "柠檬水", milk: "纯牛奶", workout: "训练",
+        eye2510: "用眼 25/10", medicationTaken: "苯溴马隆", horseQuestion: "马夫一问",
+        tmdExercise: "TMD 康复"
+      };
+      const LV_THRESHOLDS = [1, 3, 7, 15, 30, 60, 120, 250, 500];
+      const LV_TAGS = ["新手", "入门", "熟练", "精通", "大师", "宗师", "圣手", "传奇", "神话"];
+
+      function levelFromCount(c) {
+        let lv = 0, prev = 0, next = LV_THRESHOLDS[0];
+        for (let i = 0; i < LV_THRESHOLDS.length; i++) {
+          if (c >= LV_THRESHOLDS[i]) { lv = i + 1; prev = LV_THRESHOLDS[i]; next = LV_THRESHOLDS[i + 1] || null; }
+          else break;
+        }
+        return { lv, prev, next };
+      }
+
+      function computeSkillCounts() {
+        let all = {};
+        try { all = JSON.parse(localStorage.getItem(SCORE_KEY) || "{}"); } catch {}
+        const counts = {};
+        ADD_ITEMS.forEach((i) => { counts[i.id] = 0; });
+        Object.values(all).forEach((day) => {
+          ADD_ITEMS.forEach((i) => { if (day && day[i.id]) counts[i.id] += 1; });
+        });
+        return counts;
+      }
+
+      function renderSkillTree() {
+        const grid = document.getElementById("skillTreeGrid");
+        if (!grid) return;
+        const counts = computeSkillCounts();
+        grid.innerHTML = ADD_ITEMS.map((item) => {
+          const c = counts[item.id] || 0;
+          const { lv, prev, next } = levelFromCount(c);
+          const pct = next ? Math.round(((c - prev) / (next - prev)) * 100) : 100;
+          const lvCls = lv === 0 ? "lv-0" : lv >= 5 ? "lv-high" : "";
+          const lvTag = LV_TAGS[lv - 1] || "未启";
+          const nextLabel = next ? `→ LV ${lv + 1} (${next})` : `MAX`;
+          return `
+            <div class="skill-card">
+              <div class="skill-card-head">
+                <span class="skill-emoji">${SKILL_EMOJI[item.id] || "·"}</span>
+                <span class="skill-name">${SKILL_SHORT_NAME[item.id] || item.label}</span>
+                <span class="skill-lv ${lvCls}">
+                  <span class="skill-lv-num">LV ${lv}</span>
+                  <span class="skill-lv-tag">${lvTag}</span>
+                </span>
+              </div>
+              <div class="skill-bar"><div class="skill-bar-fill" style="width:${pct}%"></div></div>
+              <div class="skill-meta">
+                <span class="skill-meta-count">${c} 次</span>
+                <span>${nextLabel}</span>
+              </div>
+            </div>
+          `;
+        }).join("");
+      }
+
       // ── 评分模块初始化（Commit 2 误删了 init，这里补回来）──
       renderItems(loadToday());
       renderScore();
+      renderSkillTree();
       bindEvents();
 
       // ── 体重×尿酸联合模块初始化 ──
