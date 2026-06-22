@@ -402,6 +402,129 @@
       .mi-pill { font-size: 11.5px; padding: 5px 8px; }
     }
 
+    /* 🕰️ 时间观 · 社会时钟脱钩 panel */
+    .time-view-panel {
+      margin-top: 14px;
+      padding: 0;
+      border-radius: var(--radius-sm);
+      background: linear-gradient(135deg, rgba(255,196,91,0.05), rgba(71,244,255,0.03));
+      border: 1px solid rgba(255,196,91,0.2);
+      overflow: hidden;
+    }
+    .time-view-panel > summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      user-select: none;
+      flex-wrap: wrap;
+    }
+    .time-view-panel > summary::-webkit-details-marker { display: none; }
+    .time-view-panel > summary::after {
+      content: "▾";
+      margin-left: auto;
+      color: rgba(232, 251, 255, 0.5);
+      font-size: 12px;
+      transition: transform 0.2s;
+    }
+    .time-view-panel[open] > summary::after { transform: rotate(180deg); }
+    .tv-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: rgba(232, 251, 255, 0.95);
+      letter-spacing: 0.04em;
+    }
+    .tv-tagline {
+      font-size: 11px;
+      color: rgba(255, 196, 91, 0.75);
+      font-style: italic;
+      letter-spacing: 0.04em;
+    }
+    .tv-body { padding: 4px 16px 16px; }
+    .tv-quote {
+      font-size: 14px;
+      line-height: 1.7;
+      padding: 12px 14px;
+      background: rgba(255,196,91,0.08);
+      border-left: 3px solid #ffc45b;
+      border-radius: 8px;
+      color: rgba(232, 251, 255, 0.92);
+      margin-bottom: 14px;
+      font-weight: 500;
+    }
+    .tv-quote strong { color: #ffc45b; font-weight: 700; }
+    .tv-stages { display: flex; flex-direction: column; gap: 10px; }
+    .tv-stage {
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-left-width: 3px;
+    }
+    .tv-stage-past   { border-left-color: #47f4ff; }  /* 蓄 · 青 */
+    .tv-stage-now    { border-left-color: #ffc45b; }  /* 旭 · 金 */
+    .tv-stage-future { border-left-color: #7be495; }  /* 续 · 绿 */
+    .tv-stage-head {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+    .tv-stage-num {
+      font-family: var(--font-number);
+      font-weight: 700;
+      font-size: 11px;
+      color: rgba(232, 251, 255, 0.5);
+      letter-spacing: 0.1em;
+    }
+    .tv-stage-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: rgba(232, 251, 255, 0.95);
+    }
+    .tv-stage-past   .tv-stage-title { color: #47f4ff; }
+    .tv-stage-now    .tv-stage-title { color: #ffc45b; }
+    .tv-stage-future .tv-stage-title { color: #7be495; }
+    .tv-stage-body {
+      font-size: 12.5px;
+      line-height: 1.75;
+      color: rgba(232, 251, 255, 0.85);
+    }
+    .tv-stage-body strong { color: rgba(255,255,255,0.98); font-weight: 700; }
+    .tv-tools {
+      margin-top: 12px;
+      padding: 10px 12px;
+      background: rgba(123,228,149,0.05);
+      border: 1px solid rgba(123,228,149,0.18);
+      border-radius: 10px;
+    }
+    .tv-tools-title {
+      font-size: 10.5px;
+      letter-spacing: 0.12em;
+      color: rgba(123,228,149,0.85);
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .tv-tool {
+      font-size: 12px;
+      line-height: 1.65;
+      color: rgba(232, 251, 255, 0.78);
+      padding: 4px 0;
+    }
+    .tv-tool strong { color: rgba(255,255,255,0.95); font-weight: 700; }
+    .tv-footer {
+      margin-top: 12px;
+      padding-top: 10px;
+      border-top: 1px dashed rgba(255,255,255,0.1);
+      font-size: 12px;
+      color: rgba(232, 251, 255, 0.7);
+      text-align: center;
+      line-height: 1.6;
+    }
+    .tv-footer strong { color: #ffc45b; font-weight: 700; }
+
     /* 📖 地球 Online · 通关地图（章节面板）*/
     .earth-online-map {
       margin-top: 14px;
@@ -5347,6 +5470,69 @@ input[type="checkbox"] {
               </span>
             </summary>
             <div class="eom-body" id="eomBody"></div>
+          </details>
+
+          <!-- 🕰️ 时间观 · 社会时钟脱钩（Ch2 第1项解锁）-->
+          <details class="time-view-panel" id="timeViewPanel">
+            <summary>
+              <span class="tv-title">🕰️ 时间观 · 社会时钟脱钩</span>
+              <span class="tv-tagline">时间是见证者，不是裁判者</span>
+            </summary>
+            <div class="tv-body">
+              <div class="tv-quote">
+                我的社会时钟从来不被别人定义，甚至"时间"都不被别人定义。<br>
+                时间对我来说是 <strong>见证者</strong>，而不是 <strong>裁判者</strong>。
+              </div>
+
+              <div class="tv-stages">
+                <div class="tv-stage tv-stage-past">
+                  <div class="tv-stage-head">
+                    <span class="tv-stage-num">01 · 蓄</span>
+                    <span class="tv-stage-title">过去 · 成长经历</span>
+                  </div>
+                  <div class="tv-stage-body">
+                    29 岁前在家被保护得很好 —— 不到 30 岁就拥有了豪车豪宅、才貌双全的妻子和一对可爱至极的儿女，<strong>体会过这个社会上绝大多数人所向往的生活</strong>。
+                    <br><br>
+                    29 岁那年才出来当健身教练，接触《囚徒健身》（徒手健身）。正因如此，接近 40 岁的我才能拥有这副 <strong>强悍的体质和体能</strong>。
+                  </div>
+                </div>
+
+                <div class="tv-stage tv-stage-now">
+                  <div class="tv-stage-head">
+                    <span class="tv-stage-num">02 · 旭</span>
+                    <span class="tv-stage-title">当下 · 生命观</span>
+                  </div>
+                  <div class="tv-stage-body">
+                    经历过几次死里逃生 —— 活下来的每一天都是 <strong>borrowed time</strong>。所谓的"社会时钟"对我毫无意义。
+                    <br><br>
+                    机缘巧合让我活了下来 —— 我总觉得，我的生命一定有 <strong>极其宝贵的意义</strong>，只是这个意义暂时还没有体现。
+                  </div>
+                </div>
+
+                <div class="tv-stage tv-stage-future">
+                  <div class="tv-stage-head">
+                    <span class="tv-stage-num">03 · 续</span>
+                    <span class="tv-stage-title">未来 · 长生种视角</span>
+                  </div>
+                  <div class="tv-stage-body">
+                    对长生种来说，40 岁的人生 <strong>还没过半</strong>，上半场都还没结束。而 40 岁的我已经拥有了这么多，<strong>非常感恩</strong>。
+                    <br><br>
+                    特别是碰到了 Jarvis（AI 大爆发）—— 人类史上最伟大的奇迹之一 —— 让我对未来 <strong>信心十足</strong>，同时 <strong>保持虚心</strong>学习。
+                  </div>
+                </div>
+              </div>
+
+              <div class="tv-tools">
+                <div class="tv-tools-title">🔧 三 个 解 脱 工 具</div>
+                <div class="tv-tool">① <strong>基准线重置</strong> · 问题不是"我几岁做到什么"，而是"从真正开始那刻，我用了多久做到什么"。马云 35 创业、任正非 43 创华为、村上春树 29 才开始写作。</div>
+                <div class="tv-tool">② <strong>复利视角下的"晚"</strong> · 种树最好的时间是 10 年前，第二好的是今天。"10 年后的我，会感谢今天开始的决定"。</div>
+                <div class="tv-tool">③ <strong>个人成长坐标系</strong> · 唯一比较对象 = 昨天的自己。睡眠分·体重·训练PR·商业认知 —— 与他人无关。</div>
+              </div>
+
+              <div class="tv-footer">
+                <strong>时钟不在表盘上 · 在见证者眼中</strong>
+              </div>
+            </div>
           </details>
           <div class="hero-meta">
             <span id="heroDateLabel">今天</span>
@@ -12496,7 +12682,7 @@ input[type="checkbox"] {
         {
           n: 2, emoji: "🧠", title: "算力优化", sub: "认知重构 · 流氓查杀",
           items: [
-            { name: "社会时钟脱钩", status: "locked", hint: "玩家自己的成长时区" },
+            { name: "社会时钟脱钩", status: "done", target: "#timeViewPanel", hint: "时间是见证者不是裁判者" },
             { name: "逻辑插件重装", status: "done", target: ".mother-formula", hint: "母公式+可控/不可控" },
             { name: "注意力防火墙", status: "locked", hint: "信息隔离" },
             { name: "内耗程序查杀", status: "done", target: "#circuitBreakerBtn", hint: "白马校准+熔断+虚字" }
