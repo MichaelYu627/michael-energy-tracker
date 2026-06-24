@@ -6066,6 +6066,7 @@ input[type="checkbox"] {
       <header class="miying-header">
         <span class="miying-logo">📈</span>
         <h2>觅应运营看板</h2>
+        <button class="miying-action-btn" id="miyingPushBtn" type="button" style="margin-left:auto">📤 推今日数字到 Obsidian</button>
         <button class="miying-toggle" id="miyingToggleBtn" type="button">收起</button>
       </header>
 
@@ -11503,6 +11504,75 @@ input[type="checkbox"] {
             }
           });
         });
+
+        // ── 📤 推今日数字到 Obsidian ──
+        function buildMiyingMarkdown() {
+          const today = todayISO();
+          const m = state.metrics;
+          const todayDeals = state.deals.filter((d) => d.date === today);
+          const todayDealsTotal = todayDeals.reduce((s, d) => s + (d.amount || 0), 0);
+          const incomePct = m.monthlyIncomeTarget > 0
+            ? Math.round((m.monthlyIncome / m.monthlyIncomeTarget) * 100)
+            : 0;
+
+          // 本周内容分发
+          const weekDates = getWeekDates();
+          const distribLines = weekDates.map((d, i) => {
+            const day = state.distribution[d] || {};
+            const marks = PLATFORMS.map((p) => `${day[p] ? "✅" : "·"} ${p}`).join(" ");
+            return `- ${DAY_LABELS[i]} (${fmtShortDate(d)})：${marks}`;
+          });
+
+          // 本周重点 (todos)
+          const todoLines = state.todos.length
+            ? state.todos.map((t) => `- [${t.done ? "x" : " "}] ${t.text}`)
+            : ["- （无）"];
+
+          const sections = [
+            `## 觅应运营 · ${today} 数字快照`,
+            "",
+            `### 🎯 核心 KPI`,
+            `- 总成交额：${fmtCurrency(m.totalRevenue)}`,
+            `- 净利润：${fmtCurrency(m.netProfit)}`,
+            `- 月度收入：${fmtCurrency(m.monthlyIncome)} / ${fmtCurrency(m.monthlyIncomeTarget)}（${incomePct}%）`,
+            `- 房源总数：${m.propertyCount ?? 0} 套`,
+            "",
+            `### 💰 今日新成交`,
+            todayDeals.length
+              ? todayDeals.map((d) => `- ${d.source}：${fmtCurrency(d.amount)}`).join("\n") +
+                `\n- **今日小计：${fmtCurrency(todayDealsTotal)}**`
+              : "- 今日无新成交",
+            "",
+            `### 📅 本周内容分发`,
+            distribLines.join("\n"),
+            "",
+            `### ✅ 本周重点`,
+            todoLines.join("\n"),
+            "",
+            `---`,
+            `推送于 ${new Date().toLocaleString("zh-CN", { timeZone: "Asia/Shanghai" })}`
+          ];
+          return sections.join("\n");
+        }
+
+        function pushMiyingToObsidian() {
+          const today = todayISO();
+          const content = "\n\n" + buildMiyingMarkdown();
+          const vault = "Michael&Jarvis"; // CONFIG.obsidianVault 同款
+          const file = `觅应运营/觅应日志 ${today}`;
+          const url = `obsidian://new?vault=${encodeURIComponent(vault)}&file=${encodeURIComponent(file)}&append=true&content=${encodeURIComponent(content)}`;
+          window.location.href = url;
+          // 浮 toast 反馈
+          const btn = document.getElementById("miyingPushBtn");
+          if (btn) {
+            const orig = btn.textContent;
+            btn.textContent = `✓ 已推送到 ${file.split("/").pop()}`;
+            btn.disabled = true;
+            setTimeout(() => { btn.textContent = orig; btn.disabled = false; }, 2500);
+          }
+        }
+
+        document.getElementById("miyingPushBtn").addEventListener("click", pushMiyingToObsidian);
 
         // Toggle 收起/展开
         const toggleBtn = document.getElementById("miyingToggleBtn");
