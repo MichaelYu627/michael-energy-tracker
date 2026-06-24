@@ -3316,6 +3316,34 @@ input[type="checkbox"] {
   font-weight: 700;
 }
 
+/* 复查临近提醒：黄/橙/红三档 + <0 已过期 */
+.recheck-reminder[hidden] { display: none !important; }
+.recheck-reminder {
+  margin-top: 8px;
+  padding: 8px 12px 8px 14px !important;
+  border-radius: 8px;
+  background: rgba(255, 196, 91, 0.12);
+  border: 1px solid rgba(255, 196, 91, 0.4);
+  font-weight: 600;
+  color: #b87f00;
+}
+.recheck-reminder::before { display: none !important; }
+.recheck-reminder.urgent {
+  background: rgba(198, 40, 40, 0.1);
+  border-color: rgba(198, 40, 40, 0.45);
+  color: #b04030;
+  animation: recheckPulse 1.4s ease-in-out infinite;
+}
+.recheck-reminder.overdue {
+  background: rgba(176, 64, 48, 0.18);
+  border-color: rgba(176, 64, 48, 0.6);
+  color: #882828;
+}
+@keyframes recheckPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(198, 40, 40, 0); }
+  50%      { box-shadow: 0 0 0 6px rgba(198, 40, 40, 0.25); }
+}
+
 @media (max-width: 480px) {
   .health-combined > summary { padding: 12px 14px; font-size: 14px; }
   .health-combined-target { font-size: 11px; }
@@ -5912,8 +5940,8 @@ input[type="checkbox"] {
               <li><strong>非布司他</strong>（医生改药，原苯溴马隆停用），按医嘱服</li>
               <li><strong>痛风定胶囊</strong>，按医嘱服</li>
               <li>白天饮水 ≥ 2500ml（19:00 前完成）</li>
-              <li>📅 <strong>下次复查：2026-07-25</strong></li>
               <li>目标：尿酸 &lt; 420 μmol/L</li>
+              <li id="uricRecheckReminder" class="recheck-reminder" hidden></li>
             </ul>
           </div>
 
@@ -10926,10 +10954,38 @@ input[type="checkbox"] {
         }).join("");
       }
 
+      // ── 📅 尿酸复查临近提醒 ──
+      const URIC_RECHECK_DATE = "2026-07-25";
+      function renderRecheckReminder() {
+        const el = document.getElementById("uricRecheckReminder");
+        if (!el) return;
+        const today = window.BJ.todayISO();
+        const days = window.BJ.diffDays(today, URIC_RECHECK_DATE);
+        const fmtMD = (iso) => { const [, m, d] = iso.split("-"); return `${Number(m)}/${Number(d)}`; };
+        el.classList.remove("urgent", "overdue");
+        if (days > 14) { el.hidden = true; return; }
+        if (days >= 4) {
+          el.textContent = `📅 复查临近：${fmtMD(URIC_RECHECK_DATE)} （${days} 天后）`;
+        } else if (days >= 1) {
+          el.textContent = `🚨 复查倒计时：${fmtMD(URIC_RECHECK_DATE)} （${days} 天后）`;
+          el.classList.add("urgent");
+        } else if (days === 0) {
+          el.textContent = `🚨 今日复查 ${fmtMD(URIC_RECHECK_DATE)}！`;
+          el.classList.add("urgent");
+        } else if (days >= -7) {
+          el.textContent = `⚠️ 复查已过期 ${Math.abs(days)} 天，尽快补查`;
+          el.classList.add("overdue");
+        } else {
+          el.hidden = true; return;
+        }
+        el.hidden = false;
+      }
+
       // ── 评分模块初始化（Commit 2 误删了 init，这里补回来）──
       renderItems(loadToday());
       renderScore();
       renderSkillTree();
+      renderRecheckReminder();
       bindEvents();
 
       // ── 体重×尿酸联合模块初始化 ──
