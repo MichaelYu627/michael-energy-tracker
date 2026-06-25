@@ -9520,7 +9520,7 @@ input[type="checkbox"] {
           const date = events[0].date;
           const count = events.length;
           const content = "\n\n" + EventModel.renderBatchMarkdown(events);
-          const file = `${CONFIG.obsidianFolder}/训练日志 ${DateUtils.formatShortYearDate(date)}`;
+          const file = `${CONFIG.obsidianFolder}/${DateUtils.formatShortYearDate(date)} 训练日志`;
           const url = `obsidian://new?vault=${encodeURIComponent(CONFIG.obsidianVault)}&file=${encodeURIComponent(file)}&append=true&content=${encodeURIComponent(content)}`;
           // 同步调用，自定义协议必须这样
           window.location.href = url;
@@ -9564,7 +9564,7 @@ input[type="checkbox"] {
         },
 
         buildObsidianNotePath(entry) {
-          return `${CONFIG.obsidianFolder}/训练日志 ${DateUtils.formatShortYearDate(entry.date)}`;
+          return `${CONFIG.obsidianFolder}/${DateUtils.formatShortYearDate(entry.date)} 训练日志`;
         },
 
         buildObsidianMarkdown(entry) {
