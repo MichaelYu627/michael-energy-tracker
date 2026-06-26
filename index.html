@@ -9433,6 +9433,10 @@ input[type="checkbox"] {
           if (event.eventType === "training") {
             window.TrainingProgress?.refresh?.();
           }
+          // 睡眠事件 → 同步 sleepScore 到健康预管理 health_scores + 重渲染
+          if (event.eventType === "sleep" && nextEntry.sleepScore != null) {
+            window.HealthScore?.syncSleepScore?.(nextEntry.date, nextEntry.sleepScore);
+          }
           return true;
         },
 
@@ -10980,6 +10984,24 @@ input[type="checkbox"] {
         }
         el.hidden = false;
       }
+
+      // ── 暴露 hook 给主 IIFE applyEvent("sleep") 调用 ──
+      // 写入 sleepScore 到 health_scores[date]，今日则同步刷 input + renderScore
+      window.HealthScore = {
+        syncSleepScore(date, score) {
+          if (!date || !Number.isFinite(Number(score))) return;
+          const all = loadAll();
+          all[date] = { ...(all[date] || {}), sleepScore: Number(score) };
+          saveAll(all);
+          // 若是今日 → 更新 UI
+          if (date === todayISO()) {
+            const input = document.getElementById("healthSleepInput");
+            if (input) input.value = score;
+            renderScore();
+            renderSkillTree();
+          }
+        }
+      };
 
       // ── 评分模块初始化（Commit 2 误删了 init，这里补回来）──
       renderItems(loadToday());
