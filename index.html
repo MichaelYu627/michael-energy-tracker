@@ -13765,31 +13765,34 @@ input[type="checkbox"] {
 
       // 关卡 & 任务 (spec)
       // auto(day) → 完成态；critWhen(day) → 暴击态
+      // capture: 点击未完成 quest → 跳该 capture-bar 按钮录入
+      // manual: 点击未完成 → 直接 toggle (无对应 capture 入口)
+      // special: 自定义跳转 (如 miying 新增成交)
       const QUESTS = [
         { key: "morning", group: "🌅 晨起体检", items: [
-          { id: "sleep_score",  name: "睡眠评分",  xp: 10,
+          { id: "sleep_score",  name: "睡眠评分",  xp: 10, capture: "sleep",
             auto: (d) => Number(d.entry?.sleepScore) > 0,
             critWhen: (d) => Number(d.entry?.sleepScore) >= 80 },
-          { id: "weight",       name: "体重",      xp: 10,
+          { id: "weight",       name: "体重",      xp: 10, capture: "weight",
             auto: (d) => Number(d.entry?.weight) > 0 },
-          { id: "waist",        name: "腰围",      xp: 10,
+          { id: "waist",        name: "腰围",      xp: 10, capture: "weight",
             auto: (d) => Number(d.entry?.waistCircumference) > 0 },
-          { id: "glucose",      name: "血糖",      xp: 10,
+          { id: "glucose",      name: "血糖",      xp: 10, capture: "bloodGlucose",
             auto: (d) => Number(d.entry?.bloodGlucose) > 0 },
-          { id: "uric",         name: "尿酸",      xp: 10,
+          { id: "uric",         name: "尿酸",      xp: 10, capture: "uric",
             auto: (d) => Number(d.entry?.uricAcid) > 0,
             critWhen: (d) => Number(d.entry?.uricAcid) > 0 && Number(d.entry?.uricAcid) <= 420 }
         ]},
         { key: "supply", group: "🍽️ 补给", items: [
-          { id: "breakfast",    name: "早餐",             xp: 10,
+          { id: "breakfast",    name: "早餐",             xp: 10, capture: "meal",
             auto: (d) => (d.entry?.mealItems || []).some((m) => (m.type||"").includes("早")) },
           { id: "morning_med",  name: "早间药（非布司他）", xp: 10, manual: true },
-          { id: "dinner",       name: "晚饭",              xp: 10,
+          { id: "dinner",       name: "晚饭",              xp: 10, capture: "meal",
             auto: (d) => (d.entry?.mealItems || []).some((m) => (m.type||"").includes("晚")) },
           { id: "evening_med",  name: "睡前药（痛风定）",  xp: 10, manual: true }
         ]},
         { key: "training", group: "💪 黑马·训练", items: [
-          { id: "workout",      name: "囚徒训练 / 跑步 (练一休二)", xp: 30,
+          { id: "workout",      name: "囚徒训练 / 跑步 (练一休二)", xp: 30, capture: "training",
             auto: (d) => (d.entry?.workoutItems || []).length > 0,
             critWhen: (d) => {
               const w = d.entry?.workoutItems || [];
@@ -13799,17 +13802,15 @@ input[type="checkbox"] {
         ]},
         { key: "work", group: "🧠 马夫·事业", items: [
           { id: "jarvis_brain", name: "与 Jarvis 头脑风暴", xp: 10, manual: true },
-          { id: "afternoon_order", name: "下午订单",        xp: 10,
+          { id: "afternoon_order", name: "下午订单",        xp: 10, special: "miyingDeal",
             auto: (d) => (d.miyingDeals || []).filter((x) => x.date === d.today).length > 0 },
           { id: "website_refine",  name: "精进网站",       xp: 10, manual: true }
         ]},
         { key: "recovery", group: "😴 回血·恢复", items: [
-          { id: "nap",       name: "午睡 20-30 min", xp: 10,
-            auto: (d) => (d.entry?.recoveryItems || []).some((r) => (r.type||"").includes("午睡")),
-            manual: true /* manual toggle too if no recovery item */ },
-          { id: "sleep_sop", name: "睡前 SOP · 断水+AirPods Max", xp: 10,
-            auto: (d) => d.health?.sleepSop === true,
-            manual: true }
+          { id: "nap",       name: "午睡 20-30 min", xp: 10, capture: "recovery",
+            auto: (d) => (d.entry?.recoveryItems || []).some((r) => (r.type||"").includes("午睡")) },
+          { id: "sleep_sop", name: "睡前 SOP · 断水+AirPods Max", xp: 10, manual: true,
+            auto: (d) => d.health?.sleepSop === true }
         ]}
       ];
 
@@ -14014,10 +14015,32 @@ input[type="checkbox"] {
         const ctx = buildContext(today);
         const autoDone = typeof found.auto === "function" && found.auto(ctx);
         if (autoDone) return; // 已被数据判定完成，用户不需 toggle
-        // 允许所有未 auto 完成的 quest 手动 toggle（fallback）
-        toggleQuestManual(qid);
-        // 检查是否新完成 → float XP
+
+        // 优先：有 capture 入口 → 跳转到 capture-bar 对应 panel
+        if (found.capture) {
+          const btn = document.querySelector(`[data-event-type="${found.capture}"]`);
+          if (btn) {
+            btn.click();
+            setTimeout(() => {
+              const firstInput = document.querySelector(`[data-panel-type="${found.capture}"] input, [data-panel-type="${found.capture}"] select, [data-panel-type="${found.capture}"] textarea`);
+              firstInput?.scrollIntoView({ behavior: "smooth", block: "center" });
+              firstInput?.focus();
+            }, 100);
+            return;
+          }
+        }
+        // 特殊：miying 新增成交
+        if (found.special === "miyingDeal") {
+          const btn = document.getElementById("miyingAddDealBtn");
+          if (btn) {
+            btn.scrollIntoView({ behavior: "smooth", block: "center" });
+            setTimeout(() => btn.click(), 300);
+            return;
+          }
+        }
+        // Fallback: manual toggle (jarvis_brain / morning_med / evening_med / website_refine / sleep_sop)
         const wasDone = q.classList.contains("done");
+        toggleQuestManual(qid);
         if (!wasDone) {
           const isCrit = typeof found.critWhen === "function" && found.critWhen(ctx);
           floatXP(q, isCrit ? Math.round(found.xp * 1.5) : found.xp, isCrit);
