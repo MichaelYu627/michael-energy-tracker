@@ -13841,13 +13841,8 @@ input[type="checkbox"] {
       }
 
       function isQuestDone(item, ctx, manualChecks) {
-        if (item.manual && !item.auto) return !!manualChecks?.[item.id];
-        // 有 auto 判定：满足即完成；否则若也允许 manual 就退回 manual
-        if (typeof item.auto === "function") {
-          if (item.auto(ctx)) return true;
-          if (item.manual) return !!manualChecks?.[item.id];
-          return false;
-        }
+        // auto 优先；未满足 → 允许 manual fallback（所有 quest 都能点勾）
+        if (typeof item.auto === "function" && item.auto(ctx)) return true;
         return !!manualChecks?.[item.id];
       }
 
@@ -14019,7 +14014,7 @@ input[type="checkbox"] {
         const ctx = buildContext(today);
         const autoDone = typeof found.auto === "function" && found.auto(ctx);
         if (autoDone) return; // 已被数据判定完成，用户不需 toggle
-        if (!found.manual) return;
+        // 允许所有未 auto 完成的 quest 手动 toggle（fallback）
         toggleQuestManual(qid);
         // 检查是否新完成 → float XP
         const wasDone = q.classList.contains("done");
