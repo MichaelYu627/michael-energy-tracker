@@ -543,6 +543,151 @@
       .rb-node-goto { display: none; }
     }
 
+    /* 🎖️ 玩家等级 chip (hero badge 下) */
+    .player-level {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 10px;
+      padding: 6px 14px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, rgba(255,196,91,0.14), rgba(123,228,149,0.1));
+      border: 1px solid rgba(255,196,91,0.35);
+      font-size: 12px;
+    }
+    .player-level[hidden] { display: none !important; }
+    .pl-tag {
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      background: linear-gradient(90deg, #ffc45b, #7be495);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+      font-size: 12px;
+    }
+    .pl-lv {
+      font-family: var(--font-number);
+      font-weight: 900;
+      font-size: 15px;
+      color: #ffc45b;
+    }
+    .pl-bar {
+      width: 72px; height: 5px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .pl-bar-fill {
+      display: block; height: 100%;
+      background: linear-gradient(90deg, #ffc45b, #7be495);
+      border-radius: 999px;
+      transition: width 0.6s ease;
+    }
+    .pl-xp {
+      font-family: var(--font-number);
+      font-weight: 600;
+      color: rgba(232,251,255,0.65);
+      font-size: 11px;
+    }
+    .player-level.level-up { animation: plLevelUp 1s ease-out; }
+    @keyframes plLevelUp {
+      0%   { transform: scale(1); box-shadow: 0 0 0 0 rgba(255,196,91,0); }
+      40%  { transform: scale(1.08); box-shadow: 0 0 20px 4px rgba(255,196,91,0.55); }
+      100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255,196,91,0); }
+    }
+
+    /* 🏅 quest 完成 toast (底部居中滑入) */
+    .dd-toast {
+      position: fixed;
+      bottom: 90px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      z-index: 9500;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      background: linear-gradient(135deg, #0a2d1a, #1a3d2a);
+      border: 1px solid rgba(123,228,149,0.5);
+      border-radius: 999px;
+      color: #d4e8d4;
+      font-size: 13px;
+      font-weight: 600;
+      box-shadow: 0 8px 30px rgba(45,171,136,0.45);
+      opacity: 0;
+      transition: opacity 0.25s ease, transform 0.25s ease;
+      pointer-events: none;
+      max-width: 88vw;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .dd-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .dd-toast.crit {
+      background: linear-gradient(135deg, #2d1a0a, #3d2a0a);
+      border-color: rgba(255,196,91,0.6);
+      color: #ffe1a0;
+      box-shadow: 0 8px 30px rgba(255,196,91,0.5);
+    }
+    .dd-toast .dd-toast-xp {
+      font-family: var(--font-number);
+      font-weight: 900;
+      color: #7be495;
+    }
+    .dd-toast.crit .dd-toast-xp { color: #ffc45b; }
+
+    /* 🎁 副产品定律 panel */
+    .byproduct-panel {
+      margin-top: 14px;
+      padding: 0;
+      border-radius: var(--radius-sm);
+      background: linear-gradient(135deg, rgba(255,196,91,0.06), rgba(255,138,138,0.04));
+      border: 1px solid rgba(255,196,91,0.22);
+      overflow: hidden;
+    }
+    .byproduct-panel > summary {
+      list-style: none; cursor: pointer;
+      padding: 12px 16px;
+      display: flex; align-items: center; gap: 10px;
+      user-select: none; flex-wrap: wrap;
+    }
+    .byproduct-panel > summary::-webkit-details-marker { display: none; }
+    .byproduct-panel > summary::after {
+      content: "▾"; margin-left: auto;
+      color: rgba(232,251,255,0.5); font-size: 12px;
+      transition: transform 0.2s;
+    }
+    .byproduct-panel[open] > summary::after { transform: rotate(180deg); }
+    .bp-title { font-size: 13px; font-weight: 700; color: rgba(232,251,255,0.95); letter-spacing: 0.04em; }
+    .bp-tagline { font-size: 11px; color: rgba(255,196,91,0.8); font-style: italic; }
+    .bp-body { padding: 4px 16px 16px; }
+    .bp-laws { display: flex; flex-direction: column; gap: 6px; }
+    .bp-law {
+      display: flex; align-items: baseline; gap: 10px;
+      padding: 9px 12px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.05);
+      border-left: 3px solid rgba(255,196,91,0.4);
+      border-radius: 8px;
+      font-size: 13px; line-height: 1.6;
+      color: rgba(232,251,255,0.88);
+    }
+    .bp-law strong { color: #ffc45b; font-weight: 700; }
+    .bp-law em { color: #7be495; font-style: normal; font-weight: 600; }
+    .bp-conclusion {
+      margin-top: 12px;
+      padding: 14px 16px;
+      background: linear-gradient(135deg, rgba(255,196,91,0.1), rgba(123,228,149,0.06));
+      border: 1px dashed rgba(255,196,91,0.4);
+      border-radius: 10px;
+      text-align: center;
+      font-size: 14px; font-weight: 700;
+      color: rgba(232,251,255,0.95);
+      line-height: 1.8;
+    }
+    .bp-conclusion strong {
+      background: linear-gradient(90deg, #ffc45b, #7be495);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+
     /* 🕰️ 时间观 · 社会时钟脱钩 panel */
     .time-view-panel {
       margin-top: 14px;
@@ -6077,6 +6222,12 @@ input[type="checkbox"] {
       <div class="hero-grid">
         <div class="hero-copy">
           <div class="hero-badge">每日健康与能量管理仪表盘</div>
+          <div class="player-level" id="playerLevel" hidden>
+            <span class="pl-tag">长生种</span>
+            <span class="pl-lv" id="plLv">Lv.1</span>
+            <span class="pl-bar"><span class="pl-bar-fill" id="plBarFill" style="width:0%"></span></span>
+            <span class="pl-xp" id="plXp">0 XP</span>
+          </div>
           <h1>Michael 能量追踪器</h1>
           <p class="hero-manifesto">
             不是把自己活成一块流动的电池。<br><br>
@@ -6317,6 +6468,29 @@ input[type="checkbox"] {
 
               <div class="rb-loop-footer">
                 ↺ 循环加强 <strong>回到 01</strong> · 河床越冲越深
+              </div>
+            </div>
+          </details>
+
+          <!-- 🎁 副产品定律 -->
+          <details class="byproduct-panel" id="byproductPanel">
+            <summary>
+              <span class="bp-title">🎁 副产品定律</span>
+              <span class="bp-tagline">真正好的东西无法直接追求</span>
+            </summary>
+            <div class="bp-body">
+              <div class="bp-laws">
+                <div class="bp-law">好<strong>睡眠</strong>，是好<em>结构</em>的副产品。</div>
+                <div class="bp-law">好<strong>身材</strong>，是好<em>生活</em>的副产品。</div>
+                <div class="bp-law">好<strong>婚姻</strong>，是好<em>人格</em>的副产品。</div>
+                <div class="bp-law">好<strong>事业</strong>，是<em>长期积累</em>的副产品。</div>
+                <div class="bp-law">好<strong>运气</strong>，是<em>长期留在牌桌上</em>的副产品。</div>
+                <div class="bp-law"><strong>幸福</strong>，是<em>整个系统协调运转</em>的副产品。</div>
+              </div>
+              <div class="bp-conclusion">
+                所有真正好的东西，都无法直接追求。<br>
+                只能 —— <strong>间接获得</strong>。<br>
+                <span style="font-size:11.5px;font-weight:500;color:rgba(232,251,255,0.6)">↑ 这正是「河床升级」循环存在的理由：不追结果，只筑河床。</span>
               </div>
             </div>
           </details>
@@ -14189,10 +14363,82 @@ input[type="checkbox"] {
         return `${iso} · ${days[dow]}`;
       }
 
+      // ── 🎖️ 玩家等级：全历史 dungeon XP 累计 → sqrt 曲线 ──
+      // Lv = floor(sqrt(totalXP / 60))；下一级需 60·(lv+1)²
+      function collectAllDates() {
+        const set = new Set();
+        loadEntries().forEach((e) => { if (e.date) set.add(e.date); });
+        Object.keys(loadHealth()).forEach((d) => set.add(d));
+        Object.keys(loadStore()).forEach((d) => set.add(d));
+        return [...set].filter((d) => /^\d{4}-\d{2}-\d{2}$/.test(d));
+      }
+      function computeLifetimeXP() {
+        return collectAllDates().reduce((sum, d) => sum + computeDungeon(d).xp, 0);
+      }
+      let prevLevel = null;
+      function renderPlayerLevel() {
+        const chip = document.getElementById("playerLevel");
+        if (!chip) return;
+        const totalXP = computeLifetimeXP();
+        const lv = Math.floor(Math.sqrt(totalXP / 60));
+        const curLvXP = 60 * lv * lv;
+        const nextLvXP = 60 * (lv + 1) * (lv + 1);
+        const pct = Math.round(((totalXP - curLvXP) / (nextLvXP - curLvXP)) * 100);
+        document.getElementById("plLv").textContent = `Lv.${lv}`;
+        document.getElementById("plBarFill").style.width = Math.max(2, Math.min(100, pct)) + "%";
+        document.getElementById("plXp").textContent = `${totalXP} XP`;
+        chip.hidden = false;
+        // 升级动画
+        if (prevLevel !== null && lv > prevLevel) {
+          chip.classList.remove("level-up");
+          void chip.offsetWidth; // reflow 重启动画
+          chip.classList.add("level-up");
+          showToast(`🎖️ 升级！长生种 Lv.${lv}`, true);
+        }
+        prevLevel = lv;
+      }
+
+      // ── 🏅 quest 完成 toast ──
+      let toastEl = null, toastTimer = null;
+      function showToast(html, isCrit) {
+        if (!toastEl) {
+          toastEl = document.createElement("div");
+          toastEl.className = "dd-toast";
+          document.body.appendChild(toastEl);
+        }
+        toastEl.classList.toggle("crit", !!isCrit);
+        toastEl.innerHTML = html;
+        toastEl.classList.add("show");
+        if (toastTimer) clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => toastEl.classList.remove("show"), 2600);
+      }
+
+      // 上一次渲染的完成集（diff 检测新完成 quest）
+      let prevDoneMap = null;
+
       function render() {
         const today = window.BJ.todayISO();
         const dungeon = computeDungeon(today);
         const streak = computeStreak(today);
+
+        // 🏅 diff：新完成的 quest → toast（首次渲染不弹）
+        const doneMap = {};
+        dungeon.groupResults.forEach((g) => g.items.forEach((it) => { doneMap[it.id] = { done: it.done, crit: it.crit, name: it.name, xp: it.xp }; }));
+        if (prevDoneMap) {
+          Object.entries(doneMap).forEach(([id, cur]) => {
+            const prev = prevDoneMap[id];
+            if (cur.done && prev && !prev.done) {
+              const gain = cur.crit ? Math.round(cur.xp * 1.5) : cur.xp;
+              showToast(
+                cur.crit
+                  ? `⚡ 暴击！${cur.name} <span class="dd-toast-xp">+${gain} XP</span>`
+                  : `✅ ${cur.name} 完成 <span class="dd-toast-xp">+${gain} XP</span>`,
+                cur.crit
+              );
+            }
+          });
+        }
+        prevDoneMap = doneMap;
 
         document.getElementById("ddDate").textContent = formatDateLabel(today);
 
@@ -14249,6 +14495,9 @@ input[type="checkbox"] {
             showSCelebration();
           }
         }
+
+        // 🎖️ 玩家等级（全历史 XP → Lv）
+        renderPlayerLevel();
       }
 
       function showSCelebration() {
