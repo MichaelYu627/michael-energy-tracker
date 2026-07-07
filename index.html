@@ -8902,6 +8902,12 @@ input[type="checkbox"] {
   const time = prefill?.time || DateUtils.getCurrentTimeString();
   // 餐次默认值：prefill 有就用 prefill，否则按时间自动推断
   const defaultType = p.type || mealTypeFromTime(time);
+  // 🥣 固定早餐模板：06:00-08:00 打开且无 prefill → 预填标准组合
+  const BREAKFAST_TEMPLATE = "燕麦 + 牛奶 + 希腊酸奶 + 坚果";
+  const hm = time.match(/^(\d{1,2}):(\d{2})/);
+  const mins = hm ? Number(hm[1]) * 60 + Number(hm[2]) : -1;
+  const inBreakfastWindow = mins >= 6 * 60 && mins <= 8 * 60;
+  const defaultFood = p.food || (inBreakfastWindow && defaultType === "早餐" ? BREAKFAST_TEMPLATE : "");
   return `
     <div class="capture-panel" data-panel-type="meal">
       <h3>🍱 记一餐</h3>
@@ -8924,7 +8930,8 @@ input[type="checkbox"] {
       </div>
       <div class="field">
         <label>吃了什么</label>
-        <textarea id="mealPanelFood" placeholder="例如：牛肉 青菜 米饭" rows="2">${p.food || ""}</textarea>
+        <textarea id="mealPanelFood" placeholder="例如：牛肉 青菜 米饭" rows="2">${defaultFood}</textarea>
+        <button class="btn-secondary btn-slim" id="mealBreakfastTplBtn" type="button" style="margin-top:6px">🥣 标准早餐（燕麦+牛奶+希腊酸奶+坚果）</button>
       </div>
       <div class="field-row">
         <label class="meal-tag-check"><input type="checkbox" id="mealPanelCooked" ${p.cooked !== false ? "checked" : ""}> 自己做</label>
@@ -9282,8 +9289,28 @@ input[type="checkbox"] {
     timeEl.addEventListener("input", () => {
       if (typeManuallySet) return;
       typeEl.value = mealTypeFromTime(timeEl.value);
+      // 改时间落入 06:00-08:00 早餐窗 + food 还空着 → 自动填标准早餐
+      const foodEl = document.getElementById("mealPanelFood");
+      if (foodEl && !foodEl.value.trim()) {
+        const m = timeEl.value.match(/^(\d{1,2}):(\d{2})/);
+        const mins = m ? Number(m[1]) * 60 + Number(m[2]) : -1;
+        if (mins >= 6 * 60 && mins <= 8 * 60 && typeEl.value === "早餐") {
+          foodEl.value = "燕麦 + 牛奶 + 希腊酸奶 + 坚果";
+        }
+      }
     });
   }
+
+  // 🥣 标准早餐模板按钮：一键填入（随时可用，不限时间窗）
+  document.getElementById("mealBreakfastTplBtn")?.addEventListener("click", () => {
+    const foodEl = document.getElementById("mealPanelFood");
+    if (foodEl) foodEl.value = "燕麦 + 牛奶 + 希腊酸奶 + 坚果";
+    if (typeEl) { typeEl.value = "早餐"; typeManuallySet = true; }
+    const cooked = document.getElementById("mealPanelCooked");
+    const healthy = document.getElementById("mealPanelHealthy");
+    if (cooked) cooked.checked = true;
+    if (healthy) healthy.checked = true;
+  });
 
   document.getElementById("mealPanelSave").addEventListener("click", () => {
     const data = {
