@@ -7685,7 +7685,7 @@ input[type="checkbox"] {
         seededKey: "michael-energy-tracker-seeded",
         templateSettingsKey: "michael-energy-template-settings-v1",
         pendingSyncKey: "michael-energy-tracker-pending-sync-v1",
-        exportVersion: 10,
+        exportVersion: 11,
         obsidianVault: "Michael&Jarvis",
         obsidianFolder: "我的训练日志",
         currentWeightDefault: 83.4,
@@ -9562,11 +9562,21 @@ input[type="checkbox"] {
         },
 
         buildExportPayload(entries) {
+          // v11: 附带觅应看板 + 健康评分等外围 localStorage 数据
+          const readJSON = (key, fallback) => {
+            try { return JSON.parse(localStorage.getItem(key)) ?? fallback; }
+            catch { return fallback; }
+          };
           return {
             app: "Michael 能量追踪器",
             version: CONFIG.exportVersion,
             exportedAt: new Date().toISOString(),
-            entries: EntryModel.dedupe(entries)
+            entries: EntryModel.dedupe(entries),
+            miying: readJSON("michael-miying-dashboard-v1", null),
+            healthScores: readJSON("health_scores", null),
+            dailyDungeon: readJSON("daily_dungeon_v1", null),
+            victoryMilestones: readJSON("victory_milestones", null),
+            creatorLog: readJSON("creator_log", null)
           };
         },
 
@@ -9585,6 +9595,15 @@ input[type="checkbox"] {
           }
 
           if (payload && typeof payload === "object" && Array.isArray(payload.entries)) {
+            // v11: 外围数据一并恢复（存在才写，不覆盖为 null）
+            const restoreJSON = (key, value) => {
+              if (value != null) localStorage.setItem(key, JSON.stringify(value));
+            };
+            restoreJSON("michael-miying-dashboard-v1", payload.miying);
+            restoreJSON("health_scores", payload.healthScores);
+            restoreJSON("daily_dungeon_v1", payload.dailyDungeon);
+            restoreJSON("victory_milestones", payload.victoryMilestones);
+            restoreJSON("creator_log", payload.creatorLog);
             return validateImportedEntries(payload.entries);
           }
 
