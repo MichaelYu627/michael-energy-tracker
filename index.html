@@ -5793,6 +5793,52 @@ input[type="checkbox"] {
 
 /* Tables */
 .miying-table-wrap { overflow-x: auto; }
+
+/* 净利润构成 bar（场地/餐饮/其他）*/
+.miying-profit-bar {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 8px 14px;
+  margin-bottom: 10px;
+  background: rgba(255,179,71,0.08);
+  border: 1px solid rgba(255,179,71,0.25);
+  border-radius: 10px;
+  font-size: 12px;
+}
+.miying-profit-bar[hidden] { display: none !important; }
+.miying-profit-bar .mp-label {
+  color: rgba(255,255,255,0.45);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  font-weight: 600;
+}
+.miying-profit-bar .mp-item { color: rgba(255,255,255,0.75); }
+.miying-profit-bar .mp-item strong {
+  font-family: var(--font-number);
+  font-weight: 700;
+  color: #ffe1a0;
+  margin-left: 2px;
+}
+.miying-profit-bar .mp-total {
+  margin-left: auto;
+  color: rgba(255,255,255,0.75);
+}
+.miying-profit-bar .mp-total strong {
+  font-family: var(--font-number);
+  font-weight: 800;
+  font-size: 14px;
+  color: #ffb347;
+  margin-left: 2px;
+}
+.miying-table td.profit-cell {
+  color: #ffe1a0;
+  font-family: var(--font-number);
+  font-size: 11.5px;
+  text-align: right;
+  white-space: nowrap;
+}
 .miying-table {
   width: 100%;
   border-collapse: collapse;
@@ -7128,9 +7174,17 @@ input[type="checkbox"] {
             <h3>近期成交记录</h3>
             <button class="miying-action-btn" id="miyingAddDealBtn" type="button">+ 新增成交</button>
           </div>
+          <!-- 净利润构成（场地/餐饮/其他，从 deals.profit 汇总）-->
+          <div class="miying-profit-bar" id="miyingProfitBar" hidden>
+            <span class="mp-label">净利构成</span>
+            <span class="mp-item">🏠 场地 <strong id="mpVenue">¥0</strong></span>
+            <span class="mp-item">🍽 餐饮 <strong id="mpFood">¥0</strong></span>
+            <span class="mp-item">📦 其他 <strong id="mpOther">¥0</strong></span>
+            <span class="mp-total">Σ <strong id="mpTotal">¥0</strong></span>
+          </div>
           <div class="miying-table-wrap">
             <table class="miying-table">
-              <thead><tr><th>日期</th><th>来源</th><th class="num">金额</th><th class="num">累计</th><th></th></tr></thead>
+              <thead><tr><th>日期</th><th>来源</th><th class="num">金额</th><th class="num">净利</th><th class="num">累计</th><th></th></tr></thead>
               <tbody id="miyingDealsBody"></tbody>
             </table>
           </div>
@@ -12609,27 +12663,61 @@ input[type="checkbox"] {
         }
       }
 
+      // 单笔 deal 三类净利合计
+      function dealProfitTotal(d) {
+        const p = d.profit || {};
+        return (Number(p.venue) || 0) + (Number(p.food) || 0) + (Number(p.other) || 0);
+      }
+
       function renderDeals() {
         const tbody = document.getElementById("miyingDealsBody");
         if (!tbody) return;
         const sorted = [...state.deals].sort((a, b) => a.date.localeCompare(b.date));
         if (!sorted.length) {
-          tbody.innerHTML = `<tr class="empty-row"><td colspan="5">还没有成交记录，点右上"+ 新增成交"添加。</td></tr>`;
+          tbody.innerHTML = `<tr class="empty-row"><td colspan="6">还没有成交记录，点右上"+ 新增成交"添加。</td></tr>`;
+          renderProfitBar();
           return;
         }
         let running = 0;
         tbody.innerHTML = sorted.map((d) => {
           running += d.amount || 0;
+          const pt = dealProfitTotal(d);
+          const p = d.profit || {};
+          const profitTitle = pt > 0
+            ? `场地 ${Number(p.venue)||0} · 餐饮 ${Number(p.food)||0} · 其他 ${Number(p.other)||0}`
+            : "";
           return `
             <tr data-deal-id="${d.id}">
               <td>${fmtShortDate(d.date)}</td>
               <td>${escapeHtml(d.source || "")}</td>
               <td class="num amount">${fmtCurrency(d.amount || 0)}</td>
+              <td class="profit-cell" title="${profitTitle}">${pt > 0 ? fmtCurrency(pt) : "—"}</td>
               <td class="num cumulative">${fmtCurrency(running)}</td>
               <td><button class="miying-deal-del" type="button" data-action="delete-deal" aria-label="删除">×</button></td>
             </tr>
           `;
         }).join("");
+        renderProfitBar();
+      }
+
+      // 净利润构成汇总（场地/餐饮/其他）
+      function renderProfitBar() {
+        const bar = document.getElementById("miyingProfitBar");
+        if (!bar) return;
+        let venue = 0, food = 0, other = 0;
+        state.deals.forEach((d) => {
+          const p = d.profit || {};
+          venue += Number(p.venue) || 0;
+          food += Number(p.food) || 0;
+          other += Number(p.other) || 0;
+        });
+        const total = venue + food + other;
+        if (total <= 0) { bar.hidden = true; return; }
+        document.getElementById("mpVenue").textContent = fmtCurrency(venue);
+        document.getElementById("mpFood").textContent = fmtCurrency(food);
+        document.getElementById("mpOther").textContent = fmtCurrency(other);
+        document.getElementById("mpTotal").textContent = fmtCurrency(total);
+        bar.hidden = false;
       }
 
       function renderDistribution() {
@@ -12741,9 +12829,26 @@ input[type="checkbox"] {
             "",
             `### 💰 今日新成交`,
             todayDeals.length
-              ? todayDeals.map((d) => `- ${d.source}：${fmtCurrency(d.amount)}`).join("\n") +
+              ? todayDeals.map((d) => {
+                  const pt = dealProfitTotal(d);
+                  const p = d.profit || {};
+                  const profitStr = pt > 0
+                    ? `（净利 ${fmtCurrency(pt)}：场地 ${Number(p.venue)||0} / 餐饮 ${Number(p.food)||0} / 其他 ${Number(p.other)||0}）`
+                    : "";
+                  return `- ${d.source}：${fmtCurrency(d.amount)}${profitStr}`;
+                }).join("\n") +
                 `\n- **今日小计：${fmtCurrency(todayDealsTotal)}**`
               : "- 今日无新成交",
+            "",
+            `### 💎 净利润构成（累计）`,
+            (() => {
+              let v = 0, f = 0, o = 0;
+              state.deals.forEach((d) => { const p = d.profit || {}; v += Number(p.venue)||0; f += Number(p.food)||0; o += Number(p.other)||0; });
+              const t = v + f + o;
+              return t > 0
+                ? `- 🏠 场地：${fmtCurrency(v)}\n- 🍽 餐饮：${fmtCurrency(f)}\n- 📦 其他：${fmtCurrency(o)}\n- **合计：${fmtCurrency(t)}**`
+                : "- 暂无净利拆分数据（新成交时录入）";
+            })(),
             "",
             `### 📅 本周内容分发`,
             distribLines.join("\n"),
@@ -12790,7 +12895,7 @@ input[type="checkbox"] {
           applyCollapsed();
         });
 
-        // 新增成交
+        // 新增成交（含 场地/餐饮/其他 三类净利拆分，留空=0）
         document.getElementById("miyingAddDealBtn").addEventListener("click", () => {
           const date = window.prompt("日期 (YYYY-MM-DD)", todayISO());
           if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) return;
@@ -12803,7 +12908,19 @@ input[type="checkbox"] {
             window.alert("金额需要是正数");
             return;
           }
-          state.deals.push({ id: makeId("deal"), date, source: source.trim(), amount });
+          // 三类净利（选填，取消或留空 = 0）
+          const askProfit = (label) => {
+            const s = window.prompt(`净利 · ${label}（选填，留空跳过）`, "");
+            if (s === null || s.trim() === "") return 0;
+            const n = parseNumber(s);
+            return Number.isFinite(n) && n > 0 ? n : 0;
+          };
+          const profit = {
+            venue: askProfit("场地"),
+            food: askProfit("餐饮"),
+            other: askProfit("其他")
+          };
+          state.deals.push({ id: makeId("deal"), date, source: source.trim(), amount, profit });
           // 自动累加到总成交额
           state.metrics.totalRevenue = state.deals.reduce((sum, d) => sum + (d.amount || 0), 0);
           save(state);
