@@ -13102,21 +13102,63 @@ input[type="checkbox"] {
           URL.revokeObjectURL(url);
         });
 
-        // 删除成交
-        document.getElementById("miyingDealsBody").addEventListener("click", (e) => {
-          const btn = e.target.closest("[data-action='delete-deal']");
-          if (!btn) return;
-          const row = btn.closest("tr[data-deal-id]");
-          if (!row) return;
-          const id = row.dataset.dealId;
+        // 编辑成交（点行 → 逐字段 prompt，预填现值，取消 = 该字段不改）
+        function editDealFlow(id) {
           const deal = state.deals.find((d) => d.id === id);
           if (!deal) return;
-          if (!window.confirm(`确定删除 ${fmtShortDate(deal.date)} ${deal.source} ${fmtCurrency(deal.amount)} 这条记录吗？`)) return;
-          state.deals = state.deals.filter((d) => d.id !== id);
+          const ask = (label, current) => {
+            const s = window.prompt(`${label}（取消 = 保持不变）`, String(current ?? ""));
+            return s === null ? null : s.trim();
+          };
+          // 日期
+          const dateStr = ask("日期 YYYY-MM-DD", deal.date);
+          if (dateStr !== null && /^\d{4}-\d{2}-\d{2}$/.test(dateStr)) deal.date = dateStr;
+          // 来源
+          const srcStr = ask("来源", deal.source);
+          if (srcStr !== null && srcStr) deal.source = srcStr;
+          // 金额
+          const amtStr = ask("金额", deal.amount);
+          if (amtStr !== null) {
+            const n = parseNumber(amtStr);
+            if (Number.isFinite(n) && n > 0) deal.amount = n;
+          }
+          // 三类净利
+          if (!deal.profit) deal.profit = { venue: 0, food: 0, other: 0 };
+          const askProfit = (label, cur) => {
+            const s = ask(`净利 · ${label}`, cur || 0);
+            if (s === null) return cur || 0;
+            const n = parseNumber(s);
+            return Number.isFinite(n) && n >= 0 ? n : (cur || 0);
+          };
+          deal.profit.venue = askProfit("场地", deal.profit.venue);
+          deal.profit.food = askProfit("餐饮", deal.profit.food);
+          deal.profit.other = askProfit("其他", deal.profit.other);
+
           state.metrics.totalRevenue = state.deals.reduce((sum, d) => sum + (d.amount || 0), 0);
           save(state);
           renderDeals();
           renderKPIs();
+        }
+
+        // 点击成交行：删除按钮 → 删；其他区域 → 编辑
+        document.getElementById("miyingDealsBody").addEventListener("click", (e) => {
+          const row = e.target.closest("tr[data-deal-id]");
+          if (!row) return;
+          const id = row.dataset.dealId;
+          const delBtn = e.target.closest("[data-action='delete-deal']");
+          if (delBtn) {
+            const deal = state.deals.find((d) => d.id === id);
+            if (!deal) return;
+            if (!window.confirm(`确定删除 ${fmtShortDate(deal.date)} ${deal.source} ${fmtCurrency(deal.amount)} 这条记录吗？`)) return;
+            state.deals = state.deals.filter((d) => d.id !== id);
+            state.metrics.totalRevenue = state.deals.reduce((sum, d) => sum + (d.amount || 0), 0);
+            save(state);
+            renderDeals();
+            renderKPIs();
+            return;
+          }
+          // 行点击 → 编辑补录
+          editDealFlow(id);
         });
 
         // 分发格子点击
