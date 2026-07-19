@@ -5832,6 +5832,58 @@ input[type="checkbox"] {
   color: #ffb347;
   margin-left: 2px;
 }
+/* 批量补录 modal */
+.miying-batch-modal {
+  position: fixed; inset: 0; z-index: 9600;
+  background: rgba(10, 15, 12, 0.85);
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px;
+}
+.miying-batch-modal[hidden] { display: none !important; }
+.mb-inner {
+  width: 100%; max-width: 560px;
+  background: #1a2420;
+  border: 1px solid rgba(255,179,71,0.35);
+  border-radius: 14px;
+  padding: 20px;
+  max-height: 85vh;
+  overflow-y: auto;
+}
+.mb-inner h4 { margin: 0 0 10px; color: #ffb347; font-size: 16px; }
+.mb-hint {
+  font-size: 12px; color: rgba(255,255,255,0.6);
+  line-height: 1.7; margin-bottom: 10px;
+}
+.mb-hint code {
+  background: rgba(255,255,255,0.08);
+  padding: 1px 6px; border-radius: 4px;
+  color: #ffe1a0; font-size: 11.5px;
+}
+.mb-inner textarea {
+  width: 100%; box-sizing: border-box;
+  background: rgba(0,0,0,0.3) !important;
+  color: #e8f5ee !important;
+  border: 1px solid rgba(255,179,71,0.3) !important;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-family: var(--font-number), monospace;
+  font-size: 12.5px;
+  line-height: 1.8;
+}
+.mb-preview {
+  margin-top: 8px; font-size: 11.5px;
+  color: rgba(255,255,255,0.7);
+  line-height: 1.6;
+  max-height: 120px; overflow-y: auto;
+}
+.mb-preview .ok { color: #7be495; }
+.mb-preview .err { color: #ff8a8a; }
+.mb-actions {
+  display: flex; gap: 8px; justify-content: flex-end;
+  margin-top: 12px;
+}
+.mb-confirm { background: rgba(123,228,149,0.25) !important; color: #7be495 !important; border-color: rgba(123,228,149,0.5) !important; }
+
 .miying-table td.profit-cell {
   color: #ffe1a0;
   font-family: var(--font-number);
@@ -7172,7 +7224,31 @@ input[type="checkbox"] {
         <div class="miying-sub">
           <div class="miying-sub-header">
             <h3>近期成交记录</h3>
-            <button class="miying-action-btn" id="miyingAddDealBtn" type="button">+ 新增成交</button>
+            <div style="display:flex;gap:6px;flex-wrap:wrap">
+              <button class="miying-action-btn" id="miyingAddDealBtn" type="button">+ 新增成交</button>
+              <button class="miying-action-btn" id="miyingBatchBtn" type="button">📋 批量补录</button>
+              <button class="miying-action-btn" id="miyingCsvBtn" type="button">📊 导出CSV</button>
+            </div>
+          </div>
+
+          <!-- 批量补录 modal -->
+          <div class="miying-batch-modal" id="miyingBatchModal" hidden>
+            <div class="mb-inner">
+              <h4>📋 批量补录成交</h4>
+              <div class="mb-hint">
+                一行一单，用空格或逗号分隔：<br>
+                <code>日期 来源 金额 [场地净利] [餐饮净利] [其他净利]</code><br>
+                日期支持 2026-05-20 / 5-20 / 5/20（自动补今年）。后三列选填。
+              </div>
+              <textarea id="miyingBatchInput" rows="10" placeholder="2026-05-20 网站 8000 3000 1200 300
+5/22 抖音 6500 2200
+6-01 推荐 12000"></textarea>
+              <div class="mb-preview" id="miyingBatchPreview"></div>
+              <div class="mb-actions">
+                <button class="miying-action-btn" id="miyingBatchCancel" type="button">取消</button>
+                <button class="miying-action-btn mb-confirm" id="miyingBatchConfirm" type="button">✅ 解析并导入</button>
+              </div>
+            </div>
           </div>
           <!-- 净利润构成（场地/餐饮/其他，从 deals.profit 汇总）-->
           <div class="miying-profit-bar" id="miyingProfitBar" hidden>
@@ -12926,6 +13002,104 @@ input[type="checkbox"] {
           save(state);
           renderDeals();
           renderKPIs();
+        });
+
+        // ── 📋 批量补录 ──
+        // 每行：日期 来源 金额 [场地] [餐饮] [其他]；分隔符 空格/逗号/tab
+        function parseBatchLine(line) {
+          const parts = line.trim().split(/[,，\t ]+/).filter(Boolean);
+          if (parts.length < 3) return { error: "字段不足（至少 日期 来源 金额）", raw: line };
+          // 日期归一化：YYYY-MM-DD / M-D / M/D → 补今年
+          let dateRaw = parts[0].replace(/\//g, "-");
+          let date;
+          if (/^\d{4}-\d{1,2}-\d{1,2}$/.test(dateRaw)) {
+            const [y, m, d] = dateRaw.split("-");
+            date = `${y}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+          } else if (/^\d{1,2}-\d{1,2}$/.test(dateRaw)) {
+            const [m, d] = dateRaw.split("-");
+            const year = window.BJ.todayISO().slice(0, 4);
+            date = `${year}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+          } else {
+            return { error: `日期格式不识别：${parts[0]}`, raw: line };
+          }
+          const source = parts[1];
+          const amount = parseNumber(parts[2]);
+          if (!Number.isFinite(amount) || amount <= 0) return { error: `金额无效：${parts[2]}`, raw: line };
+          const num = (s) => { const n = parseNumber(s || ""); return Number.isFinite(n) && n > 0 ? n : 0; };
+          const profit = { venue: num(parts[3]), food: num(parts[4]), other: num(parts[5]) };
+          return { date, source, amount, profit };
+        }
+
+        function parseBatchInput(text) {
+          const lines = text.split("\n").map((l) => l.trim()).filter(Boolean);
+          return lines.map(parseBatchLine);
+        }
+
+        const batchModal = document.getElementById("miyingBatchModal");
+        const batchInput = document.getElementById("miyingBatchInput");
+        const batchPreview = document.getElementById("miyingBatchPreview");
+
+        document.getElementById("miyingBatchBtn").addEventListener("click", () => {
+          batchInput.value = "";
+          batchPreview.innerHTML = "";
+          batchModal.hidden = false;
+        });
+        document.getElementById("miyingBatchCancel").addEventListener("click", () => {
+          batchModal.hidden = true;
+        });
+        // 实时预览解析结果
+        batchInput.addEventListener("input", () => {
+          const results = parseBatchInput(batchInput.value);
+          if (!results.length) { batchPreview.innerHTML = ""; return; }
+          batchPreview.innerHTML = results.map((r, i) => {
+            if (r.error) return `<div class="err">✗ 第${i+1}行：${r.error}</div>`;
+            const pt = (r.profit.venue + r.profit.food + r.profit.other);
+            return `<div class="ok">✓ ${r.date} ${r.source} ${fmtCurrency(r.amount)}${pt > 0 ? `（净利 ${fmtCurrency(pt)}）` : ""}</div>`;
+          }).join("");
+        });
+        document.getElementById("miyingBatchConfirm").addEventListener("click", () => {
+          const results = parseBatchInput(batchInput.value);
+          const valid = results.filter((r) => !r.error);
+          const errors = results.filter((r) => r.error);
+          if (!valid.length) { window.alert("没有可导入的有效行"); return; }
+          if (errors.length && !window.confirm(`${errors.length} 行有错误将被跳过，导入 ${valid.length} 行有效数据？`)) return;
+          valid.forEach((r) => {
+            state.deals.push({ id: makeId("deal"), date: r.date, source: r.source, amount: r.amount, profit: r.profit });
+          });
+          state.metrics.totalRevenue = state.deals.reduce((sum, d) => sum + (d.amount || 0), 0);
+          save(state);
+          renderDeals();
+          renderKPIs();
+          batchModal.hidden = true;
+          window.alert(`✅ 已导入 ${valid.length} 笔成交`);
+        });
+
+        // ── 📊 导出 CSV（会计用，Excel 兼容）──
+        document.getElementById("miyingCsvBtn").addEventListener("click", () => {
+          const sorted = [...state.deals].sort((a, b) => a.date.localeCompare(b.date));
+          if (!sorted.length) { window.alert("还没有成交记录"); return; }
+          const header = ["日期", "来源", "金额", "净利-场地", "净利-餐饮", "净利-其他", "净利合计"];
+          let running = 0;
+          const rows = sorted.map((d) => {
+            const p = d.profit || {};
+            const v = Number(p.venue) || 0, f = Number(p.food) || 0, o = Number(p.other) || 0;
+            return [d.date, `"${(d.source || "").replace(/"/g, '""')}"`, d.amount || 0, v, f, o, v + f + o];
+          });
+          // 汇总行
+          const tv = sorted.reduce((s, d) => s + (d.amount || 0), 0);
+          const tp = sorted.reduce((s, d) => s + dealProfitTotal(d), 0);
+          const tVenue = sorted.reduce((s, d) => s + (Number(d.profit?.venue) || 0), 0);
+          const tFood = sorted.reduce((s, d) => s + (Number(d.profit?.food) || 0), 0);
+          const tOther = sorted.reduce((s, d) => s + (Number(d.profit?.other) || 0), 0);
+          rows.push(["合计", "", tv, tVenue, tFood, tOther, tp]);
+          const csv = "\uFEFF" + [header.join(","), ...rows.map((r) => r.join(","))].join("\r\n");
+          const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = `觅应成交明细_${todayISO()}.csv`;
+          a.click();
+          URL.revokeObjectURL(url);
         });
 
         // 删除成交
