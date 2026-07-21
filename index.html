@@ -8947,7 +8947,8 @@ input[type="checkbox"] {
     const today = state.entries.find((e) => e.date === DateUtils.getTodayISO()) || {};
     const time = prefill?.time || DateUtils.getCurrentTimeString();
     const defaultValue = p.value ?? today.bloodGlucose ?? 5.5;
-    const defaultType = p.type || glucoseTypeFromTime(time);
+    // 用户习惯：晨起空腹测 → 默认直接"空腹"（下拉仍可手动改）
+    const defaultType = p.type || "空腹";
     return `
     <div class="capture-panel" data-panel-type="bloodGlucose">
       <h3>🩸 记血糖</h3>
@@ -9014,7 +9015,7 @@ input[type="checkbox"] {
       </div>
       <div class="field">
         <label>备注（选填）</label>
-        <input type="text" id="uricPanelNote" placeholder="例如：复查，下降明显" value="${p.note || ""}">
+        <input type="text" id="uricPanelNote" placeholder="例如：复查，下降明显" value="${p.note || "晨起空腹"}">
       </div>
       <div class="panel-actions">
         <button class="btn-primary" id="uricPanelSave" type="button">💾 保存</button>
@@ -9347,17 +9348,7 @@ input[type="checkbox"] {
 },
 
   bloodGlucose(prefill) {
-    // 智能同步：改时间自动跟随类型；一旦用户手动选过就停止
-    const timeEl = document.getElementById("bgPanelTime");
-    const typeEl = document.getElementById("bgPanelType");
-    let typeManuallySet = false;
-    if (typeEl) typeEl.addEventListener("change", () => { typeManuallySet = true; });
-    if (timeEl && typeEl) {
-      timeEl.addEventListener("input", () => {
-        if (typeManuallySet) return;
-        typeEl.value = glucoseTypeFromTime(timeEl.value);
-      });
-    }
+    // 类型默认固定"空腹"（用户习惯晨起空腹测），不再按时间自动切换；下拉可手动改
     document.getElementById("bgPanelSave").addEventListener("click", () => {
       const data = {
         time: document.getElementById("bgPanelTime").value,
