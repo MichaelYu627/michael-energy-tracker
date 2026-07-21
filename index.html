@@ -5884,6 +5884,14 @@ input[type="checkbox"] {
 }
 .mb-confirm { background: rgba(123,228,149,0.25) !important; color: #7be495 !important; border-color: rgba(123,228,149,0.5) !important; }
 
+.miying-table td.deal-note {
+  color: rgba(255,255,255,0.5);
+  font-size: 11px;
+  max-width: 130px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 .miying-table td.profit-cell {
   color: #ffe1a0;
   font-family: var(--font-number);
@@ -7237,7 +7245,7 @@ input[type="checkbox"] {
               <h4>📋 批量补录成交</h4>
               <div class="mb-hint">
                 一行一单，用空格或逗号分隔：<br>
-                <code>日期 来源 金额 [场地净利] [餐饮净利] [其他净利]</code><br>
+                <code>日期 来源 金额 [场地] [餐饮] [其他] [说明...]</code><br>
                 日期支持 2026-05-20 / 5-20 / 5/20（自动补今年）。后三列选填。
               </div>
               <textarea id="miyingBatchInput" rows="10" placeholder="2026-05-20 网站 8000 3000 1200 300
@@ -7258,9 +7266,11 @@ input[type="checkbox"] {
             <span class="mp-item">📦 其他 <strong id="mpOther">¥0</strong></span>
             <span class="mp-total">Σ <strong id="mpTotal">¥0</strong></span>
           </div>
+          <!-- 渠道分布（来源净利排行）-->
+          <div class="miying-profit-bar" id="miyingChannelBar" hidden></div>
           <div class="miying-table-wrap">
             <table class="miying-table">
-              <thead><tr><th>日期</th><th>来源</th><th class="num">金额</th><th class="num">净利</th><th class="num">累计</th><th></th></tr></thead>
+              <thead><tr><th>日期</th><th>来源</th><th class="num">金额</th><th class="num">净利</th><th class="num">累计</th><th>说明</th><th></th></tr></thead>
               <tbody id="miyingDealsBody"></tbody>
             </table>
           </div>
@@ -12741,8 +12751,9 @@ input[type="checkbox"] {
         if (!tbody) return;
         const sorted = [...state.deals].sort((a, b) => a.date.localeCompare(b.date));
         if (!sorted.length) {
-          tbody.innerHTML = `<tr class="empty-row"><td colspan="6">还没有成交记录，点右上"+ 新增成交"添加。</td></tr>`;
+          tbody.innerHTML = `<tr class="empty-row"><td colspan="7">还没有成交记录，点右上"+ 新增成交"添加。</td></tr>`;
           renderProfitBar();
+          renderChannelBar();
           return;
         }
         let running = 0;
@@ -12753,6 +12764,8 @@ input[type="checkbox"] {
           const profitTitle = pt > 0
             ? `场地 ${Number(p.venue)||0} · 餐饮 ${Number(p.food)||0} · 其他 ${Number(p.other)||0}`
             : "";
+          const note = (d.note || "").trim();
+          const noteShort = note.length > 14 ? note.slice(0, 14) + "…" : note;
           return `
             <tr data-deal-id="${d.id}">
               <td>${fmtShortDate(d.date)}</td>
@@ -12760,11 +12773,33 @@ input[type="checkbox"] {
               <td class="num amount">${fmtCurrency(d.amount || 0)}</td>
               <td class="profit-cell" title="${profitTitle}">${pt > 0 ? fmtCurrency(pt) : "—"}</td>
               <td class="num cumulative">${fmtCurrency(running)}</td>
+              <td class="deal-note" title="${escapeHtml(note)}">${escapeHtml(noteShort) || "—"}</td>
               <td><button class="miying-deal-del" type="button" data-action="delete-deal" aria-label="删除">×</button></td>
             </tr>
           `;
         }).join("");
         renderProfitBar();
+        renderChannelBar();
+      }
+
+      // 渠道分布统计（来源 → 单数/金额/净利，按净利降序取前 8）
+      function renderChannelBar() {
+        const box = document.getElementById("miyingChannelBar");
+        if (!box) return;
+        if (!state.deals.length) { box.hidden = true; return; }
+        const agg = {};
+        state.deals.forEach((d) => {
+          const s = (d.source || "未知").trim();
+          if (!agg[s]) agg[s] = { n: 0, amt: 0, profit: 0 };
+          agg[s].n += 1;
+          agg[s].amt += d.amount || 0;
+          agg[s].profit += dealProfitTotal(d);
+        });
+        const top = Object.entries(agg).sort((a, b) => b[1].profit - a[1].profit).slice(0, 8);
+        box.innerHTML = `<span class="mp-label">渠道分布</span>` + top.map(([s, v]) =>
+          `<span class="mp-item" title="${v.n} 单 · 金额 ${fmtCurrency(v.amt)}">${escapeHtml(s)} <strong>${fmtCurrency(Math.round(v.profit))}</strong><small style="opacity:0.5">·${v.n}单</small></span>`
+        ).join("");
+        box.hidden = false;
       }
 
       // 净利润构成汇总（场地/餐饮/其他）
@@ -12987,7 +13022,8 @@ input[type="checkbox"] {
             food: askProfit("餐饮"),
             other: askProfit("其他")
           };
-          state.deals.push({ id: makeId("deal"), date, source: source.trim(), amount, profit });
+          const note = (window.prompt("房源/订单说明（选填）", "") || "").trim();
+          state.deals.push({ id: makeId("deal"), date, source: source.trim(), amount, profit, note });
           // 自动累加到总成交额
           state.metrics.totalRevenue = state.deals.reduce((sum, d) => sum + (d.amount || 0), 0);
           save(state);
@@ -13018,7 +13054,9 @@ input[type="checkbox"] {
           if (!Number.isFinite(amount) || amount <= 0) return { error: `金额无效：${parts[2]}`, raw: line };
           const num = (s) => { const n = parseNumber(s || ""); return Number.isFinite(n) && n > 0 ? n : 0; };
           const profit = { venue: num(parts[3]), food: num(parts[4]), other: num(parts[5]) };
-          return { date, source, amount, profit };
+          // 第 7 列起 = 房源/订单说明（含空格自动合并）
+          const note = parts.slice(6).join(" ");
+          return { date, source, amount, profit, note };
         }
 
         function parseBatchInput(text) {
@@ -13055,7 +13093,7 @@ input[type="checkbox"] {
           if (!valid.length) { window.alert("没有可导入的有效行"); return; }
           if (errors.length && !window.confirm(`${errors.length} 行有错误将被跳过，导入 ${valid.length} 行有效数据？`)) return;
           valid.forEach((r) => {
-            state.deals.push({ id: makeId("deal"), date: r.date, source: r.source, amount: r.amount, profit: r.profit });
+            state.deals.push({ id: makeId("deal"), date: r.date, source: r.source, amount: r.amount, profit: r.profit, note: r.note || "" });
           });
           state.metrics.totalRevenue = state.deals.reduce((sum, d) => sum + (d.amount || 0), 0);
           save(state);
@@ -13069,12 +13107,12 @@ input[type="checkbox"] {
         document.getElementById("miyingCsvBtn").addEventListener("click", () => {
           const sorted = [...state.deals].sort((a, b) => a.date.localeCompare(b.date));
           if (!sorted.length) { window.alert("还没有成交记录"); return; }
-          const header = ["日期", "来源", "金额", "净利-场地", "净利-餐饮", "净利-其他", "净利合计"];
+          const header = ["日期", "来源", "金额", "净利-场地", "净利-餐饮", "净利-其他", "净利合计", "房源/订单说明"];
           let running = 0;
           const rows = sorted.map((d) => {
             const p = d.profit || {};
             const v = Number(p.venue) || 0, f = Number(p.food) || 0, o = Number(p.other) || 0;
-            return [d.date, `"${(d.source || "").replace(/"/g, '""')}"`, d.amount || 0, v, f, o, v + f + o];
+            return [d.date, `"${(d.source || "").replace(/"/g, '""')}"`, d.amount || 0, v, f, o, v + f + o, `"${(d.note || "").replace(/"/g, '""')}"`];
           });
           // 汇总行
           const tv = sorted.reduce((s, d) => s + (d.amount || 0), 0);
@@ -13082,7 +13120,7 @@ input[type="checkbox"] {
           const tVenue = sorted.reduce((s, d) => s + (Number(d.profit?.venue) || 0), 0);
           const tFood = sorted.reduce((s, d) => s + (Number(d.profit?.food) || 0), 0);
           const tOther = sorted.reduce((s, d) => s + (Number(d.profit?.other) || 0), 0);
-          rows.push(["合计", "", tv, tVenue, tFood, tOther, tp]);
+          rows.push(["合计", "", tv, tVenue, tFood, tOther, tp, ""]);
           const csv = "\uFEFF" + [header.join(","), ...rows.map((r) => r.join(","))].join("\r\n");
           const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
           const url = URL.createObjectURL(blob);
@@ -13124,6 +13162,9 @@ input[type="checkbox"] {
           deal.profit.venue = askProfit("场地", deal.profit.venue);
           deal.profit.food = askProfit("餐饮", deal.profit.food);
           deal.profit.other = askProfit("其他", deal.profit.other);
+          // 说明
+          const noteStr = ask("房源/订单说明", deal.note || "");
+          if (noteStr !== null) deal.note = noteStr;
 
           state.metrics.totalRevenue = state.deals.reduce((sum, d) => sum + (d.amount || 0), 0);
           save(state);
