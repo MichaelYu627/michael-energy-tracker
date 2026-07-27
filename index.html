@@ -12722,6 +12722,19 @@ input[type="checkbox"] {
       // ── 渲染 ──
       function renderKPIs() {
         const m = state.metrics;
+        // 自动派生：deals 有净利数据时，净利润 = Σ 三类净利（覆盖手动值）
+        const autoProfit = state.deals.reduce((s, d) => {
+          const p = d.profit || {};
+          return s + (Number(p.venue) || 0) + (Number(p.food) || 0) + (Number(p.other) || 0);
+        }, 0);
+        if (autoProfit > 0) m.netProfit = Math.round(autoProfit * 100) / 100;
+        // 自动派生：月度收入 = 本月（北京时间）成交金额合计
+        const ym = window.BJ.todayISO().slice(0, 7);
+        const monthAmt = state.deals
+          .filter((d) => (d.date || "").startsWith(ym))
+          .reduce((s, d) => s + (d.amount || 0), 0);
+        if (state.deals.length) m.monthlyIncome = Math.round(monthAmt * 100) / 100;
+
         document.querySelectorAll(".kpi-value[data-metric]").forEach((el) => {
           const key = el.dataset.metric;
           if (key === "propertyCount") {
