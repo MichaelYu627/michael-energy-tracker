@@ -7236,6 +7236,7 @@ input[type="checkbox"] {
               <button class="miying-action-btn" id="miyingAddDealBtn" type="button">+ 新增成交</button>
               <button class="miying-action-btn" id="miyingBatchBtn" type="button">📋 批量补录</button>
               <button class="miying-action-btn" id="miyingCsvBtn" type="button">📊 导出CSV</button>
+              <button class="miying-action-btn" id="miyingClearDealsBtn" type="button" style="color:#ff8a8a">🗑️ 清空全部</button>
             </div>
           </div>
 
@@ -13129,6 +13130,21 @@ input[type="checkbox"] {
           a.download = `觅应成交明细_${todayISO()}.csv`;
           a.click();
           URL.revokeObjectURL(url);
+        });
+
+        // ── 🗑️ 清空全部成交（双重确认，为批量重导前清场）──
+        document.getElementById("miyingClearDealsBtn").addEventListener("click", () => {
+          const n = state.deals.length;
+          if (!n) { window.alert("成交记录已是空的"); return; }
+          if (!window.confirm(`⚠️ 将删除全部 ${n} 笔成交记录（合计 ${fmtCurrency(state.metrics.totalRevenue)}）。\n\n建议先点「📊 导出CSV」备份。\n\n确定清空？`)) return;
+          const word = window.prompt(`二次确认：输入「清空」两个字后执行`, "");
+          if (word !== "清空") { window.alert("已取消"); return; }
+          state.deals = [];
+          state.metrics.totalRevenue = 0;
+          save(state);
+          renderDeals();
+          renderKPIs();
+          window.alert("✅ 已清空。现在可以点「📋 批量补录」粘贴复核版数据。");
         });
 
         // 编辑成交（点行 → 逐字段 prompt，预填现值，取消 = 该字段不改）
