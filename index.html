@@ -6566,7 +6566,7 @@ input[type="checkbox"] {
                   <div class="rb-num">12</div>
                   <div class="rb-node-body">
                     <div class="rb-node-title">🏆 真实成就反馈</div>
-                    <div class="rb-node-desc">腰围 -N cm · 尿酸 ≤420 · 觅应 KPI 达成</div>
+                    <div class="rb-node-desc">腰围 -N cm · 尿酸 &lt;360 · 觅应 KPI 达成</div>
                   </div>
                   <div class="rb-node-goto">→ 里程碑</div>
                 </button>
@@ -6856,7 +6856,7 @@ input[type="checkbox"] {
       <details class="health-combined" id="healthCombined">
         <summary>
           📊 体重 × 血糖 × 尿酸 <span class="ctrl-badge output">不可控 · 输出</span>
-          <span class="health-combined-target" id="healthCombinedTarget">83.2 → 80 kg · 5.5 mmol/L · 566 → 420</span>
+          <span class="health-combined-target" id="healthCombinedTarget">83.2 → 80 kg · 5.5 mmol/L · 566 → 360</span>
         </summary>
         <div class="health-combined-body">
 
@@ -7028,10 +7028,9 @@ input[type="checkbox"] {
           <div class="health-medication-card">
             <h4>💊 用药提醒</h4>
             <ul>
-              <li><strong>非布司他</strong>（医生改药，原苯溴马隆停用），按医嘱服</li>
-              <li><strong>痛风定胶囊</strong>，按医嘱服</li>
+              <li><strong>多替诺雷 1mg</strong>，按医嘱服用</li>
               <li>白天饮水 ≥ 2500ml（19:00 前完成）</li>
-              <li>目标：尿酸 &lt; 420 μmol/L</li>
+              <li>目标：尿酸 &lt; 360 μmol/L</li>
               <li id="uricRecheckReminder" class="recheck-reminder" hidden></li>
             </ul>
           </div>
@@ -8452,11 +8451,11 @@ input[type="checkbox"] {
             toMarkdown(event) {
               const d = event.data;
               const lines = [`### 🧪 尿酸 ${event.time}`, `- ${d.value} μmol/L`];
-              // 范围解读（男性）
+              // Michael 当前个人目标解读
               const v = d.value;
-              const interp = v <= 420 ? "✅ 目标范围内 (≤420)"
-                          : v <= 480 ? "⚠️ 偏高 (420-480)"
-                          : "🚨 高尿酸 (>480)";
+              const interp = v < 360 ? "✅ 个人目标范围内 (<360)"
+                          : v <= 480 ? "⚠️ 高于个人目标 (360-480)"
+                          : "🚨 明显高于个人目标 (>480)";
               lines.push(`- 解读：${interp}`);
               if (d.medication) lines.push(`- 用药：${d.medication}`);
               if (d.note) lines.push(`- 备注：${d.note}`);
@@ -9003,12 +9002,12 @@ input[type="checkbox"] {
     const p = prefill?.data || {};
     const today = state.entries.find((e) => e.date === DateUtils.getTodayISO()) || {};
     const time = prefill?.time || DateUtils.getCurrentTimeString();
-    const defaultValue = p.value ?? today.uricAcid ?? 420;
+    const defaultValue = p.value ?? today.uricAcid ?? 360;
     return `
     <div class="capture-panel" data-panel-type="uric">
       <h3>🧪 记尿酸</h3>
       <div style="background:linear-gradient(135deg,rgba(123,228,149,0.06),rgba(123,228,149,0.02));border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:12px;line-height:1.6;color:var(--muted);border-left:3px solid #2dab88;">
-        目标范围 · ≤420 μmol/L · 非布司他 + 痛风定 + 饮水 ≥ 2500ml · 下次复查 7/25
+        个人目标 · &lt;360 μmol/L · 多替诺雷 1mg · 饮水 ≥ 2500ml · 复查时间按医生安排
       </div>
       <div class="field-row">
         <div class="field">
@@ -9017,12 +9016,12 @@ input[type="checkbox"] {
         </div>
         <div class="field" style="flex:1">
           <label>尿酸（μmol/L）</label>
-          <input type="number" id="uricPanelValue" min="50" max="1500" step="1" value="${defaultValue}" inputmode="decimal" style="width:100%;padding:10px 14px;font-size:20px;font-weight:700;font-family:var(--font-number);border:1px solid var(--border);border-radius:10px;background:var(--panel);color:var(--text);text-align:center;-moz-appearance:textfield;" placeholder="420">
+          <input type="number" id="uricPanelValue" min="50" max="1500" step="1" value="${defaultValue}" inputmode="decimal" style="width:100%;padding:10px 14px;font-size:20px;font-weight:700;font-family:var(--font-number);border:1px solid var(--border);border-radius:10px;background:var(--panel);color:var(--text);text-align:center;-moz-appearance:textfield;" placeholder="360">
         </div>
       </div>
       <div class="field">
         <label>用药（选填）</label>
-        <input type="text" id="uricPanelMed" placeholder="例如：非布司他 + 痛风定胶囊" value="${p.medication || today.uricMedication || ""}">
+        <input type="text" id="uricPanelMed" placeholder="例如：多替诺雷 1mg" value="${p.medication || today.uricMedication || ""}">
       </div>
       <div class="field">
         <label>备注（选填）</label>
@@ -10674,7 +10673,7 @@ input[type="checkbox"] {
             window.LoopEngine?.refreshNourishGuard?.();
             window.LoopEngine?.checkMilestones?.();
           }
-          // 血糖/尿酸 → 刷 panel + 检 milestones（如 uric_acid_400）
+          // 血糖/尿酸 → 刷 panel + 检 milestones（如 uric_acid_360）
           if (event.eventType === "bloodGlucose" || event.eventType === "uric") {
             window.HealthCombined?.refresh?.();
             window.LoopEngine?.checkMilestones?.();
@@ -11406,7 +11405,7 @@ input[type="checkbox"] {
         { id: "milk",           cat: "饮水", label: "喝了纯牛奶", score: 2 },
         { id: "workout",        cat: "运动", label: "完成囚徒健身训练", score: 5 },
         { id: "eye2510",        cat: "用眼", label: "执行 25/10 用眼节律", score: 3 },
-        { id: "medicationTaken",cat: "用药", label: "非布司他 + 痛风定 按时服", score: 2 },
+        { id: "medicationTaken",cat: "用药", label: "多替诺雷 1mg 按医嘱服用", score: 2 },
         { id: "horseQuestion",  cat: "觉察", label: "执行了「马夫一问」（饿了还是累了？）", score: 3 },
         { id: "tmdExercise",    cat: "康复", label: "执行 TMD 康复动作", score: 3 }
       ];
@@ -11763,7 +11762,7 @@ input[type="checkbox"] {
 
       const ENTRIES_KEY = "michael-energy-tracker-v1"; // 与主 IIFE 的 CONFIG.storageKey 一致
       const URIC_KEY = "uric_acid_records";
-      const URIC_TARGET = 420;
+      const URIC_TARGET = 360;
       const WEIGHT_TARGET = 80;
 
       // 从 state.entries 派生 weight 视图：只读，结构同原 weight_records
@@ -12042,7 +12041,7 @@ input[type="checkbox"] {
                 ctx.fillText(`目标 ${WEIGHT_TARGET}kg`, chartArea.left + 4, yW - 3);
                 ctx.restore();
               }
-              // 尿酸目标线 420（橙色虚线）
+              // 尿酸目标线 360（橙色虚线）
               const yU = scales.yUric.getPixelForValue(URIC_TARGET);
               if (yU >= chartArea.top && yU <= chartArea.bottom) {
                 ctx.save();
@@ -12156,7 +12155,7 @@ input[type="checkbox"] {
         sleepSop: "睡前 SOP", slowEating: "慢食", waterBeforeMeal: "餐前水",
         avoidRed: "避红灯", cookedOnce: "自做饭", water2500: "饮水 2.5L",
         lemonWater: "柠檬水", milk: "纯牛奶", workout: "训练",
-        eye2510: "用眼 25/10", medicationTaken: "非布司他+痛风定", horseQuestion: "马夫一问",
+        eye2510: "用眼 25/10", medicationTaken: "多替诺雷 1mg", horseQuestion: "马夫一问",
         tmdExercise: "TMD 康复"
       };
       const LV_THRESHOLDS = [1, 3, 7, 15, 30, 60, 120, 250, 500];
@@ -13986,7 +13985,7 @@ input[type="checkbox"] {
       const PLATEAU_DISMISS_KEY = "plateau_card_dismissed_at";
       const PLATEAU_WINDOW_DAYS = 7;
       const PLATEAU_RANGE_KG = 0.6;   // 7 天 max-min ≤ 0.6kg 视为平台
-      const URIC_TARGET_FOR_ENGINE = 400;
+      const URIC_TARGET_FOR_ENGINE = 360;
       const WEIGHT_TARGET_KG = 80;
 
       // ── localStorage helpers ────────────────────────────────────
@@ -14132,12 +14131,12 @@ input[type="checkbox"] {
           }
         },
         {
-          id: "uric_acid_400",
-          msg: "尿酸<400。四条防线生效了。身体在回应你的'蓄'。",
+          id: "uric_acid_360",
+          msg: "尿酸<360。四条防线生效了。身体在回应你的'蓄'。",
           detect({ uric }) {
             if (!uric.length) return false;
             const latest = uric.slice().sort((a, b) => a.date.localeCompare(b.date)).pop();
-            return Number(latest.value) <= URIC_TARGET_FOR_ENGINE;
+            return Number(latest.value) < URIC_TARGET_FOR_ENGINE;
           }
         },
         {
@@ -14675,15 +14674,15 @@ input[type="checkbox"] {
             auto: (d) => Number(d.entry?.bloodGlucose) > 0 },
           { id: "uric",         name: "尿酸",      xp: 10, capture: "uric",
             auto: (d) => Number(d.entry?.uricAcid) > 0,
-            critWhen: (d) => Number(d.entry?.uricAcid) > 0 && Number(d.entry?.uricAcid) <= 420 }
+            critWhen: (d) => Number(d.entry?.uricAcid) > 0 && Number(d.entry?.uricAcid) < 360 }
         ]},
         { key: "supply", group: "🍽️ 补给", items: [
           { id: "breakfast",    name: "早餐",             xp: 10, capture: "meal",
             auto: (d) => (d.entry?.mealItems || []).some((m) => (m.type||"").includes("早")) },
-          { id: "morning_med",  name: "早间药（非布司他）", xp: 10, manual: true },
+          { id: "morning_med",  name: "每日用药（多替诺雷 1mg）", xp: 10, manual: true },
           { id: "dinner",       name: "晚饭",              xp: 10, capture: "meal",
             auto: (d) => (d.entry?.mealItems || []).some((m) => (m.type||"").includes("晚")) },
-          { id: "evening_med",  name: "睡前药（痛风定）",  xp: 10, manual: true }
+          { id: "evening_med",  name: "历史睡前用药",      xp: 10, manual: true, activeUntil: "2026-08-09" }
         ]},
         { key: "training", group: "💪 黑马·训练", items: [
           { id: "workout",      name: "囚徒训练 / 跑步 (练一休二)", xp: 30, capture: "training",
@@ -14752,7 +14751,8 @@ input[type="checkbox"] {
 
         let baseTotal = 0, baseDone = 0, xp = 0, crits = 0;
         const groupResults = QUESTS.map((g) => {
-          const items = g.items.map((it) => {
+          const activeItems = g.items.filter((it) => !it.activeUntil || dateISO <= it.activeUntil);
+          const items = activeItems.map((it) => {
             const done = isQuestDone(it, ctx, dayStore.manual);
             const crit = done && isQuestCrit(it, ctx);
             baseTotal += it.xp;
