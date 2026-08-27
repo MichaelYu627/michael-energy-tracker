@@ -2572,6 +2572,124 @@
   font-weight: 700;
 }
 
+/* 餐饮拍照 · 照片存 IndexedDB，不占用核心 localStorage */
+.meal-photo-capture {
+  margin-top: 12px;
+  padding: 12px;
+  border: 1px dashed rgba(31, 122, 92, 0.35);
+  border-radius: var(--radius-md);
+  background: rgba(31, 122, 92, 0.05);
+}
+.meal-photo-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.meal-photo-preview {
+  margin-top: 10px;
+  display: grid;
+  grid-template-columns: 92px minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+}
+.meal-photo-preview[hidden] { display: none !important; }
+.meal-photo-preview img {
+  width: 92px;
+  height: 92px;
+  object-fit: cover;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  background: var(--bg);
+}
+.meal-photo-preview-meta {
+  min-width: 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.55;
+}
+.meal-photo-hint {
+  display: block;
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 11.5px;
+  line-height: 1.55;
+}
+
+.food-photo-review {
+  display: grid;
+  gap: 14px;
+}
+.food-photo-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+}
+.food-photo-card {
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--bg);
+}
+.food-photo-card img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  background: var(--bg-deep);
+}
+.food-photo-card-body {
+  padding: 9px 10px 10px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+.food-photo-card-body strong {
+  display: block;
+  margin-bottom: 2px;
+  color: var(--text);
+  font-size: 13px;
+}
+.food-photo-review-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.food-photo-review-actions button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.food-photo-empty {
+  padding: 18px;
+  border: 1px dashed var(--line);
+  border-radius: var(--radius-md);
+  color: var(--muted);
+  text-align: center;
+  line-height: 1.6;
+}
+.food-review-prompt {
+  border-top: 1px dashed var(--line);
+  padding-top: 10px;
+}
+.food-review-prompt summary {
+  cursor: pointer;
+  color: var(--accent);
+  font-size: 12.5px;
+  font-weight: 600;
+}
+.food-review-prompt textarea {
+  width: 100%;
+  min-height: 180px;
+  margin-top: 8px;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  color: var(--text);
+  font: 12px/1.6 var(--font-main);
+  resize: vertical;
+}
+
 /* 恢复 checkbox 的原生样式 —— 全局 input 规则把它们误伤成空白胶囊了 */
 input[type="checkbox"] {
   width: auto !important;
@@ -7343,6 +7461,31 @@ input[type="checkbox"] {
   </div>
 </article>
 
+<!-- 今日餐饮照片 · 晚间一键交给 Jarvis -->
+<article class="panel" id="foodPhotoReviewPanel">
+  <div class="panel-content food-photo-review">
+    <div class="section-title">
+      <h2>📷 今日餐饮照片</h2>
+      <span id="foodPhotoCount">0 张 · 照片只在当前设备</span>
+    </div>
+    <div class="food-photo-gallery" id="foodPhotoGallery">
+      <div class="food-photo-empty">白天在“🍱 餐食”里拍照，晚上这里会自动组成全天饮食证据。</div>
+    </div>
+    <div class="food-photo-review-actions">
+      <button class="btn-primary" id="foodPhotoShareBtn" type="button" disabled>🌙 交给 Jarvis 分析</button>
+      <button class="btn-secondary" id="foodPhotoDownloadBtn" type="button" disabled>下载今日饮食拼图</button>
+      <button class="btn-secondary" id="foodPhotoCopyPromptBtn" type="button" disabled>复制分析提示词</button>
+    </div>
+    <details class="food-review-prompt">
+      <summary>查看 Jarvis 分析提示词</summary>
+      <textarea id="foodReviewPromptText" readonly placeholder="拍下第一餐后自动生成"></textarea>
+    </details>
+    <div class="footer-note" id="foodPhotoStorageNote">
+      Privacy-first：原图不会上传到 GitHub；当前 JSON 只保存照片引用，不包含图片本体。请把每日拼图另存为照片备份。
+    </div>
+  </div>
+</article>
+
       <article class="panel">
         <div class="panel-content">
           <details class="panel-collapse" open>
@@ -8004,6 +8147,149 @@ input[type="checkbox"] {
         }
       };
 
+      // 餐食照片单独存 IndexedDB：避免大体积 base64 挤爆 localStorage。
+      // 核心 entries 只保存 photoId，因此旧数据和 v10/v11 JSON 继续兼容。
+      const MealPhotoStore = (() => {
+        const DB_NAME = "michael-energy-tracker-media";
+        const DB_VERSION = 1;
+        const STORE_NAME = "meal_photos";
+        const MAX_SOURCE_BYTES = 30 * 1024 * 1024;
+        const MAX_EDGE = 1600;
+        let dbPromise = null;
+
+        function open() {
+          if (!window.indexedDB) return Promise.reject(new Error("当前浏览器不支持照片本地存储"));
+          if (dbPromise) return dbPromise;
+          dbPromise = new Promise((resolve, reject) => {
+            const request = window.indexedDB.open(DB_NAME, DB_VERSION);
+            request.onupgradeneeded = () => {
+              const db = request.result;
+              if (!db.objectStoreNames.contains(STORE_NAME)) {
+                const store = db.createObjectStore(STORE_NAME, { keyPath: "id" });
+                store.createIndex("date", "date", { unique: false });
+              }
+            };
+            request.onsuccess = () => resolve(request.result);
+            request.onerror = () => {
+              dbPromise = null;
+              reject(request.error || new Error("照片数据库打开失败"));
+            };
+          });
+          return dbPromise;
+        }
+
+        function makeId(date) {
+          const suffix = window.crypto?.randomUUID
+            ? window.crypto.randomUUID()
+            : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+          return `meal-${date}-${suffix}`;
+        }
+
+        async function put(blob, meta = {}) {
+          const db = await open();
+          const record = {
+            id: meta.id || makeId(meta.date || DateUtils.getTodayISO()),
+            date: meta.date || DateUtils.getTodayISO(),
+            time: meta.time || "",
+            mealType: meta.mealType || "餐食",
+            createdAt: new Date().toISOString(),
+            width: Number(meta.width) || 0,
+            height: Number(meta.height) || 0,
+            bytes: blob.size,
+            mimeType: blob.type || "image/jpeg",
+            blob
+          };
+          await new Promise((resolve, reject) => {
+            const tx = db.transaction(STORE_NAME, "readwrite");
+            tx.objectStore(STORE_NAME).put(record);
+            tx.oncomplete = () => resolve();
+            tx.onerror = () => reject(tx.error || new Error("照片保存失败"));
+            tx.onabort = () => reject(tx.error || new Error("照片保存被中止"));
+          });
+          return record;
+        }
+
+        async function get(id) {
+          if (!id) return null;
+          const db = await open();
+          return new Promise((resolve, reject) => {
+            const request = db.transaction(STORE_NAME, "readonly").objectStore(STORE_NAME).get(id);
+            request.onsuccess = () => resolve(request.result || null);
+            request.onerror = () => reject(request.error || new Error("照片读取失败"));
+          });
+        }
+
+        async function remove(id) {
+          if (!id) return;
+          const db = await open();
+          await new Promise((resolve, reject) => {
+            const tx = db.transaction(STORE_NAME, "readwrite");
+            tx.objectStore(STORE_NAME).delete(id);
+            tx.oncomplete = () => resolve();
+            tx.onerror = () => reject(tx.error || new Error("照片删除失败"));
+            tx.onabort = () => reject(tx.error || new Error("照片删除被中止"));
+          });
+        }
+
+        function loadImage(blob) {
+          return new Promise((resolve, reject) => {
+            const url = URL.createObjectURL(blob);
+            const image = new Image();
+            image.onload = () => resolve({ image, url });
+            image.onerror = () => {
+              URL.revokeObjectURL(url);
+              reject(new Error("无法读取这张照片"));
+            };
+            image.src = url;
+          });
+        }
+
+        async function compress(file) {
+          if (!file || !String(file.type || "").startsWith("image/")) {
+            throw new Error("请选择一张图片");
+          }
+          if (file.size > MAX_SOURCE_BYTES) {
+            throw new Error("照片超过 30MB，请换一张或先在相册中裁剪");
+          }
+          const loaded = await loadImage(file);
+          try {
+            const sourceWidth = loaded.image.naturalWidth || loaded.image.width;
+            const sourceHeight = loaded.image.naturalHeight || loaded.image.height;
+            if (!sourceWidth || !sourceHeight) throw new Error("照片尺寸无效");
+            const scale = Math.min(1, MAX_EDGE / Math.max(sourceWidth, sourceHeight));
+            const width = Math.max(1, Math.round(sourceWidth * scale));
+            const height = Math.max(1, Math.round(sourceHeight * scale));
+            const canvas = document.createElement("canvas");
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext("2d");
+            ctx.fillStyle = "#ffffff";
+            ctx.fillRect(0, 0, width, height);
+            ctx.drawImage(loaded.image, 0, 0, width, height);
+            const blob = await new Promise((resolve, reject) => {
+              canvas.toBlob(
+                (result) => result ? resolve(result) : reject(new Error("照片压缩失败")),
+                "image/jpeg",
+                0.84
+              );
+            });
+            return { blob, width, height, originalBytes: file.size };
+          } finally {
+            URL.revokeObjectURL(loaded.url);
+          }
+        }
+
+        function formatBytes(bytes) {
+          const n = Number(bytes) || 0;
+          if (n < 1024) return `${n} B`;
+          if (n < 1024 * 1024) return `${(n / 1024).toFixed(0)} KB`;
+          return `${(n / 1024 / 1024).toFixed(1)} MB`;
+        }
+
+        return { put, get, remove, compress, loadImage, formatBytes };
+      })();
+      window.MealPhotoStore = MealPhotoStore;
+
       const WorkoutModel = {
         getTemplates() {
           return CONFIG.workoutTemplates.map((item) => {
@@ -8194,7 +8480,7 @@ input[type="checkbox"] {
             label: "餐食",
             mode: "append",
             validate(data) {
-              if (!data.food || !data.food.trim()) return "请填写吃了什么";
+              if ((!data.food || !data.food.trim()) && !data.photoId) return "请填写吃了什么，或拍一张餐食照片";
               if (!data.type) return "请选择餐次";
               return "";
             },
@@ -8206,6 +8492,7 @@ input[type="checkbox"] {
                 cooked: !!data.cooked,
                 healthy: !!data.healthy,
                 ateOut: !!data.ateOut,
+                photoId: String(data.photoId || ""),
                 note: ""
               }];
               return EntryModel.normalize({
@@ -8223,8 +8510,9 @@ input[type="checkbox"] {
               return [
                 `### 🍱 ${d.type} ${event.time}`,
                 `- ${d.food}`,
-                `- ${tags}`
-              ].join("\n");
+                `- ${tags}`,
+                d.photoId ? "- 📷 已拍照（照片保存在能量追踪器当前设备）" : null
+              ].filter(Boolean).join("\n");
             }
           },
 
@@ -8514,9 +8802,10 @@ input[type="checkbox"] {
               cooked: this.normalizeBoolean(item.cooked),
               healthy: this.normalizeBoolean(item.healthy),
               ateOut: this.normalizeBoolean(item.ateOut),
+              photoId: String(item.photoId || item.photoID || "").trim(),
               note: String(item.note || "").trim()
             }))
-            .filter((item) => item.food || item.note);
+            .filter((item) => item.food || item.note || item.photoId);
         },
 
         normalizeRecoveryItems(items) {
@@ -8549,7 +8838,7 @@ input[type="checkbox"] {
           const items = this.normalizeMealItems(mealItems);
           if (!items.length) return String(fallback || "").trim();
           return items
-            .map((item) => `${item.time ? `${item.time} ` : ""}${item.type}：${item.food}${item.note ? `（${item.note}）` : ""}`)
+            .map((item) => `${item.time ? `${item.time} ` : ""}${item.type}：${item.food || "照片记录（待 Jarvis 分析）"}${item.note ? `（${item.note}）` : ""}`)
             .join("\n");
         },
 
@@ -9070,9 +9359,21 @@ input[type="checkbox"] {
         </div>
       </div>
       <div class="field">
-        <label>吃了什么</label>
+        <label>吃了什么（拍照后可留空，晚间让 Jarvis 看图补全）</label>
         <textarea id="mealPanelFood" placeholder="例如：牛肉 青菜 米饭" rows="2">${defaultFood}</textarea>
         <button class="btn-secondary btn-slim" id="mealBreakfastTplBtn" type="button" style="margin-top:6px">🥣 标准早餐（燕麦+牛奶+希腊酸奶+坚果）</button>
+      </div>
+      <div class="meal-photo-capture">
+        <input class="hidden-input" id="mealPanelPhotoInput" type="file" accept="image/*" capture="environment">
+        <div class="meal-photo-actions">
+          <button class="btn-secondary" id="mealPanelPhotoBtn" type="button">📷 拍照 / 选照片</button>
+          <button class="btn-warning btn-slim" id="mealPanelPhotoRemoveBtn" type="button" hidden>移除照片</button>
+        </div>
+        <div class="meal-photo-preview" id="mealPanelPhotoPreview" hidden>
+          <img id="mealPanelPhotoImage" alt="餐食照片预览">
+          <div class="meal-photo-preview-meta" id="mealPanelPhotoMeta">正在读取照片…</div>
+        </div>
+        <small class="meal-photo-hint">照片会自动压缩并只保存在当前设备。保存后，晚上可一键生成全天饮食拼图交给 Jarvis。</small>
       </div>
       <div class="field-row">
         <label class="meal-tag-check"><input type="checkbox" id="mealPanelCooked" ${p.cooked !== false ? "checked" : ""}> 自己做</label>
@@ -9443,29 +9744,140 @@ input[type="checkbox"] {
     if (healthy) healthy.checked = true;
   });
 
-  document.getElementById("mealPanelSave").addEventListener("click", () => {
-    const data = {
-      time: document.getElementById("mealPanelTime").value,
-      type: document.getElementById("mealPanelType").value,
-      food: document.getElementById("mealPanelFood").value.trim(),
-      cooked: document.getElementById("mealPanelCooked").checked,
-      healthy: document.getElementById("mealPanelHealthy").checked,
-      ateOut: document.getElementById("mealPanelAteOut").checked
-    };
-    const err = EventModel.types.meal.validate(data);
-    if (err) {
-      document.getElementById("mealPanelError").textContent = err;
-      return;
+  const photoInput = document.getElementById("mealPanelPhotoInput");
+  const photoButton = document.getElementById("mealPanelPhotoBtn");
+  const photoRemoveButton = document.getElementById("mealPanelPhotoRemoveBtn");
+  const photoPreview = document.getElementById("mealPanelPhotoPreview");
+  const photoImage = document.getElementById("mealPanelPhotoImage");
+  const photoMeta = document.getElementById("mealPanelPhotoMeta");
+  const originalPhotoId = String(prefill?.data?.photoId || "");
+  let currentPhotoId = originalPhotoId;
+  let pendingPhoto = null;
+  let removeExistingPhoto = false;
+  let previewUrl = "";
+
+  function clearPreviewUrl() {
+    if (previewUrl) URL.revokeObjectURL(previewUrl);
+    previewUrl = "";
+  }
+
+  function showPhotoPreview(blob, metaText) {
+    clearPreviewUrl();
+    previewUrl = URL.createObjectURL(blob);
+    photoImage.src = previewUrl;
+    photoPreview.hidden = false;
+    photoRemoveButton.hidden = false;
+    photoMeta.textContent = metaText;
+  }
+
+  function hidePhotoPreview() {
+    clearPreviewUrl();
+    photoImage.removeAttribute("src");
+    photoPreview.hidden = true;
+    photoRemoveButton.hidden = true;
+    photoMeta.textContent = "";
+  }
+
+  if (currentPhotoId) {
+    MealPhotoStore.get(currentPhotoId).then((record) => {
+      if (!record || pendingPhoto || removeExistingPhoto || photoPreview !== document.getElementById("mealPanelPhotoPreview")) return;
+      showPhotoPreview(
+        record.blob,
+        `已保存 · ${record.width || "--"}×${record.height || "--"} · ${MealPhotoStore.formatBytes(record.bytes)}`
+      );
+    }).catch((error) => {
+      console.warn("餐食照片读取失败:", error);
+      currentPhotoId = "";
+      hidePhotoPreview();
+    });
+  }
+
+  photoButton?.addEventListener("click", () => photoInput?.click());
+  photoInput?.addEventListener("change", async () => {
+    const file = photoInput.files?.[0];
+    if (!file) return;
+    const errorEl = document.getElementById("mealPanelError");
+    errorEl.textContent = "";
+    photoButton.disabled = true;
+    photoButton.textContent = "正在压缩照片…";
+    try {
+      pendingPhoto = await MealPhotoStore.compress(file);
+      removeExistingPhoto = false;
+      showPhotoPreview(
+        pendingPhoto.blob,
+        `待保存 · ${pendingPhoto.width}×${pendingPhoto.height} · ${MealPhotoStore.formatBytes(pendingPhoto.blob.size)}`
+      );
+    } catch (error) {
+      pendingPhoto = null;
+      errorEl.textContent = error.message || "照片处理失败";
+    } finally {
+      photoInput.value = "";
+      photoButton.disabled = false;
+      photoButton.textContent = "📷 拍照 / 选照片";
     }
-    const event = prefill
-      ? { ...prefill, time: data.time, data, capturedAt: Date.now() }
-      : EventModel.buildQueueItem("meal", DateUtils.getTodayISO(), data.time, data);
-    App.applyEvent(event);
-    if (document.getElementById("mealPanelImmediate").checked) {
-      App.pushEventsToObsidian([event]);
+  });
+
+  photoRemoveButton?.addEventListener("click", () => {
+    pendingPhoto = null;
+    removeExistingPhoto = Boolean(currentPhotoId);
+    hidePhotoPreview();
+  });
+
+  document.getElementById("mealPanelSave").addEventListener("click", async () => {
+    const saveButton = document.getElementById("mealPanelSave");
+    const errorEl = document.getElementById("mealPanelError");
+    let newPhotoRecord = null;
+    let photoId = removeExistingPhoto ? "" : currentPhotoId;
+    saveButton.disabled = true;
+    saveButton.textContent = "正在保存…";
+    errorEl.textContent = "";
+    try {
+      const time = document.getElementById("mealPanelTime").value;
+      const type = document.getElementById("mealPanelType").value;
+      if (pendingPhoto) {
+        newPhotoRecord = await MealPhotoStore.put(pendingPhoto.blob, {
+          date: prefill?.date || DateUtils.getTodayISO(),
+          time,
+          mealType: type,
+          width: pendingPhoto.width,
+          height: pendingPhoto.height
+        });
+        photoId = newPhotoRecord.id;
+      }
+      const foodInput = document.getElementById("mealPanelFood").value.trim();
+      const normalizedFood = !photoId && foodInput === "照片记录（待 Jarvis 分析）" ? "" : foodInput;
+      const data = {
+        time,
+        type,
+        food: normalizedFood || (photoId ? "照片记录（待 Jarvis 分析）" : ""),
+        cooked: document.getElementById("mealPanelCooked").checked,
+        healthy: document.getElementById("mealPanelHealthy").checked,
+        ateOut: document.getElementById("mealPanelAteOut").checked,
+        photoId
+      };
+      const err = EventModel.types.meal.validate(data);
+      if (err) throw new Error(err);
+      const event = prefill
+        ? { ...prefill, time: data.time, data, capturedAt: Date.now() }
+        : EventModel.buildQueueItem("meal", DateUtils.getTodayISO(), data.time, data);
+      App.applyEvent(event);
+      if (document.getElementById("mealPanelImmediate").checked) {
+        App.pushEventsToObsidian([event]);
+      }
+      if (originalPhotoId && (removeExistingPhoto || newPhotoRecord)) {
+        MealPhotoStore.remove(originalPhotoId).catch((error) => console.warn("旧餐食照片清理失败:", error));
+      }
+      clearPreviewUrl();
+      UI.showStatus(`已保存：🍱 ${data.type}${photoId ? " · 📷 照片" : ""}`);
+      PanelManager.close();
+    } catch (error) {
+      if (newPhotoRecord) {
+        MealPhotoStore.remove(newPhotoRecord.id).catch(() => {});
+      }
+      errorEl.textContent = error.message || "餐食保存失败";
+      saveButton.disabled = false;
+      saveButton.textContent = "💾 保存";
     }
-    UI.showStatus(`已保存：🍱 ${data.type}`);
-    PanelManager.close();
   });
 },
   recovery(prefill) {
@@ -9741,6 +10153,352 @@ input[type="checkbox"] {
           throw new Error("JSON 格式不符合预期");
         }
       };
+
+      const FoodPhotoReview = (() => {
+        let galleryUrls = [];
+        let renderVersion = 0;
+        let preparedPackage = null;
+        let packagePromise = null;
+        let currentDate = "";
+        let currentMeals = [];
+
+        function revokeGalleryUrls() {
+          galleryUrls.forEach((url) => URL.revokeObjectURL(url));
+          galleryUrls = [];
+        }
+
+        function getPhotoMeals(date) {
+          const entry = state.entries.find((item) => item.date === date);
+          if (!entry) return [];
+          return EntryModel.normalizeMealItems(entry.mealItems || [])
+            .filter((meal) => meal.photoId)
+            .sort((left, right) => (left.time || "").localeCompare(right.time || ""));
+        }
+
+        async function loadPhotoMeals(date) {
+          const meals = getPhotoMeals(date);
+          const loaded = await Promise.all(meals.map(async (meal) => {
+            try {
+              const record = await MealPhotoStore.get(meal.photoId);
+              return record ? { meal, record } : null;
+            } catch (error) {
+              console.warn("餐食照片读取失败:", meal.photoId, error);
+              return null;
+            }
+          }));
+          return loaded.filter(Boolean);
+        }
+
+        function buildPrompt(date, loadedMeals) {
+          const mealLines = loadedMeals.map(({ meal }, index) => {
+            const tags = [meal.cooked ? "自己做" : "", meal.healthy ? "健康营养" : "", meal.ateOut ? "外食" : ""]
+              .filter(Boolean).join("、") || "未标注";
+            return `${index + 1}. ${meal.time || "未记时间"} ${meal.type}｜${meal.food || "请看图识别"}｜${tags}`;
+          });
+          return [
+            `Jarvis，请分析我 ${date} 的全天饮食照片。`,
+            "",
+            "我的 current goals：尿酸 <360 μmol/L；控尿酸、稳血糖、保肌减脂；当前多替诺雷 1mg 按医嘱服用。",
+            "",
+            "当天餐食索引：",
+            ...mealLines,
+            "",
+            "请按以下结构回答：",
+            "1. 先区分照片中明确可见、合理推测、需要我补充的信息；不要假装能从照片得出精确克数。",
+            "2. 分析全天结构：蛋白质、蔬菜、主食、油糖、饮水与餐次分布。",
+            "3. 用尿酸友好红/黄/绿灯指出风险，但不要擅自修改药物或医疗方案。",
+            "4. 结合稳血糖、保肌减脂与慢食 70% 饱原则，指出做得好的地方。",
+            "5. 最后只给明天一个最小、可执行的调整（Minimum Viable Improvement）。"
+          ].join("\n");
+        }
+
+        function roundedRect(ctx, x, y, width, height, radius) {
+          const r = Math.min(radius, width / 2, height / 2);
+          ctx.beginPath();
+          ctx.moveTo(x + r, y);
+          ctx.arcTo(x + width, y, x + width, y + height, r);
+          ctx.arcTo(x + width, y + height, x, y + height, r);
+          ctx.arcTo(x, y + height, x, y, r);
+          ctx.arcTo(x, y, x + width, y, r);
+          ctx.closePath();
+        }
+
+        function wrapText(ctx, text, x, y, maxWidth, lineHeight, maxLines = 2) {
+          const chars = Array.from(String(text || ""));
+          const lines = [];
+          let line = "";
+          chars.forEach((char) => {
+            const test = line + char;
+            if (ctx.measureText(test).width > maxWidth && line) {
+              lines.push(line);
+              line = char;
+            } else {
+              line = test;
+            }
+          });
+          if (line) lines.push(line);
+          const visible = lines.slice(0, maxLines);
+          if (lines.length > maxLines && visible.length) {
+            let last = visible[visible.length - 1];
+            while (ctx.measureText(`${last}…`).width > maxWidth && last) last = last.slice(0, -1);
+            visible[visible.length - 1] = `${last}…`;
+          }
+          visible.forEach((value, index) => ctx.fillText(value, x, y + index * lineHeight));
+        }
+
+        function drawImageContain(ctx, image, x, y, width, height) {
+          const iw = image.naturalWidth || image.width;
+          const ih = image.naturalHeight || image.height;
+          const scale = Math.min(width / iw, height / ih);
+          const dw = iw * scale;
+          const dh = ih * scale;
+          ctx.fillStyle = "#eee7dc";
+          ctx.fillRect(x, y, width, height);
+          ctx.drawImage(image, x + (width - dw) / 2, y + (height - dh) / 2, dw, dh);
+        }
+
+        async function buildContactSheet(date, loadedMeals) {
+          const width = 1600;
+          const columns = loadedMeals.length === 1 ? 1 : 2;
+          const outer = 54;
+          const gap = 30;
+          const cardWidth = columns === 1 ? width - outer * 2 : (width - outer * 2 - gap) / 2;
+          const photoHeight = columns === 1 ? 820 : 500;
+          const cardHeight = photoHeight + 150;
+          const rows = Math.ceil(loadedMeals.length / columns);
+          const headerHeight = 180;
+          const footerHeight = 120;
+          const height = headerHeight + rows * cardHeight + Math.max(0, rows - 1) * gap + footerHeight;
+          const canvas = document.createElement("canvas");
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext("2d");
+
+          ctx.fillStyle = "#f5efe4";
+          ctx.fillRect(0, 0, width, height);
+          ctx.fillStyle = "#123b35";
+          ctx.fillRect(0, 0, width, 145);
+          ctx.fillStyle = "#f9f3e8";
+          ctx.font = "700 48px -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif";
+          ctx.fillText("Michael · 今日饮食证据", outer, 72);
+          ctx.font = "400 25px -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif";
+          ctx.fillStyle = "#cce5dc";
+          ctx.fillText(`${date} · ${loadedMeals.length} 餐 · For Jarvis Review`, outer, 116);
+
+          for (let index = 0; index < loadedMeals.length; index += 1) {
+            const { meal, record } = loadedMeals[index];
+            const col = index % columns;
+            const row = Math.floor(index / columns);
+            const x = outer + col * (cardWidth + gap);
+            const y = headerHeight + row * (cardHeight + gap);
+            ctx.fillStyle = "#fffaf3";
+            roundedRect(ctx, x, y, cardWidth, cardHeight, 24);
+            ctx.fill();
+            ctx.strokeStyle = "rgba(89,73,45,0.15)";
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            const loaded = await MealPhotoStore.loadImage(record.blob);
+            try {
+              ctx.save();
+              roundedRect(ctx, x + 18, y + 18, cardWidth - 36, photoHeight - 18, 16);
+              ctx.clip();
+              drawImageContain(ctx, loaded.image, x + 18, y + 18, cardWidth - 36, photoHeight - 18);
+              ctx.restore();
+            } finally {
+              URL.revokeObjectURL(loaded.url);
+            }
+            ctx.fillStyle = "#1f2421";
+            ctx.font = "700 29px -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif";
+            ctx.fillText(`${meal.time || "--:--"} · ${meal.type}`, x + 24, y + photoHeight + 38);
+            ctx.fillStyle = "#625e57";
+            ctx.font = "400 23px -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif";
+            wrapText(ctx, meal.food || "照片记录（待 Jarvis 分析）", x + 24, y + photoHeight + 76, cardWidth - 48, 31, 2);
+          }
+
+          ctx.fillStyle = "#1f7a5c";
+          ctx.font = "600 24px -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif";
+          ctx.fillText("Targets · 尿酸 <360 · 稳血糖 · 保肌减脂 · 慢食 70% 饱", outer, height - 65);
+          ctx.fillStyle = "#6e6a62";
+          ctx.font = "400 19px -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif";
+          ctx.fillText("照片只提供视觉证据；份量、油盐与食材不确定处需要 Michael 补充。", outer, height - 30);
+
+          return new Promise((resolve, reject) => {
+            canvas.toBlob(
+              (blob) => blob ? resolve(blob) : reject(new Error("今日饮食拼图生成失败")),
+              "image/jpeg",
+              0.9
+            );
+          });
+        }
+
+        async function prepare(date, loadedMeals) {
+          const prompt = buildPrompt(date, loadedMeals);
+          const blob = await buildContactSheet(date, loadedMeals);
+          const fileName = `Michael-饮食复盘-${date}.jpg`;
+          const file = new File([blob], fileName, { type: "image/jpeg" });
+          return { date, prompt, blob, file, fileName, count: loadedMeals.length };
+        }
+
+        function downloadBlob(blob, fileName) {
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement("a");
+          link.href = url;
+          link.download = fileName;
+          document.body.appendChild(link);
+          link.click();
+          link.remove();
+          window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+        }
+
+        async function copyPrompt(prompt) {
+          try {
+            await navigator.clipboard.writeText(prompt);
+            return true;
+          } catch {
+            const textarea = document.getElementById("foodReviewPromptText");
+            if (!textarea) return false;
+            textarea.focus();
+            textarea.select();
+            return document.execCommand("copy");
+          }
+        }
+
+        async function getPreparedPackage() {
+          if (preparedPackage) return preparedPackage;
+          if (packagePromise) {
+            const pendingResult = await packagePromise;
+            if (pendingResult) return pendingResult;
+            packagePromise = null;
+          }
+          if (!currentMeals.length) throw new Error("今天还没有餐食照片");
+          packagePromise = prepare(currentDate, currentMeals).then((result) => {
+            preparedPackage = result;
+            return result;
+          });
+          return packagePromise;
+        }
+
+        async function refresh() {
+          const version = ++renderVersion;
+          const date = DateUtils.getTodayISO();
+          const gallery = document.getElementById("foodPhotoGallery");
+          if (!gallery) return;
+          const loadedMeals = await loadPhotoMeals(date);
+          if (version !== renderVersion) return;
+          currentDate = date;
+          currentMeals = loadedMeals;
+          preparedPackage = null;
+          packagePromise = null;
+          revokeGalleryUrls();
+          gallery.innerHTML = "";
+          const countEl = document.getElementById("foodPhotoCount");
+          const shareBtn = document.getElementById("foodPhotoShareBtn");
+          const downloadBtn = document.getElementById("foodPhotoDownloadBtn");
+          const copyBtn = document.getElementById("foodPhotoCopyPromptBtn");
+          const promptEl = document.getElementById("foodReviewPromptText");
+          if (countEl) countEl.textContent = `${loadedMeals.length} 张 · 照片只在当前设备`;
+          [shareBtn, downloadBtn, copyBtn].forEach((button) => {
+            if (button) button.disabled = loadedMeals.length === 0;
+          });
+          if (!loadedMeals.length) {
+            gallery.innerHTML = '<div class="food-photo-empty">白天在“🍱 餐食”里拍照，晚上这里会自动组成全天饮食证据。</div>';
+            if (promptEl) promptEl.value = "";
+            return;
+          }
+          loadedMeals.forEach(({ meal, record }) => {
+            const card = document.createElement("div");
+            card.className = "food-photo-card";
+            const image = document.createElement("img");
+            const url = URL.createObjectURL(record.blob);
+            galleryUrls.push(url);
+            image.src = url;
+            image.alt = `${meal.time || ""} ${meal.type} 餐食照片`;
+            const body = document.createElement("div");
+            body.className = "food-photo-card-body";
+            const title = document.createElement("strong");
+            title.textContent = `${meal.time || "--:--"} · ${meal.type}`;
+            const description = document.createElement("span");
+            description.textContent = meal.food || "照片记录（待 Jarvis 分析）";
+            body.append(title, description);
+            card.append(image, body);
+            gallery.appendChild(card);
+          });
+          const prompt = buildPrompt(date, loadedMeals);
+          if (promptEl) promptEl.value = prompt;
+          // 提前生成，尽量让晚间点击后可立即唤起手机 Share Sheet。
+          packagePromise = prepare(date, loadedMeals).then((result) => {
+            if (version === renderVersion) preparedPackage = result;
+            return result;
+          }).catch((error) => {
+            console.warn("饮食复盘包预生成失败:", error);
+            return null;
+          });
+        }
+
+        async function share() {
+          const button = document.getElementById("foodPhotoShareBtn");
+          const original = button?.textContent || "🌙 交给 Jarvis 分析";
+          if (button) { button.disabled = true; button.textContent = "正在准备…"; }
+          try {
+            const review = await getPreparedPackage();
+            const shareData = { title: `${review.date} 饮食复盘`, text: review.prompt, files: [review.file] };
+            const canShareFile = typeof navigator.share === "function"
+              && (!navigator.canShare || navigator.canShare({ files: [review.file] }));
+            if (canShareFile) {
+              try {
+                await navigator.share(shareData);
+                UI.showStatus("已打开分享菜单：请选择 ChatGPT / Codex 交给 Jarvis");
+                return;
+              } catch (error) {
+                if (error?.name === "AbortError") throw error;
+                console.warn("系统分享不可用，改用下载与复制:", error);
+              }
+            }
+            downloadBlob(review.blob, review.fileName);
+            const copied = await copyPrompt(review.prompt);
+            UI.showStatus(copied ? "已下载饮食拼图并复制提示词" : "已下载饮食拼图，请在下方复制提示词");
+          } catch (error) {
+            if (error?.name === "AbortError") {
+              UI.showStatus("已取消分享，照片仍安全保存在当前设备");
+            } else {
+              console.error("饮食复盘分享失败:", error);
+              UI.showStatus(`分享失败：${error.message || "请改用下载拼图"}`);
+            }
+          } finally {
+            if (button) { button.disabled = currentMeals.length === 0; button.textContent = original; }
+          }
+        }
+
+        async function download() {
+          try {
+            const review = await getPreparedPackage();
+            downloadBlob(review.blob, review.fileName);
+            UI.showStatus("今日饮食拼图已下载");
+          } catch (error) {
+            UI.showStatus(error.message || "饮食拼图生成失败");
+          }
+        }
+
+        async function copy() {
+          try {
+            const review = await getPreparedPackage();
+            const copied = await copyPrompt(review.prompt);
+            UI.showStatus(copied ? "Jarvis 分析提示词已复制" : "复制失败，请展开提示词手动复制");
+          } catch (error) {
+            UI.showStatus(error.message || "提示词生成失败");
+          }
+        }
+
+        function init() {
+          document.getElementById("foodPhotoShareBtn")?.addEventListener("click", share);
+          document.getElementById("foodPhotoDownloadBtn")?.addEventListener("click", download);
+          document.getElementById("foodPhotoCopyPromptBtn")?.addEventListener("click", copy);
+          refresh();
+        }
+
+        return { init, refresh, buildPrompt, _debug: { loadPhotoMeals, getPreparedPackage } };
+      })();
+      window.FoodPhotoReview = FoodPhotoReview;
 
       const Analytics = {
         clamp(value, min, max) {
@@ -10585,7 +11343,7 @@ input[type="checkbox"] {
               const snippet = (d.thoughts || d.plan || "").slice(0, 30);
               return snippet ? `${snippet}${snippet.length === 30 ? "…" : ""}` : "已记";
             }
-            case "meal": return `${d.type}：${d.food || "无内容"}`;
+            case "meal": return `${d.photoId ? "📷 " : ""}${d.type}：${d.food || "无内容"}`;
             case "training": return `${(d.workoutItems || []).length} 个动作`;
             case "recovery": return `${d.type} · +${d.boost}%`;
             case "weight": {
@@ -10640,6 +11398,7 @@ input[type="checkbox"] {
           ChartRenderer.render(entries, latestEntry);
           this.renderTodayTimeline();
           this.renderPendingCapsule();
+          FoodPhotoReview.refresh();
         }
       };
 
@@ -10655,8 +11414,39 @@ input[type="checkbox"] {
 
         applyEvent(event) {
           const entries = state.entries;
-          const existingEntry = entries.find((e) => e.date === event.date) || EntryModel.normalize({ date: event.date });
-          const nextEntry = EventModel.types[event.eventType].applyToEntry(existingEntry, event.data);
+          const def = EventModel.types[event.eventType];
+          const previousQueuedEvent = SyncQueue.load().find((item) => item.id === event.id);
+          let existingEntry = entries.find((e) => e.date === event.date) || EntryModel.normalize({ date: event.date });
+          // 编辑 append 型事件时，先移除旧版本再写入新版本，避免餐食/补能/心情重复。
+          if (previousQueuedEvent && def?.mode === "append") {
+            const arrayKey = { meal: "mealItems", recovery: "recoveryItems", mood: "moodLogs" }[event.eventType];
+            const matchKeys = {
+              meal: ["time", "food", "type"],
+              recovery: ["time", "type", "boost"],
+              mood: ["time", "tag"]
+            }[event.eventType];
+            if (arrayKey && matchKeys && Array.isArray(existingEntry[arrayKey])) {
+              let removed = false;
+              const oldData = previousQueuedEvent.data || {};
+              const nextItems = existingEntry[arrayKey].filter((item) => {
+                if (removed) return true;
+                const matches = matchKeys.every((key) => item[key] === oldData[key]);
+                if (matches) { removed = true; return false; }
+                return true;
+              });
+              const draft = { ...existingEntry, [arrayKey]: nextItems };
+              if (event.eventType === "meal") {
+                draft.cooked = nextItems.some((meal) => meal.cooked);
+                draft.healthyFood = nextItems.some((meal) => meal.healthy);
+                draft.ateOut = nextItems.some((meal) => meal.ateOut);
+                draft.mealDetails = EntryModel.formatMealDetails(nextItems, "");
+              } else if (event.eventType === "recovery") {
+                draft.energyBoost = Math.min(40, nextItems.reduce((sum, item) => sum + (item.boost || 0), 0));
+              }
+              existingEntry = EntryModel.normalize(draft);
+            }
+          }
+          const nextEntry = def.applyToEntry(existingEntry, event.data);
           const nextEntries = entries.filter((e) => e.date !== event.date).concat(nextEntry);
           state.entries = StorageService.saveEntries(nextEntries);
           // 编辑已推过的事件 → 清掉 pushedAt 让它重新进入待推队列
@@ -10710,6 +11500,9 @@ input[type="checkbox"] {
             ? `确定删除这条 ${def.emoji} ${def.label} 记录吗？`
             : `确定删除这条 ${def.emoji} ${def.label} 记录吗？将清空今日的${overwriteFieldsLabel[queueEvent.eventType] || "对应字段"}。`;
           if (!window.confirm(confirmMsg)) return false;
+          const photoIdToDelete = queueEvent.eventType === "meal"
+            ? String(queueEvent.data?.photoId || "")
+            : "";
 
           const entry = state.entries.find((e) => e.date === queueEvent.date);
           if (entry) {
@@ -10766,6 +11559,11 @@ input[type="checkbox"] {
           UI.render(state.entries);
           UI.renderTodayTimeline();
           UI.renderPendingCapsule();
+          if (photoIdToDelete) {
+            MealPhotoStore.remove(photoIdToDelete)
+              .then(() => FoodPhotoReview.refresh())
+              .catch((error) => console.warn("餐食照片删除失败:", error));
+          }
           UI.showStatus(`已删除：${def.emoji} ${def.label}`);
           return true;
         },
@@ -11047,8 +11845,15 @@ input[type="checkbox"] {
         },
 
         deleteEntry(date) {
+          const target = state.entries.find((entry) => entry.date === date);
+          const photoIds = EntryModel.normalizeMealItems(target?.mealItems || [])
+            .map((meal) => meal.photoId)
+            .filter(Boolean);
           state.entries = StorageService.saveEntries(state.entries.filter((entry) => entry.date !== date));
           UI.render(state.entries);
+          Promise.all(photoIds.map((id) => MealPhotoStore.remove(id)))
+            .then(() => FoodPhotoReview.refresh())
+            .catch((error) => console.warn("记录照片清理失败:", error));
         },
 
         exportEntries() {
@@ -11368,6 +12173,7 @@ input[type="checkbox"] {
         // 清理"非今日且已推"的事件：今日已推的保留供时间线展示，跨日后丢弃
         SyncQueue.cleanOldPushed(DateUtils.getTodayISO());
         bindEvents();
+        FoodPhotoReview.init();
         UI.render(state.entries);
         // 首页电池每 15 秒刷新一次，让“每小时 -2%”在手机上持续可见。
         state.heroBatteryTimer = window.setInterval(() => {
